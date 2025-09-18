@@ -1,0 +1,50 @@
+﻿@model Cars
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Update Car</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active">Cars</li>
+                </ol>
+            </div>
+        </div>
+        <hr />
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="container">
+        <form method="post" asp-action="EditCar" asp-controller="Cars">
+            <div class="row my-2">
+                <input asp-for="CarID" hidden />
+                <div class="col-md-6 form-group">
+                    <label class="form-label">Name <span class="text-danger fw-bold" asp-validation-for="CarName"></span></label>
+                    <input class="form-control" asp-for="CarName" />
+                </div>
+                <div class="col-md-6 form-group">
+                    <label class="form-label">Car Number <span class="text-danger fw-bold" asp-validation-for="NumberPlate"></span></label>
+                    <input class="form-control" asp-for="NumberPlate" />
+                </div>
+                <div class="col-md-6 form-group">
+                    <label class="form-label">Car Model <span class="text-danger fw-bold" asp-validation-for="CarModel"></span></label>
+                    <input class="form-control" asp-for="CarModel" />
+                </div>
+                <div class="col-md-6 form-group">
+                    <label class="form-label" hidden>Car Status <span class="text-danger fw-bold" asp-validation-for="CarStatus"></span></label>
+                    <input class="form-control" asp-for="CarStatus" value="1" hidden />
+                </div>
+                <div class="col-md-12 my-2">
+                    <button type="submit" class="btn btn-primary">Update Car</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+<!-- /.content -->

@@ -1,0 +1,49 @@
+﻿@model Services
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Add New Service</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active">Services</li>
+                </ol>
+            </div>
+        </div>
+        <hr />
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="container">
+        <form method="post" asp-action="AddService" asp-controller="Services">
+            <div class="row my-2">
+                <div class="col-md-6 form-group">
+                    <label class="form-label">Name <span class="text-danger fw-bold" asp-validation-for="ServiceName"></span></label>
+                    <input class="form-control" asp-for="ServiceName" />
+                </div>
+                <div class="col-md-6 form-group">
+                    <label class="form-label">Description <span class="text-danger fw-bold" asp-validation-for="Description"></span></label>
+                    <input class="form-control" asp-for="Description" />
+                </div>
+                <div class="col-md-6 form-group">
+                    <label class="form-label">Price <span class="text-danger fw-bold" asp-validation-for="Price"></span></label>
+                    <input class="form-control" asp-for="Price" />
+                </div>
+                <div class="col-md-6 form-group">
+                    <label class="form-label" hidden>Service Status <span class="text-danger fw-bold" asp-validation-for="ServiceStatus"></span></label>
+                    <input class="form-control" asp-for="ServiceStatus" value="1" hidden />
+                </div>
+                <div class="col-md-12 my-2">
+                    <button type="submit" class="btn btn-primary">Add Service</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+<!-- /.content -->

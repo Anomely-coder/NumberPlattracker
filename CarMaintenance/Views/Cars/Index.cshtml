@@ -1,0 +1,116 @@
+﻿@model IEnumerable<Cars>
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>View Number Plates</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active">Cars</li>
+                </ol>
+            </div>
+        </div>
+        <hr />
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <a class="btn btn-primary my-3" asp-action="AddCar" asp-controller="Cars">Add New Number</a>
+            </h3>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+            <table id="example1" class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Number Plate</th>
+                        <th>Model</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @if (Model.Any())
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <th>@item.CarID</th>
+                                <td>@item.CarName</td>
+                                <td>@item.NumberPlate</td>
+                                <td>@item.CarModel</td>
+                                <td><p><a class="text-primary fas fa-pen" asp-action="EditCar" asp-controller="Cars" asp-route-Id="@item.CarID"></a></p></td>
+                                <td><p><a class="text-danger fas fa-trash" asp-action="DeleteCar" asp-controller="Cars" asp-route-Id="@item.CarID"></a></p></td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td class="text-center" colspan="6">No Record Found.</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Number Plate</th>
+                        <th>Model</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <!-- /.card-body -->
+    </div>
+
+</section>
+<!-- /.content -->
+@section Scripts {
+
+    <!-- DataTables  & Plugins -->
+    <script src="~/AdminTheme/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/AdminTheme/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/AdminTheme/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/AdminTheme/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <script src="~/AdminTheme/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/AdminTheme/plugins/jszip/jszip.min.js"></script>
+    <script src="~/AdminTheme/plugins/pdfmake/pdfmake.min.js"></script>
+    <script src="~/AdminTheme/plugins/pdfmake/vfs_fonts.js"></script>
+    <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+    <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+
+    <!-- Page specific script -->
+    <script>
+        $(function () {
+          $("#example1").DataTable({
+            "responsive": true, "lengthChange": false, "autoWidth": false,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+          }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+          $('#example2').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+          });
+        });
+    </script>
+}

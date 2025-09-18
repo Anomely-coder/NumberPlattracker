@@ -1,0 +1,134 @@
+﻿@model ReceiptViewModel
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Add New Receipt</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active">Receipts</li>
+                </ol>
+            </div>
+        </div>
+        <hr />
+    </div><!-- /.container-fluid -->
+</section>
+
+
+<!-- Main content -->
+<section class="content">
+    <div class="container">
+        <form method="post" asp-action="AddReceipt" asp-controller="Receipts">
+            <div class="row my-2">
+                <div class="col-md-4">
+                    <label>Customer</label>
+                    <select asp-for="CustomerID" asp-items="Model.CustomersList" class="form-control" id="customerDropdown">
+                        <option value="">-- Select Customer --</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label>Car Number</label>
+                    <input type="text" class="form-control" asp-for="NumberPlate" readonly id="NumberPlateTextbox" />
+                    <input type="hidden" asp-for="CarID" id="carIdHidden" />
+                </div>
+                <div class="col-md-4">
+                    <label>Date</label>
+                    <input asp-for="Date" class="form-control" readonly />
+                </div>
+            </div>
+
+            <hr />
+            <div class="row my-2">
+                <div class="col-md-10">
+                    <select class="form-control" id="serviceDropdown" asp-items="Model.ServicesList">
+                        <option value="">-- Select Service --</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" id="addServiceBtn" class="btn btn-primary w-100">Add</button>
+                </div>
+            </div>
+
+            <table class="table table-bordered" id="servicesTable">
+                <thead>
+                    <tr>
+                        <th>Service</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- JS Appended Rows -->
+                </tbody>
+            </table>
+
+            <input type="hidden" asp-for="TotalAmount" id="totalAmountHidden" />
+            <h4>Total: <span id="totalDisplay">0</span></h4>
+
+            <button type="submit" class="btn btn-success w-100 mt-2">Save Receipt</button>
+        </form>
+
+    </div>
+</section>
+<!-- /.content -->
+@section Scripts {
+    <script>
+        $('#customerDropdown').change(function () {
+            var customerId = $(this).val();
+            $.get('/Receipts/GetCarByCustomer?customerId=' + customerId, function (data) {
+                $('#NumberPlateTextbox').val(data.NumberPlate);
+                $('#carIdHidden').val(data.carId);
+            });
+        });
+
+
+        let total = 0;
+        let index = 0;
+
+        $('#addServiceBtn').click(function () {
+            const serviceId = $('#serviceDropdown').val();
+            if (!serviceId) return;
+
+            $.get('/Receipts/GetServiceDetails?serviceId=' + serviceId, function (data) {
+                total += data.price;
+                $('#totalAmountHidden').val(total);
+                $('#totalDisplay').text(total);
+
+                const row = `
+                    <tr>
+                        <td>
+                            <input type="hidden" name="ServicesSelected[${index}].ServiceID" value="${data.serviceID}" />
+                            <input type="hidden" name="ServicesSelected[${index}].ServiceName" value="${data.serviceName}" />
+                            ${data.serviceName}
+                        </td>
+                        <td>
+                            <input type="hidden" name="ServicesSelected[${index}].Description" value="${data.description}" />
+                            ${data.description}
+                        </td>
+                        <td>
+                            <input type="hidden" name="ServicesSelected[${index}].Price" value="${data.price}" />
+                            ${data.price}
+                        </td>
+                        <td><button type="button" class="btn btn-danger btn-sm removeService">X</button></td>
+                    </tr>
+                `;
+                $('#servicesTable tbody').append(row);
+                index++; // increment index for next service row
+            });
+        });
+
+
+        $(document).on('click', '.removeService', function () {
+            const price = parseFloat($(this).closest('tr').find("input[name$='.Price']").val());
+            total -= price;
+            $('#totalAmountHidden').val(total);
+            $('#totalDisplay').text(total);
+            $(this).closest('tr').remove();
+        });
+    </script>
+}

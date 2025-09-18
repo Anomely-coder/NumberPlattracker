@@ -1,0 +1,63 @@
+﻿@model CarMaintenance.Models.Users
+
+<section class="content">
+    <div class="container">
+        @if (ViewBag.Message != null)
+        {
+            <div class="alert alert-danger">
+                @ViewBag.Message
+            </div>
+        }
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                @Html.ValidationSummary()
+            </div>
+        }
+        <form method="post" asp-action="AddUser" asp-controller="Users">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="row my-2">
+                <div class="col-md-6 form-group">
+                    <label asp-for="FirstName">First Name</label>
+                    <input class="form-control" asp-for="FirstName" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label asp-for="LastName">Last Name</label>
+                    <input class="form-control" asp-for="LastName" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label asp-for="MobileNumber">Mobile</label>
+                    <input class="form-control" asp-for="MobileNumber" />
+                    <span asp-validation-for="MobileNumber" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label asp-for="Email">Email</label>
+                    <input class="form-control" asp-for="Email" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label asp-for="Password">Password (leave empty to auto-generate)</label>
+                    <input class="form-control" asp-for="Password" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label asp-for="Role">Role</label>
+                    <select class="form-control" asp-for="Role">
+                        <option value="Admin">Admin</option>
+                        <option value="User">Normal User</option>
+                    </select>
+                    <span asp-validation-for="Role" class="text-danger"></span>
+                </div>
+                <div class="col-md-12 my-2">
+                    <button type="submit" class="btn btn-primary">Add User</button>
+                </div>
+            </div>
+            @Html.AntiForgeryToken()
+        </form>
+    </div>
+</section>
+
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>

@@ -1,0 +1,24 @@
+﻿@model IEnumerable<CarMaintenance.Models.PlateAllocation>
+
+<h2>Allocated Plates</h2>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Number Plate</th>
+            <th>Owner</th>
+            <th>Created By</th>
+            <th>Created At</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var alloc in Model)
+        {
+            <tr>
+                <td>@alloc.NumberPlate.PlateNumber</td>
+                <td>@alloc.OwnerName</td>
+                <td>@alloc.AllocatedBy</td>
+                <td>@alloc.AllocatedOn</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,22 @@
+﻿@model IEnumerable<CarMaintenance.Models.NumberPlate>
+
+<h2>Un-Allocated Plates</h2>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Number Plate</th>
+            <th>Created By</th>
+            <th>Created At</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var plate in Model)
+        {
+            <tr>
+                <td>@plate.PlateNumber</td>
+                <td>@plate.AddedBy</td>
+                <td>@plate.AddedOn</td>
+            </tr>
+        }
+    </tbody>
+</table>

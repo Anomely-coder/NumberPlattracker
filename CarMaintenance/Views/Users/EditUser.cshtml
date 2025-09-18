@@ -1,0 +1,41 @@
+﻿@model Users
+
+<section class="content">
+    <div class="container">
+        <form method="post" asp-action="EditUser" asp-controller="Users">
+            <input asp-for="UserID" hidden />
+            <div class="row my-2">
+                <div class="col-md-6 form-group">
+                    <label>First Name</label>
+                    <input class="form-control" asp-for="FirstName" />
+                </div>
+                <div class="col-md-6 form-group">
+                    <label>Last Name</label>
+                    <input class="form-control" asp-for="LastName" />
+                </div>
+                <div class="col-md-6 form-group">
+                    <label>Mobile</label>
+                    <input class="form-control" asp-for="MobileNumber" />
+                </div>
+                <div class="col-md-6 form-group">
+                    <label>Email</label>
+                    <input class="form-control" asp-for="Email" />
+                </div>
+                <div class="col-md-6 form-group">
+                    <label>Password (leave empty to keep old)</label>
+                    <input class="form-control" asp-for="Password" />
+                </div>
+                <div class="col-md-6 form-group">
+                    <label>Role</label>
+                    <select class="form-control" asp-for="Role">
+                        <option value="Admin">Admin</option>
+                        <option value="User">Normal User</option>
+                    </select>
+                </div>
+                <div class="col-md-12 my-2">
+                    <button type="submit" class="btn btn-primary">Update User</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
