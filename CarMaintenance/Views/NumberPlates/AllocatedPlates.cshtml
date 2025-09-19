@@ -1,13 +1,16 @@
-﻿@model IEnumerable<CarMaintenance.Models.PlateAllocation>
+﻿<!-- Views/NumberPlates/AllocatedPlates.cshtml -->
+@model IEnumerable<CarMaintenance.Models.PlateAllocation>
 
 <h2>Allocated Plates</h2>
+<p>@TempData["Message"]</p>
 <table class="table table-bordered">
     <thead>
         <tr>
             <th>Number Plate</th>
-            <th>Owner</th>
-            <th>Created By</th>
-            <th>Created At</th>
+            <th>Current Owner</th>
+            <th>Allocated By</th>
+            <th>Allocated On</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -17,7 +20,14 @@
                 <td>@alloc.NumberPlate.PlateNumber</td>
                 <td>@alloc.OwnerName</td>
                 <td>@alloc.AllocatedBy</td>
-                <td>@alloc.AllocatedOn</td>
+                <td>@alloc.AllocatedOn.ToString("g")</td>
+                <td>
+                    <form asp-action="TransferPlate" method="post" style="display:inline;">
+                        <input type="hidden" name="plateId" value="@alloc.NumberPlateId" />
+                        <input type="text" name="newOwnerName" placeholder="New Owner Name" class="form-control d-inline-block" style="width:150px;" required />
+                        <button type="submit" class="btn btn-sm btn-primary">Transfer</button>
+                    </form>
+                </td>
             </tr>
         }
     </tbody>

@@ -1,12 +1,17 @@
-﻿@model IEnumerable<CarMaintenance.Models.NumberPlate>
+﻿<!-- Views/NumberPlates/UnAllocatedPlates.cshtml -->
+@model IEnumerable<CarMaintenance.Models.NumberPlate>
 
 <h2>Un-Allocated Plates</h2>
+<p>@TempData["Message"]</p>
 <table class="table table-bordered">
     <thead>
         <tr>
             <th>Number Plate</th>
-            <th>Created By</th>
-            <th>Created At</th>
+            <th>Added By</th>
+            <th>Added On</th>
+            <th>Edited By</th>
+            <th>Edited On</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -15,8 +20,20 @@
             <tr>
                 <td>@plate.PlateNumber</td>
                 <td>@plate.AddedBy</td>
-                <td>@plate.AddedOn</td>
+                <td>@plate.AddedOn?.ToString("g")</td>
+                <td>@plate.EditedBy</td>
+                <td>@plate.EditedOn?.ToString("g")</td>
+                <td>
+                    <a asp-action="EditPlate" asp-route-id="@plate.Id" class="btn btn-sm btn-warning">Edit</a>
+                    <form asp-action="AllocatePlate" method="post" style="display:inline;">
+                        <input type="hidden" name="plateId" value="@plate.Id" />
+                        <input type="text" name="ownerName" placeholder="Owner Name" class="form-control d-inline-block" style="width:150px;" required />
+                        <button type="submit" class="btn btn-sm btn-primary">Allocate</button>
+                    </form>
+                </td>
             </tr>
         }
     </tbody>
 </table>
+
+<a asp-action="AddPlate" class="btn btn-success">Add New Plate</a>

@@ -1,9 +1,24 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@using System.Globalization
+@using Microsoft.Extensions.Localization
+@using Microsoft.Extensions.Logging
+@inject IStringLocalizer<CarMaintenance.SharedResource> Localizer
+@inject ILoggerFactory LoggerFactory
+
+@{
+    var culture = CultureInfo.CurrentCulture;
+    var logger = LoggerFactory.CreateLogger("LayoutDebug");
+
+    // optional debug logs (remove if noisy)
+    logger.LogDebug("Layout rendered at {Time}", DateTime.Now);
+    logger.LogInformation("Current Culture: {Culture}", culture.Name);
+}
+
+<!DOCTYPE html>
+<html dir="@(culture.TextInfo.IsRightToLeft ? "rtl" : "ltr")" lang="@culture.Name">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Car Number Plate Tracker</title>
+    <title>@Localizer["AppTitle"]</title>
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
@@ -17,8 +32,115 @@
 
     <!-- Theme style -->
     <link rel="stylesheet" href="~/AdminTheme/dist/css/adminlte.min.css">
+
+    <style>
+        [dir="rtl"] {
+            direction: rtl;
+            text-align: right;
+        }
+
+        [dir="ltr"] {
+            direction: ltr;
+            text-align: left;
+        }
+
+        /* RTL adjustments for AdminLTE elements */
+        [dir="rtl"] .nav {
+            flex-direction: row-reverse;
+        }
+
+        [dir="rtl"] .navbar-nav .nav-item {
+            margin-left: 0;
+            margin-right: 1rem;
+        }
+
+        [dir="rtl"] .user-panel .info {
+            margin-left: 0;
+            margin-right: 1rem;
+        }
+
+        [dir="rtl"] .brand-text {
+            margin-left: 0;
+            margin-right: 0.5rem;
+        }
+
+        [dir="rtl"] .sidebar .nav-link p {
+            white-space: normal;
+            overflow: visible;
+            padding-right: 0.5rem;
+        }
+
+        [dir="rtl"] .content-wrapper {
+            margin-right: 0;
+        }
+        /* AdminLTE handles the rest */
+
+        /* Enhanced RTL fixes for sidebar alignment */
+        [dir="rtl"] .main-sidebar {
+            right: auto;
+            left: 0;
+        }
+
+        [dir="rtl"] .sidebar .user-panel {
+            flex-direction: row-reverse;
+        }
+
+        [dir="rtl"] .user-panel .image {
+            margin-left: 1rem;
+            margin-right: 0;
+        }
+
+        [dir="rtl"] .sidebar .nav-treeview .nav-item {
+            text-align: right;
+        }
+
+        [dir="rtl"] .sidebar .nav-link .right {
+            float: left !important;
+            margin-left: 0.5rem;
+            margin-right: 0;
+        }
+
+        [dir="rtl"] .sidebar .nav-link p {
+            padding-left: 0.5rem;
+            padding-right: 0;
+            margin: 0;
+        }
+
+        [dir="rtl"] .main-sidebar .nav-sidebar .nav-link {
+            padding: 0.5rem 1rem 0.5rem 0.5rem;
+            text-align: right;
+        }
+
+        [dir="rtl"] .main-sidebar .nav-sidebar .nav-treeview .nav-link {
+            padding-right: 2.5rem;
+            padding-left: 0.5rem;
+        }
+
+        [dir="rtl"] .navbar-nav.ml-auto {
+            margin-right: 0 !important;
+            margin-left: auto !important;
+        }
+
+        [dir="rtl"] .brand-link .brand-text {
+            margin-right: 0;
+            margin-left: 0.5rem;
+        }
+
+        [dir="rtl"] .nav-link i {
+            margin-left: 0.5rem;
+            margin-right: 0;
+        }
+
+        [dir="rtl"] .content-wrapper, [dir="rtl"] .main-footer {
+            margin-left: 0;
+        }
+
+        [dir="rtl"] .main-header .navbar-nav:first-child {
+            margin-right: auto;
+        }
+    </style>
 </head>
-<body class="hold-transition sidebar-mini">
+<body class="hold-transition sidebar-mini @(culture.TextInfo.IsRightToLeft ? "layout-fixed" : "")">
     <div class="wrapper">
         <!-- Navbar -->
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -26,11 +148,27 @@
                 <li class="nav-item">
                     <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                 </li>
+
                 <li class="nav-item d-none d-sm-inline-block">
-                    <a href="#" class="nav-link">Home</a>
+                    <a asp-action="Index" asp-controller="Home" class="nav-link">@Localizer["HomeLink"]</a>
                 </li>
+
                 <li class="nav-item d-none d-sm-inline-block">
-                    <a class="nav-link" asp-action="Logout" asp-controller="Account">Log Out</a>
+                    <a class="nav-link" asp-action="Logout" asp-controller="Account">@Localizer["LogoutLink"]</a>
+                </li>
+            </ul>
+
+            <!-- Right navbar (language selector + optional other controls) -->
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <form asp-action="SetLanguage" asp-controller="Home" method="post" class="form-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                        <select name="culture" onchange="this.form.submit();" class="form-control form-control-sm">
+                            <option value="en" selected="@(culture.Name.StartsWith("en"))">English</option>
+                            <option value="ar" selected="@(culture.Name.StartsWith("ar"))">Arabic</option>
+                        </select>
+                    </form>
                 </li>
             </ul>
         </nav>
@@ -38,9 +176,9 @@
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->
-            <a href="#" class="brand-link">
-                <img src="~/AdminTheme/dist/img/AdminLTELogo.png" alt="Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-                <span class="brand-text font-weight-light">Number Plate Tracker</span>
+            <a href="~/" class="brand-link">
+                <img src="~/AdminTheme/dist/img/AdminLTELogo.png" alt="@Localizer["LogoAlt"]" class="brand-image img-circle elevation-3" style="opacity: .8">
+                <span class="brand-text font-weight-light">@Localizer["AppName"]</span>
             </a>
 
             <!-- Sidebar -->
@@ -48,10 +186,10 @@
                 <!-- Sidebar user -->
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="image">
-                        <img src="~/AdminTheme/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
+                        <img src="~/AdminTheme/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="@Localizer["UserImageAlt"]">
                     </div>
                     <div class="info">
-                        <a href="#" class="d-block">Sher Khan</a>
+                        <a href="#" class="d-block">@Localizer["UserName"]</a>
                     </div>
                 </div>
 
@@ -63,16 +201,16 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-action="Index" asp-controller="Home">
                                 <i class="nav-icon fas fa-tachometer-alt"></i>
-                                <p>Dashboard</p>
+                                <p>@Localizer["DashboardLink"]</p>
                             </a>
                         </li>
 
                         <!-- Number Plate -->
-                        <li class="nav-item">
+                        <li class="nav-item has-treeview">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fas fa-car"></i>
                                 <p>
-                                    Number Plate
+                                    @Localizer["NumberPlateSection"]
                                     <i class="right fas fa-angle-left"></i>
                                 </p>
                             </a>
@@ -80,24 +218,24 @@
                                 <li class="nav-item">
                                     <a class="nav-link" asp-action="Index" asp-controller="Cars">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>View Number Plate</p>
+                                        <p>@Localizer["ViewNumberPlateLink"]</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" asp-action="AddCar" asp-controller="Cars">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Add New Number</p>
+                                        <p>@Localizer["AddNewNumberLink"]</p>
                                     </a>
                                 </li>
                             </ul>
                         </li>
 
-                        <!-- ✅ Plates Management (new) -->
-                        <li class="nav-item">
+                        <!-- Plates Management -->
+                        <li class="nav-item has-treeview">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fas fa-list"></i>
                                 <p>
-                                    Plates Management
+                                    @Localizer["PlatesManagementSection"]
                                     <i class="right fas fa-angle-left"></i>
                                 </p>
                             </a>
@@ -105,30 +243,36 @@
                                 <li class="nav-item">
                                     <a class="nav-link" asp-action="UnAllocatedPlates" asp-controller="NumberPlates">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Un-Allocated Plates</p>
+                                        <p>@Localizer["UnAllocatedPlatesLink"]</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" asp-action="AllocatedPlates" asp-controller="NumberPlates">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Allocated Plates</p>
+                                        <p>@Localizer["AllocatedPlatesLink"]</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" asp-action="PlateHistory" asp-controller="NumberPlates">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Plates History</p>
+                                        <p>@Localizer["PlatesHistoryLink"]</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-action="AddPlate" asp-controller="NumberPlates">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>@Localizer["AddNewPlateLink"]</p>
                                     </a>
                                 </li>
                             </ul>
                         </li>
 
                         <!-- Customers -->
-                        <li class="nav-item">
+                        <li class="nav-item has-treeview">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fas fa-users"></i>
                                 <p>
-                                    Customers
+                                    @Localizer["CustomersSection"]
                                     <i class="right fas fa-angle-left"></i>
                                 </p>
                             </a>
@@ -136,24 +280,24 @@
                                 <li class="nav-item">
                                     <a class="nav-link" asp-action="Index" asp-controller="Customers">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>View Customers</p>
+                                        <p>@Localizer["ViewCustomersLink"]</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" asp-action="AddCustomer" asp-controller="Customers">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Add New Customer</p>
+                                        <p>@Localizer["AddNewCustomerLink"]</p>
                                     </a>
                                 </li>
                             </ul>
                         </li>
 
                         <!-- Services -->
-                        <li class="nav-item">
+                        <li class="nav-item has-treeview">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fas fa-wrench"></i>
                                 <p>
-                                    Services
+                                    @Localizer["ServicesSection"]
                                     <i class="right fas fa-angle-left"></i>
                                 </p>
                             </a>
@@ -161,24 +305,24 @@
                                 <li class="nav-item">
                                     <a class="nav-link" asp-action="Index" asp-controller="Services">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>View Services</p>
+                                        <p>@Localizer["ViewServicesLink"]</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" asp-action="AddService" asp-controller="Services">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Add New Service</p>
+                                        <p>@Localizer["AddNewServiceLink"]</p>
                                     </a>
                                 </li>
                             </ul>
                         </li>
 
                         <!-- Receipts -->
-                        <li class="nav-item">
+                        <li class="nav-item has-treeview">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fas fa-receipt"></i>
                                 <p>
-                                    Receipts
+                                    @Localizer["ReceiptsSection"]
                                     <i class="right fas fa-angle-left"></i>
                                 </p>
                             </a>
@@ -186,24 +330,24 @@
                                 <li class="nav-item">
                                     <a class="nav-link" asp-action="Index" asp-controller="Receipts">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>View Receipts</p>
+                                        <p>@Localizer["ViewReceiptsLink"]</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" asp-action="AddReceipt" asp-controller="Receipts">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Add New Receipt</p>
+                                        <p>@Localizer["AddNewReceiptLink"]</p>
                                     </a>
                                 </li>
                             </ul>
                         </li>
 
                         <!-- Transfer -->
-                        <li class="nav-item">
+                        <li class="nav-item has-treeview">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fas fa-share"></i>
                                 <p>
-                                    Transfer
+                                    @Localizer["TransferSection"]
                                     <i class="right fas fa-angle-left"></i>
                                 </p>
                             </a>
@@ -211,24 +355,24 @@
                                 <li class="nav-item">
                                     <a class="nav-link" asp-action="Index" asp-controller="TransferCars">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>View History</p>
+                                        <p>@Localizer["ViewHistoryLink"]</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" asp-action="Transfer" asp-controller="TransferCars">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Transfer New Car</p>
+                                        <p>@Localizer["TransferNewCarLink"]</p>
                                     </a>
                                 </li>
                             </ul>
                         </li>
 
                         <!-- Users -->
-                        <li class="nav-item">
+                        <li class="nav-item has-treeview">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fas fa-user-lock"></i>
                                 <p>
-                                    Users
+                                    @Localizer["UsersSection"]
                                     <i class="right fas fa-angle-left"></i>
                                 </p>
                             </a>
@@ -236,13 +380,13 @@
                                 <li class="nav-item">
                                     <a class="nav-link" asp-action="Index" asp-controller="Users">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>View Users</p>
+                                        <p>@Localizer["ViewUsersLink"]</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" asp-action="AddUser" asp-controller="Users">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Add New User</p>
+                                        <p>@Localizer["AddNewUserLink"]</p>
                                     </a>
                                 </li>
                             </ul>
@@ -250,6 +394,7 @@
 
                     </ul>
                 </nav>
+                <!-- /.sidebar-menu -->
             </div>
             <!-- /.sidebar -->
         </aside>
@@ -259,11 +404,13 @@
             @RenderBody()
         </div>
 
+        <!-- Footer -->
         <footer class="main-footer">
             <div class="float-right d-none d-sm-block">
-                <b>Version</b> 1.0.0
+                <b>@Localizer["VersionLabel"]</b> 1.0.0
             </div>
-            <strong>Copyright &copy; @DateTime.Now.ToString("yyyy") <a href="#">IoT Systems</a>.</strong> All rights reserved.
+            <strong>@Localizer["CopyrightText"] @DateTime.Now.ToString("yyyy") <a href="#">@Localizer["CompanyLink"]</a>.</strong>
+            @Localizer["AllRightsReserved"]
         </footer>
     </div>
 
