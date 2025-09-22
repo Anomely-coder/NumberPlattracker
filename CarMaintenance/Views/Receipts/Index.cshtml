@@ -1,12 +1,9 @@
-﻿@model IEnumerable<Receipts>
+﻿@model IEnumerable<CarMaintenance.Models.Receipts>
 
-<!-- Content Header (Page header) -->
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1>Receipts</h1>
-            </div>
+            <div class="col-sm-6"><h1>Receipts</h1></div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
                     <li class="breadcrumb-item"><a href="#">Home</a></li>
@@ -15,20 +12,19 @@
             </div>
         </div>
         <hr />
-    </div><!-- /.container-fluid -->
+    </div>
 </section>
 
-<!-- Main content -->
 <section class="content">
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">
-                <a class="btn btn-primary my-3" asp-action="AddReceipt" asp-controller="Receipts">Create New Receipt</a>
+                <a class="btn btn-primary my-3" asp-action="AddReceipt">Create New Receipt</a>
             </h3>
         </div>
-        <!-- /.card-header -->
+
         <div class="card-body">
-            <table id="example1" class="table table-bordered table-striped">
+            <table class="table table-bordered table-striped">
                 <thead>
                     <tr>
                         <th>ID</th>
@@ -41,10 +37,10 @@
                 <tbody>
                     @if (Model.Any())
                     {
-                        @foreach (var item in Model)
+                        foreach (var item in Model)
                         {
                             <tr>
-                                <th>@item.ReceiptID</th>
+                                <td>@item.ReceiptID</td>
                                 <td>@item.Customers?.Name</td>
                                 <td>@item.Cars?.NumberPlate</td>
                                 <td>@item.Date</td>
@@ -55,76 +51,11 @@
                     else
                     {
                         <tr>
-                            <td class="text-center" colspan="5">No Record Found.</td>
+                            <td colspan="5" class="text-center">No Record Found.</td>
                         </tr>
                     }
                 </tbody>
-                <tfoot>
-                    <tr>
-                        <th>ID</th>
-                        <th>Customer</th>
-                        <th>Car</th>
-                        <th>Date</th>
-                        <th>Amount</th>
-                    </tr>
-                </tfoot>
             </table>
         </div>
-        <!-- /.card-body -->
     </div>
-
 </section>
-<!-- /.content -->
-@section Scripts {
-
-    <!-- DataTables  & Plugins -->
-    <script src="~/AdminTheme/plugins/datatables/jquery.dataTables.min.js"></script>
-    <script src="~/AdminTheme/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-    <script src="~/AdminTheme/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-    <script src="~/AdminTheme/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-    <script src="~/AdminTheme/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
-    <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-    <script src="~/AdminTheme/plugins/jszip/jszip.min.js"></script>
-    <script src="~/AdminTheme/plugins/pdfmake/pdfmake.min.js"></script>
-    <script src="~/AdminTheme/plugins/pdfmake/vfs_fonts.js"></script>
-    <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
-    <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.print.min.js"></script>
-    <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
-
-    <!-- Page specific script -->
-    <script>
-        $(function () {
-            $("#example1").DataTable({
-                "responsive": true,
-                "lengthChange": false,
-                "autoWidth": false,
-                "buttons": [
-                    "copy", "csv", "excel", "pdf",
-                    {
-                        extend: 'print',
-                        text: 'Print',
-                        title: '', // remove default title
-                        customize: function (win) {
-                            // Add logo and header at top
-                            $(win.document.body)
-                                .prepend(
-                                    '<div style="display:flex; justify-content:space-between; align-items:right; margin-bottom:20px;">' +
-                                        '<h2 style="margin:0;">Receipts Report</h2>' +
-                                        '<img src="/images/logo.png" style="height:60px;" />' +
-                                    '</div>'
-                                );
-
-                            // Optional: make table full width & smaller font
-                            $(win.document.body).find('table')
-                                .addClass('compact')
-                                .css('font-size', '12px')
-                                .css('width', '100%');
-                        }
-                    },
-                    "colvis"
-                ]
-            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-        });
-    </script>
-
-}

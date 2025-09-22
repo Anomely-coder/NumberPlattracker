@@ -32,9 +32,7 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Name</th>
                         <th>Number Plate</th>
-                        <th>Model</th>
                         <th>Edit</th>
                         <th>Delete</th>
                     </tr>
@@ -47,9 +45,7 @@
                         {
                             <tr>
                                 <th>@item.CarID</th>
-                                <td>@item.CarName</td>
                                 <td>@item.NumberPlate</td>
-                                <td>@item.CarModel</td>
                                 <td><p><a class="text-primary fas fa-pen" asp-action="EditCar" asp-controller="Cars" asp-route-Id="@item.CarID"></a></p></td>
                                 <td><p><a class="text-danger fas fa-trash" asp-action="DeleteCar" asp-controller="Cars" asp-route-Id="@item.CarID"></a></p></td>
                             </tr>
@@ -65,9 +61,7 @@
                 <tfoot>
                     <tr>
                         <th>ID</th>
-                        <th>Name</th>
-                        <th>Number Plate</th>
-                        <th>Model</th>
+                        <th>Number Plate</t>
                         <th>Edit</th>
                         <th>Delete</th>
                     </tr>
@@ -81,7 +75,6 @@
 <!-- /.content -->
 @section Scripts {
 
-    <!-- DataTables  & Plugins -->
     <script src="~/AdminTheme/plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="~/AdminTheme/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
     <script src="~/AdminTheme/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
@@ -95,6 +88,7 @@
     <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.print.min.js"></script>
     <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
 
+
     <!-- Page specific script -->
     <script>
         $(function () {
@@ -103,22 +97,45 @@
                 "lengthChange": false,
                 "autoWidth": false,
                 "buttons": [
-                    "copy", "csv", "excel", "pdf",
+                    {
+                        extend: 'copy',
+                        exportOptions: {
+                            columns: [0, 1] // Only export ID + Number Plate
+                        }
+                    },
+                    {
+                        extend: 'csv',
+                        exportOptions: {
+                            columns: [0, 1]
+                        }
+                    },
+                    {
+                        extend: 'excel',
+                        exportOptions: {
+                            columns: [0, 1]
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        exportOptions: {
+                            columns: [0, 1]
+                        }
+                    },
                     {
                         extend: 'print',
                         text: 'Print',
-                        title: '', // remove default title
+                        title: '',
+                        exportOptions: {
+                            columns: [0, 1] // Skip Edit/Delete
+                        },
                         customize: function (win) {
-                            // Add logo and header at top
-                            $(win.document.body)
-                                .prepend(
-                                    '<div style="display:flex; justify-content:space-between; align-items:right; margin-bottom:20px;">' +
-                                        '<h2 style="margin:0;">Receipts Report</h2>' +
-                                        '<img src="/images/logo.png" style="height:60px;" />' +
-                                    '</div>'
-                                );
+                            $(win.document.body).prepend(
+                                '<div style="display:flex; justify-content:space-between; margin-bottom:20px;">' +
+                                '<h2 style="margin:0;">Receipts Report</h2>' +
+                                '<img src="/images/logo1.png" style="height:60px;" />' +
+                                '</div>'
+                            );
 
-                            // Optional: make table full width & smaller font
                             $(win.document.body).find('table')
                                 .addClass('compact')
                                 .css('font-size', '12px')
@@ -130,5 +147,6 @@
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
         });
     </script>
+
 
 }

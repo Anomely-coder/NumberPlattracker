@@ -15,7 +15,7 @@
             </div>
         </div>
         <hr />
-    </div><!-- /.container-fluid -->
+    </div>
 </section>
 
 <!-- Main content -->
@@ -24,24 +24,41 @@
         <form method="post" asp-action="EditCustomer" asp-controller="Customers">
             <div class="row my-2">
                 <input asp-for="CustomerID" hidden />
+
                 <div class="col-md-6 form-group">
-                    <label class="form-label">Name <span class="text-danger fw-bold" asp-validation-for="Name"></span></label>
+                    <label class="form-label">
+                        Name
+                        <span class="text-danger fw-bold" asp-validation-for="Name"></span>
+                    </label>
                     <input class="form-control" asp-for="Name" />
                 </div>
+
                 <div class="col-md-6 form-group">
-                    <label class="form-label">CNIC <span class="text-danger fw-bold" asp-validation-for="CNIC"></span></label>
-                    <input class="form-control" asp-for="CNIC" />
+                    <label class="form-label">
+                        Email
+                        <span class="text-danger fw-bold" asp-validation-for="Email"></span>
+                    </label>
+                    <input class="form-control" asp-for="Email" type="email" />
                 </div>
+
                 <div class="col-md-6 form-group">
-                    <label class="form-label">Car <span class="text-danger fw-bold" asp-validation-for="CarID"></span></label>
+                    <label class="form-label">
+                        Car
+                        <span class="text-danger fw-bold" asp-validation-for="CarID"></span>
+                    </label>
                     <select class="form-control" asp-for="CarID" asp-items="ViewBag.Cars">
                         <option value="">-- Select Car --</option>
                     </select>
                 </div>
-                <div class="col-md-6 form-group">
-                    <label class="form-label" hidden>Customer Status <span class="text-danger fw-bold" asp-validation-for="CustomerStatus"></span></label>
-                    <input class="form-control" asp-for="CustomerStatus" value="1" hidden />
+
+                <div class="col-md-6 form-group" hidden>
+                    <label class="form-label">
+                        Customer Status
+                        <span class="text-danger fw-bold" asp-validation-for="CustomerStatus"></span>
+                    </label>
+                    <input class="form-control" asp-for="CustomerStatus" value="1" />
                 </div>
+
                 <div class="col-md-12 my-2">
                     <button type="submit" class="btn btn-primary">Update Customer</button>
                 </div>
@@ -49,4 +66,3 @@
         </form>
     </div>
 </section>
-<!-- /.content -->

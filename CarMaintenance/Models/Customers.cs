@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -12,7 +11,8 @@ namespace CarMaintenance.Models
 
         public string Name { get; set; }
 
-        public string CNIC { get; set; }
+        [Required, EmailAddress]
+        public string Email { get; set; } 
 
         public int? CarID { get; set; }
 
@@ -21,9 +21,7 @@ namespace CarMaintenance.Models
 
         public int CustomerStatus { get; set; }
 
-        // Navigation
         [ValidateNever]
         public ICollection<Receipts> Receipts { get; set; }
-
     }
 }

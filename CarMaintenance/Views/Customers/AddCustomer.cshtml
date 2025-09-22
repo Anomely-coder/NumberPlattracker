@@ -28,9 +28,13 @@
                     <input class="form-control" asp-for="Name" />
                 </div>
                 <div class="col-md-6 form-group">
-                    <label class="form-label">CNIC <span class="text-danger fw-bold" asp-validation-for="CNIC"></span></label>
-                    <input class="form-control" asp-for="CNIC" />
+                    <label class="form-label">
+                        Email
+                        <span class="text-danger fw-bold" asp-validation-for="Email"></span>
+                    </label>
+                    <input class="form-control" asp-for="Email" type="email" />
                 </div>
+
                 <div class="col-md-6 form-group">
                     <label class="form-label">Car <span class="text-danger fw-bold" asp-validation-for="CarID"></span></label>
                     <select class="form-control" asp-for="CarID" asp-items="ViewBag.Cars">

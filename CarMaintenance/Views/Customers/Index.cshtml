@@ -33,7 +33,7 @@
                     <tr>
                         <th>ID</th>
                         <th>Name</th>
-                        <th>CNIC</th>
+                        <th>Email</th>
                         <th>Car Number</th>
                         <th>Edit</th>
                         <th>Delete</th>
@@ -48,7 +48,7 @@
                             <tr>
                                 <th>@item.CustomerID</th>
                                 <td>@item.Name</td>
-                                <td>@item.CNIC</td>
+                                <td>@item.Email</td>
                                 <td>@item.Cars?.NumberPlate</td>
                                 <td><p><a class="text-primary fas fa-pen" asp-action="EditCustomer" asp-controller="Customers" asp-route-Id="@item.CustomerID"></a></p></td>
                                 <td><p><a class="text-danger fas fa-trash" asp-action="DeleteCustomer" asp-controller="Customers" asp-route-Id="@item.CustomerID"></a></p></td>
@@ -66,7 +66,7 @@
                     <tr>
                         <th>ID</th>
                         <th>Name</th>
-                        <th>CNIC</th>
+                        <th>Emial</th>
                         <th>Car Number</th>
                         <th>Edit</th>
                         <th>Delete</th>
@@ -96,39 +96,62 @@
     <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
 
     <!-- Page specific script -->
-        <<script>
-             $(function () {
-                 $("#example1").DataTable({
-                     "responsive": true,
-                     "lengthChange": false,
-                     "autoWidth": false,
-                     "buttons": [
-                         "copy", "csv", "excel", "pdf",
-                         {
-                             extend: 'print',
-                             text: 'Print',
-                             title: '', // remove default title
-                             customize: function (win) {
-                                 // Add logo and header at top
-                                 $(win.document.body)
-                                     .prepend(
-                                         '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">' +
-                                             '<h2 style="margin:0;">Customer Report</h2>' +
-                                             '<img src="/images/logo.png" style="height:60px;" />' +
-                                         '</div>'
-                                     );
+    <script>
+        $(function () {
+            $("#example1").DataTable({
+                "responsive": true,
+                "lengthChange": false,
+                "autoWidth": false,
+                "buttons": [
+                    {
+                        extend: 'copy',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3] 
+                        }
+                    },
+                    {
+                        extend: 'csv',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3]
+                        }
+                    },
+                    {
+                        extend: 'excel',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3]
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3]
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        text: 'Print',
+                        title: '',
+                        exportOptions: {
+                            columns: [0, 1, 2, 3] 
+                        },
+                        customize: function (win) {
+                            $(win.document.body).prepend(
+                                '<div style="display:flex; justify-content:space-between; margin-bottom:20px;">' +
+                                '<h2 style="margin:0;">Receipts Report</h2>' +
+                                '<img src="/images/logo1.png" style="height:60px;" />' +
+                                '</div>'
+                            );
 
-                                 // Optional: make table full width & smaller font
-                                 $(win.document.body).find('table')
-                                     .addClass('compact')
-                                     .css('font-size', '12px')
-                                     .css('width', '100%');
-                             }
-                         },
-                         "colvis"
-                     ]
-                 }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-             });
+                            $(win.document.body).find('table')
+                                .addClass('compact')
+                                .css('font-size', '12px')
+                                .css('width', '100%');
+                        }
+                    },
+                    "colvis"
+                ]
+            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+        });
     </script>
 
 }

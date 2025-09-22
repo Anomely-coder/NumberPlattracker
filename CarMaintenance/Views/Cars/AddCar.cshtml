@@ -5,7 +5,7 @@
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>Add New Number</h1>
+                <h1>Add New Number Plate</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
@@ -24,21 +24,18 @@
         <form method="post" asp-action="AddCar" asp-controller="Cars">
             <div class="row my-2">
                 <div class="col-md-6 form-group">
-                    <label class="form-label">Name <span class="text-danger fw-bold" asp-validation-for="CarName"></span></label>
-                    <input class="form-control" asp-for="CarName" />
-                </div>
-                <div class="col-md-6 form-group">
-                    <label class="form-label">Number Plate <span class="text-danger fw-bold" asp-validation-for="NumberPlate"></span></label>
+                    <label class="form-label">
+                        Number Plate
+                        <span class="text-danger fw-bold" asp-validation-for="NumberPlate"></span>
+                    </label>
                     <input class="form-control" asp-for="NumberPlate" />
                 </div>
-                <div class="col-md-6 form-group">
-                    <label class="form-label">Car Model <span class="text-danger fw-bold" asp-validation-for="CarModel"></span></label>
-                    <input class="form-control" asp-for="CarModel" />
+
+                <div class="col-md-6 form-group" hidden>
+                    <label class="form-label">Car Status <span class="text-danger fw-bold" asp-validation-for="CarStatus"></span></label>
+                    <input class="form-control" asp-for="CarStatus" value="1" />
                 </div>
-                <div class="col-md-6 form-group">
-                    <label class="form-label" hidden>Car Status <span class="text-danger fw-bold" asp-validation-for="CarStatus"></span></label>
-                    <input class="form-control" asp-for="CarStatus" value="1" hidden />
-                </div>
+
                 <div class="col-md-12 my-2">
                     <button type="submit" class="btn btn-primary">Add Number Plate</button>
                 </div>

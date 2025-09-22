@@ -9,12 +9,10 @@ namespace CarMaintenance.Models
         [Key]
         public int CarID { get; set; }
 
-        public string CarName { get; set; }
+        
         public string NumberPlate { get; set; }
-        public string CarModel { get; set; }
 
         public int CarStatus { get; set; }
-
 
         // Navigation
         [ValidateNever]

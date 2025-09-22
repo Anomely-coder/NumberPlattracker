@@ -33,18 +33,20 @@ namespace CarMaintenance.Controllers
         [HttpPost]
         public IActionResult AddCustomer(Customers customers)
         {
+            if (db.Tbl_Customers.Any(c => c.Email == customers.Email))
+            {
+                ModelState.AddModelError("Email", "This Email already exists. Please enter a unique Email.");
+            }
+
             if (ModelState.IsValid)
             {
                 db.Tbl_Customers.Add(customers);
                 db.SaveChanges();
-
                 return RedirectToAction("Index");
             }
 
-            // Load Cars for DropDown
             ViewBag.Cars = new SelectList(db.Tbl_Cars.ToList(), "CarID", "NumberPlate");
-
-            return View();
+            return View(customers);
         }
 
         public IActionResult EditCustomer(int Id)

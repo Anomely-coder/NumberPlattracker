@@ -23,8 +23,7 @@ namespace CarMaintenance.Models
 
         public decimal TotalAmount { get; set; }
 
-        // Navigation
         [ValidateNever]
-        public ICollection<ReceiptsDetails> ReceiptsDetails { get; set; }
+        public ICollection<ReceiptsDetails> ReceiptsDetails { get; set; } = new List<ReceiptsDetails>();
     }
 }
