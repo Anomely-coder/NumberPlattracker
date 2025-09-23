@@ -1,101 +1,102 @@
 using CarMaintenance.Data;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NLog;
+using NLog.Web;
 using System.Globalization;
 
-var builder = WebApplication.CreateBuilder(args);
+var logger = NLog.LogManager.Setup().LoadConfigurationFromFile("NLog.config").GetCurrentClassLogger();
 
-// Add services to the container.
-builder.Services.AddControllersWithViews()
-    .AddViewLocalization() // keeps view-localization available if you want it later
-    .AddDataAnnotationsLocalization();
-
-builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
-
-// Adding DBContext class for the Database operations.
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("dbcs")));
-
-// Configure session with cookie settings
-builder.Services.AddSession(options =>
+try
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // ensure HTTPS in prod
-});
+    var builder = WebApplication.CreateBuilder(args);
 
-// make IHttpContextAccessor available (if you need it)
-builder.Services.AddHttpContextAccessor();
+    // --- Logging with NLog ---
+    builder.Logging.ClearProviders();
+    builder.Host.UseNLog();
 
-// Configure supported cultures
-var supportedCultures = new[]
-{
-    new CultureInfo("en"),
-    new CultureInfo("ar")
-};
+    // --- Add MVC with localization ---
+    builder.Services.AddControllersWithViews()
+        .AddViewLocalization()
+        .AddDataAnnotationsLocalization();
 
-builder.Services.Configure<RequestLocalizationOptions>(options =>
-{
-    options.DefaultRequestCulture = new RequestCulture("en");
-    options.SupportedCultures = supportedCultures;
-    options.SupportedUICultures = supportedCultures;
+    builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
-    // providers: query-string (highest), cookie, accept-language header
-    options.RequestCultureProviders = new List<IRequestCultureProvider>
+    // --- Database context ---
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("dbcs")));
+
+    // --- Session configuration ---
+    builder.Services.AddSession(options =>
     {
-        new QueryStringRequestCultureProvider(),
-        new CookieRequestCultureProvider(),
-        new AcceptLanguageHeaderRequestCultureProvider()
+        options.IdleTimeout = TimeSpan.FromMinutes(30);
+        options.Cookie.HttpOnly = true;
+        options.Cookie.IsEssential = true;
+        options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+            ? CookieSecurePolicy.None   // Dev: allow HTTP
+            : CookieSecurePolicy.Always; // Prod: enforce HTTPS
+    });
+
+    builder.Services.AddHttpContextAccessor();
+
+    // --- Supported cultures ---
+    var supportedCultures = new[]
+    {
+        new CultureInfo("en"),
+        new CultureInfo("ar")
     };
-});
 
-// Add logging with console output (keeps your previous settings)
-builder.Services.AddLogging(logging =>
-{
-    logging.ClearProviders(); // Remove default providers
-    logging.AddConsole();    // Add console provider
-    logging.SetMinimumLevel(LogLevel.Debug); // Log all levels including Debug
-});
+    builder.Services.Configure<RequestLocalizationOptions>(options =>
+    {
+        options.DefaultRequestCulture = new RequestCulture("en");
+        options.SupportedCultures = supportedCultures;
+        options.SupportedUICultures = supportedCultures;
 
-var app = builder.Build();
+        options.RequestCultureProviders = new List<IRequestCultureProvider>
+        {
+            new QueryStringRequestCultureProvider(),
+            new CookieRequestCultureProvider(),
+            new AcceptLanguageHeaderRequestCultureProvider()
+        };
+    });
 
-// Configure the HTTP request pipeline.
-// IMPORTANT: RequestLocalization early so resources and view rendering get correct culture
-var locOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value;
-app.UseRequestLocalization(locOptions);
+    var app = builder.Build();
 
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
+    // --- Middleware ---
+
+    // Localization
+    var locOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value;
+    app.UseRequestLocalization(locOptions);
+
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseExceptionHandler("/Home/Error");
+        app.UseHsts();
+    }
+
+    app.UseHttpsRedirection();
+    app.UseStaticFiles();
+
+    app.UseRouting();
+
+    // --- Session middleware must come BEFORE authorization ---
+    app.UseSession();
+
+    app.UseAuthorization();
+
+    app.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
+
+    app.Run();
 }
-
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-// session should be before routing if you're using session inside controllers during routing
-app.UseSession();
-
-// debug logging for localization on each request (optional)
-app.Use(async (context, next) =>
+catch (Exception ex)
 {
-    var cultureFeature = context.Features.Get<IRequestCultureFeature>();
-    var culture = cultureFeature?.RequestCulture.Culture;
-    var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
-    logger.LogDebug("Request Culture at {Time}: {Culture}", DateTime.Now, culture?.Name ?? "Not set");
-    await next();
-});
-
-app.UseRouting();
-
-app.UseAuthorization();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
-
-app.Run();
+    logger.Error(ex, "Application stopped due to an exception");
+    throw;
+}
+finally
+{
+    NLog.LogManager.Shutdown();
+}

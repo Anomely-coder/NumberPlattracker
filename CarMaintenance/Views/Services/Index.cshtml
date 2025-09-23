@@ -103,22 +103,45 @@
                 "lengthChange": false,
                 "autoWidth": false,
                 "buttons": [
-                    "copy", "csv", "excel", "pdf",
+                    {
+                        extend: 'copy',
+                        exportOptions: {
+                            columns: [0, 1] // Only export ID + Number Plate
+                        }
+                    },
+                    {
+                        extend: 'csv',
+                        exportOptions: {
+                            columns: [0, 1]
+                        }
+                    },
+                    {
+                        extend: 'excel',
+                        exportOptions: {
+                            columns: [0, 1]
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        exportOptions: {
+                            columns: [0, 1]
+                        }
+                    },
                     {
                         extend: 'print',
                         text: 'Print',
-                        title: '', // remove default title
+                        title: '',
+                        exportOptions: {
+                            columns: [0, 1] // Skip Edit/Delete
+                        },
                         customize: function (win) {
-                            // Add logo and header at top
-                            $(win.document.body)
-                                .prepend(
-                                    '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">' +
-                                        '<h2 style="margin:0;">Receipts Report</h2>' +
-                                        '<img src="wwwroot/images/logo.jpg" style="height:60px;" />' +
-                                    '</div>'
-                                );
+                            $(win.document.body).prepend(
+                                '<div style="display:flex; justify-content:space-between; margin-bottom:20px;">' +
+                                '<h2 style="margin:0;">Receipts Report</h2>' +
+                                '<img src="/images/logo1.png" style="height:60px;" />' +
+                                '</div>'
+                            );
 
-                            // Optional: make table full width & smaller font
                             $(win.document.body).find('table')
                                 .addClass('compact')
                                 .css('font-size', '12px')

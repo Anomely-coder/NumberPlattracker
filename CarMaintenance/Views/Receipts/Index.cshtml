@@ -18,14 +18,12 @@
 <section class="content">
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">
-                <a class="btn btn-primary my-3" asp-action="AddReceipt">Create New Receipt</a>
-            </h3>
+            <a class="btn btn-primary my-2" asp-action="AddReceipt">Create New Receipt</a>
         </div>
 
         <div class="card-body">
-            <table class="table table-bordered table-striped">
-                <thead>
+            <table id="example1" class="table table-bordered table-striped">
+                <thead class="thead-dark">
                     <tr>
                         <th>ID</th>
                         <th>Customer</th>
@@ -43,7 +41,7 @@
                                 <td>@item.ReceiptID</td>
                                 <td>@item.Customers?.Name</td>
                                 <td>@item.Cars?.NumberPlate</td>
-                                <td>@item.Date</td>
+                                <td>@item.Date.ToString("yyyy-MM-dd")</td>
                                 <td>@item.TotalAmount</td>
                             </tr>
                         }
@@ -59,3 +57,48 @@
         </div>
     </div>
 </section>
+
+@section Scripts {
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css" />
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- DataTables + Buttons -->
+    <!-- DataTables  & Plugins -->
+    <script src="~/AdminTheme/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/AdminTheme/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/AdminTheme/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/AdminTheme/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <script src="~/AdminTheme/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/AdminTheme/plugins/jszip/jszip.min.js"></script>
+    <script src="~/AdminTheme/plugins/pdfmake/pdfmake.min.js"></script>
+    <script src="~/AdminTheme/plugins/pdfmake/vfs_fonts.js"></script>
+    <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+    <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+
+    <!-- Page specific script -->
+    <script>
+        $(function () {
+          $("#example1").DataTable({
+            "responsive": true, "lengthChange": false, "autoWidth": false,
+            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+          }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+          $('#example2').DataTable({
+            "paging": true,
+            "lengthChange": false,
+            "searching": false,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "responsive": true,
+          });
+        });
+    </script>
+
+
+}

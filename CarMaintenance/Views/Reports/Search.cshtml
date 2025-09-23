@@ -1,0 +1,16 @@
+﻿@{
+    ViewData["Title"] = "Search Reports";
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <h2>Search Customers / Cars / Transfers</h2>
+    </div>
+</section>
+
+<section class="content">
+    <form asp-controller="Reports" asp-action="Search" method="get" class="form-inline mb-3">
+        <input type="text" name="searchTerm" class="form-control mr-2" placeholder="Enter customer name, email, or car plate..." required />
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+</section>
