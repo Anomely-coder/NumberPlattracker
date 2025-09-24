@@ -75,6 +75,7 @@ namespace CarMaintenance.Controllers
             db.SaveChanges();
 
             // Add services
+            List<object> servicesList = new List<object>();
             if (vm.ServicesSelected != null && vm.ServicesSelected.Any())
             {
                 foreach (var item in vm.ServicesSelected)
@@ -84,25 +85,36 @@ namespace CarMaintenance.Controllers
                         ReceiptID = receipt.ReceiptID,
                         ServiceID = item.ServiceID
                     });
+
+                    servicesList.Add(new
+                    {
+                        serviceName = item.ServiceName,
+                        description = item.Description,
+                        price = item.Price
+                    });
                 }
                 db.SaveChanges();
             }
 
-            // Save data for printing
-            TempData["PrintReceipt"] = new
+            // Detect if request is AJAX (Save & Print)
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             {
-                ReceiptID = receipt.ReceiptID,
-                Date = receipt.Date.ToString("yyyy-MM-dd HH:mm"),
-                CustomerName = db.Tbl_Customers.FirstOrDefault(c => c.CustomerID == vm.CustomerID)?.Name ?? "N/A",
-                CarNumber = vm.NumberPlate,
-                Services = vm.ServicesSelected.Select(s => new { s.ServiceName, s.Description, s.Price }).ToList(),
-                TotalAmount = vm.TotalAmount,
-                
-            };
+                return Json(new
+                {
+                    receiptID = receipt.ReceiptID,
+                    date = receipt.Date.ToString("yyyy-MM-dd HH:mm"),
+                    customerName = db.Tbl_Customers.FirstOrDefault(c => c.CustomerID == vm.CustomerID)?.Name ?? "N/A",
+                    carNumber = vm.NumberPlate,
+                    services = servicesList,
+                    totalAmount = vm.TotalAmount
+                });
+            }
 
+            // Normal form submit
             ViewBag.Services = db.Tbl_Services.ToList();
             return View(vm);
         }
+
 
         // JSON: Search customers for autocomplete
         [HttpGet]

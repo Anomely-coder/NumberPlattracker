@@ -1,16 +1,18 @@
 ﻿@model Cars
+@using CarMaintenance
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
 
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>Add New Number Plate</h1>
+                <h1>@Localizer["AddNewNumberPlateTitle"]</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">Cars</li>
+                    <li class="breadcrumb-item"><a href="#">@Localizer["HomeLink"]</a></li>
+                    <li class="breadcrumb-item active">@Localizer["CarsBreadcrumb"]</li>
                 </ol>
             </div>
         </div>
@@ -25,19 +27,19 @@
             <div class="row my-2">
                 <div class="col-md-6 form-group">
                     <label class="form-label">
-                        Number Plate
+                        @Localizer["NumberPlateLabel"]
                         <span class="text-danger fw-bold" asp-validation-for="NumberPlate"></span>
                     </label>
                     <input class="form-control" asp-for="NumberPlate" />
                 </div>
 
                 <div class="col-md-6 form-group" hidden>
-                    <label class="form-label">Car Status <span class="text-danger fw-bold" asp-validation-for="CarStatus"></span></label>
+                    <label class="form-label">@Localizer["CarStatusLabel"] <span class="text-danger fw-bold" asp-validation-for="CarStatus"></span></label>
                     <input class="form-control" asp-for="CarStatus" value="1" />
                 </div>
 
                 <div class="col-md-12 my-2">
-                    <button type="submit" class="btn btn-primary">Add Number Plate</button>
+                    <button type="submit" class="btn btn-primary">@Localizer["AddNumberPlateButton"]</button>
                 </div>
             </div>
         </form>

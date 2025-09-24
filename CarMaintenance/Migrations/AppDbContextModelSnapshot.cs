@@ -33,18 +33,13 @@ namespace CarMaintenance.Migrations
                     b.Property<int>("CarStatus")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CustomerID")
-                        .HasColumnType("int");
-
                     b.Property<string>("NumberPlate")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("CarID");
 
-                    b.HasIndex("CustomerID");
-
-                    b.ToTable("Tbl_Cars");
+                    b.ToTable("Tbl_Cars", (string)null);
                 });
 
             modelBuilder.Entity("CarMaintenance.Models.Customers", b =>
@@ -55,6 +50,9 @@ namespace CarMaintenance.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerID"));
 
+                    b.Property<int?>("CarID")
+                        .HasColumnType("int");
+
                     b.Property<int>("CustomerStatus")
                         .HasColumnType("int");
 
@@ -62,13 +60,21 @@ namespace CarMaintenance.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("EmiratesID")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("CustomerID");
 
-                    b.ToTable("Tbl_Customers");
+                    b.HasIndex("CarID");
+
+                    b.ToTable("Tbl_Customers", (string)null);
                 });
 
             modelBuilder.Entity("CarMaintenance.Models.NumberPlate", b =>
@@ -103,7 +109,7 @@ namespace CarMaintenance.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("NumberPlates");
+                    b.ToTable("NumberPlates", (string)null);
                 });
 
             modelBuilder.Entity("CarMaintenance.Models.PasswordHistory", b =>
@@ -126,7 +132,7 @@ namespace CarMaintenance.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Tbl_PasswordHistory");
+                    b.ToTable("Tbl_PasswordHistory", (string)null);
                 });
 
             modelBuilder.Entity("CarMaintenance.Models.PlateAllocation", b =>
@@ -155,7 +161,7 @@ namespace CarMaintenance.Migrations
 
                     b.HasIndex("NumberPlateId");
 
-                    b.ToTable("PlateAllocations");
+                    b.ToTable("PlateAllocations", (string)null);
                 });
 
             modelBuilder.Entity("CarMaintenance.Models.Receipts", b =>
@@ -184,22 +190,16 @@ namespace CarMaintenance.Migrations
 
                     b.HasIndex("CustomerID");
 
-                    b.ToTable("Tbl_Receipts");
+                    b.ToTable("Tbl_Receipts", (string)null);
                 });
 
             modelBuilder.Entity("CarMaintenance.Models.ReceiptsDetails", b =>
                 {
-                    b.Property<int>("ReceiptDetailID")
+                    b.Property<int>("ReceiptsDetailsID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReceiptDetailID"));
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReceiptsDetailsID"));
 
                     b.Property<int>("ReceiptID")
                         .HasColumnType("int");
@@ -207,13 +207,13 @@ namespace CarMaintenance.Migrations
                     b.Property<int>("ServiceID")
                         .HasColumnType("int");
 
-                    b.HasKey("ReceiptDetailID");
+                    b.HasKey("ReceiptsDetailsID");
 
                     b.HasIndex("ReceiptID");
 
                     b.HasIndex("ServiceID");
 
-                    b.ToTable("Tbl_ReceiptDetails");
+                    b.ToTable("Tbl_ReceiptDetails", (string)null);
                 });
 
             modelBuilder.Entity("CarMaintenance.Models.Services", b =>
@@ -240,7 +240,7 @@ namespace CarMaintenance.Migrations
 
                     b.HasKey("ServiceID");
 
-                    b.ToTable("Tbl_Services");
+                    b.ToTable("Tbl_Services", (string)null);
                 });
 
             modelBuilder.Entity("CarMaintenance.Models.TransferCars", b =>
@@ -276,7 +276,7 @@ namespace CarMaintenance.Migrations
 
                     b.HasIndex("ToCustomerID");
 
-                    b.ToTable("Tbl_TransferCars");
+                    b.ToTable("Tbl_TransferCars", (string)null);
                 });
 
             modelBuilder.Entity("CarMaintenance.Models.Users", b =>
@@ -325,16 +325,17 @@ namespace CarMaintenance.Migrations
 
                     b.HasKey("UserID");
 
-                    b.ToTable("Tbl_Users");
+                    b.ToTable("Tbl_Users", (string)null);
                 });
 
-            modelBuilder.Entity("CarMaintenance.Models.Cars", b =>
+            modelBuilder.Entity("CarMaintenance.Models.Customers", b =>
                 {
-                    b.HasOne("CarMaintenance.Models.Customers", "Customers")
-                        .WithMany("Cars")
-                        .HasForeignKey("CustomerID");
+                    b.HasOne("CarMaintenance.Models.Cars", "Cars")
+                        .WithMany("Customers")
+                        .HasForeignKey("CarID")
+                        .OnDelete(DeleteBehavior.SetNull);
 
-                    b.Navigation("Customers");
+                    b.Navigation("Cars");
                 });
 
             modelBuilder.Entity("CarMaintenance.Models.PlateAllocation", b =>
@@ -419,6 +420,8 @@ namespace CarMaintenance.Migrations
 
             modelBuilder.Entity("CarMaintenance.Models.Cars", b =>
                 {
+                    b.Navigation("Customers");
+
                     b.Navigation("Receipts");
 
                     b.Navigation("TransferCars");
@@ -426,8 +429,6 @@ namespace CarMaintenance.Migrations
 
             modelBuilder.Entity("CarMaintenance.Models.Customers", b =>
                 {
-                    b.Navigation("Cars");
-
                     b.Navigation("Receipts");
                 });
 

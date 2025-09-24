@@ -24,7 +24,6 @@
         <form method="post" asp-action="EditCustomer" asp-controller="Customers">
             <div class="row my-2">
                 <input asp-for="CustomerID" hidden />
-
                 <div class="col-md-6 form-group">
                     <label class="form-label">
                         Name
@@ -32,7 +31,6 @@
                     </label>
                     <input class="form-control" asp-for="Name" />
                 </div>
-
                 <div class="col-md-6 form-group">
                     <label class="form-label">
                         Email
@@ -40,7 +38,13 @@
                     </label>
                     <input class="form-control" asp-for="Email" type="email" />
                 </div>
-
+                <div class="col-md-6 form-group">
+                    <label class="form-label">
+                        Emirates ID
+                        <span class="text-danger fw-bold" asp-validation-for="EmiratesID"></span>
+                    </label>
+                    <input class="form-control" asp-for="EmiratesID" />
+                </div>
                 <div class="col-md-6 form-group">
                     <label class="form-label">
                         Car
@@ -49,16 +53,6 @@
                     <select class="form-control" asp-for="CarID" asp-items="ViewBag.Cars">
                         <option value="">-- Select Car --</option>
                     </select>
-                </div>
-
-                <div class="col-md-6 form-group" hidden>
-                    <label class="form-label">
-                        Customer Status
-                        <span class="text-danger fw-bold" asp-validation-for="CustomerStatus"></span>
-                    </label>
-                    <input class="form-control" asp-for="CustomerStatus" value="1" />
-                </div>
-
                 <div class="col-md-12 my-2">
                     <button type="submit" class="btn btn-primary">Update Customer</button>
                 </div>

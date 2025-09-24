@@ -1,5 +1,4 @@
-﻿// AppDbContext.cs
-using CarMaintenance.Models;
+﻿using CarMaintenance.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace CarMaintenance.Data
@@ -24,6 +23,13 @@ namespace CarMaintenance.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // Configure Customers-Cars relationship
+            modelBuilder.Entity<Customers>()
+                .HasOne(c => c.Cars)
+                .WithMany(c => c.Customers)
+                .HasForeignKey(c => c.CarID)
+                .OnDelete(DeleteBehavior.SetNull);
 
             // Prevent cascade delete where needed
             modelBuilder.Entity<Receipts>()
@@ -68,7 +74,6 @@ namespace CarMaintenance.Data
                 .HasForeignKey(rd => rd.ServiceID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Optional: Explicitly set defaults for NumberPlate (if not handled by migration)
             modelBuilder.Entity<NumberPlate>()
                 .Property(n => n.AddedBy)
                 .HasDefaultValue("System");

@@ -34,16 +34,18 @@
                     </label>
                     <input class="form-control" asp-for="Email" type="email" />
                 </div>
-
                 <div class="col-md-6 form-group">
-                    <label class="form-label">Car <span class="text-danger fw-bold" asp-validation-for="CarID"></span></label>
-                    <select class="form-control" asp-for="CarID" asp-items="ViewBag.Cars">
-                        <option value="">-- Select Car --</option>
-                    </select>
+                    <label class="form-label">
+                        Emirates ID
+                        <span class="text-danger fw-bold" asp-validation-for="EmiratesID"></span>
+                    </label>
+                    <input class="form-control" asp-for="EmiratesID" />
                 </div>
                 <div class="col-md-6 form-group">
-                    <label class="form-label" hidden>Customer Status <span class="text-danger fw-bold" asp-validation-for="CustomerStatus"></span></label>
-                    <input class="form-control" asp-for="CustomerStatus" value="1" hidden />
+                    <label class="form-label">Number Plate <span class="text-danger fw-bold" asp-validation-for="CarID"></span></label>
+                    <select class="form-control" asp-for="CarID" asp-items="ViewBag.Cars">
+                        <option value="">-- Select Number Plate --</option>
+                    </select>
                 </div>
                 <div class="col-md-12 my-2">
                     <button type="submit" class="btn btn-primary">Add Customer</button>

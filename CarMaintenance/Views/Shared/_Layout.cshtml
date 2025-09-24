@@ -205,6 +205,14 @@
                             </a>
                         </li>
 
+                        <!-- Reports -->
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Reports" asp-action="Search">
+                                <i class="nav-icon fas fa-file-pdf"></i>
+                                <p>@Localizer["QuickSearchLink"]</p>
+                            </a>
+                        </li>
+
                         <!-- Number Plate -->
                         <li class="nav-item has-treeview">
                             <a href="#" class="nav-link">
@@ -229,44 +237,6 @@
                                 </li>
                             </ul>
                         </li>
-
-                        <!-- Plates Management -->
-                        <li class="nav-item has-treeview">
-                            <a href="#" class="nav-link">
-                                <i class="nav-icon fas fa-list"></i>
-                                <p>
-                                    @Localizer["PlatesManagementSection"]
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
-                            </a>
-                            <ul class="nav nav-treeview">
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-action="UnAllocatedPlates" asp-controller="NumberPlates">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>@Localizer["UnAllocatedPlatesLink"]</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-action="AllocatedPlates" asp-controller="NumberPlates">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>@Localizer["AllocatedPlatesLink"]</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-action="PlateHistory" asp-controller="NumberPlates">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>@Localizer["PlatesHistoryLink"]</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" asp-action="AddPlate" asp-controller="NumberPlates">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>@Localizer["AddNewPlateLink"]</p>
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-
                         <!-- Customers -->
                         <li class="nav-item has-treeview">
                             <a href="#" class="nav-link">
@@ -390,13 +360,6 @@
                                     </a>
                                 </li>
                             </ul>
-                        </li>
-
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Reports" asp-action="Search">
-                                <i class="nav-icon fas fa-file-pdf"></i>
-                                <p>Reports</p>
-                            </a>
                         </li>
 
                     </ul>

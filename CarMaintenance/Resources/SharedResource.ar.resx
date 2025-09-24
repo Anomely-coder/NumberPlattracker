@@ -117,73 +117,190 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AddNewCustomerLink" xml:space="preserve">
-    <value>إضافة عميل جديد</value>
+  <data name="CarsBreadcrumb" xml:space="preserve">
+    <value>السيارات</value>
   </data>
-  <data name="AddNewNumberLink" xml:space="preserve">
-    <value>إضافة رقم جديد</value>
+  <data name="CopyButton" xml:space="preserve">
+    <value>نسخ</value>
   </data>
-  <data name="AllocatedPlatesLink" xml:space="preserve">
-    <value>اللوحات المخصصة</value>
+  <data name="CsvButton" xml:space="preserve">
+    <value>CSV</value>
   </data>
-  <data name="AppName" xml:space="preserve">
-    <value>تتبع أرقام اللوحات</value>
+  <data name="DeleteColumn" xml:space="preserve">
+    <value>حذف</value>
   </data>
-  <data name="AppTitle" xml:space="preserve">
-    <value>تتبع أرقام اللوحات</value>
+  <data name="EditColumn" xml:space="preserve">
+    <value>تعديل</value>
   </data>
-  <data name="CustomersSection" xml:space="preserve">
-    <value>العملاء</value>
-  </data>
-  <data name="DashboardLink" xml:space="preserve">
-    <value>لوحة التحكم</value>
+  <data name="ExcelButton" xml:space="preserve">
+    <value>إكسل</value>
   </data>
   <data name="HomeLink" xml:space="preserve">
-    <value>الرئيسية</value>
+    <value>عرض لوحة الرقم</value>
   </data>
-  <data name="LanguageArabic" xml:space="preserve">
-    <value>العربية</value>
+  <data name="IdColumn" xml:space="preserve">
+    <value>المعرف</value>
+  </data>
+  <data name="NoRecordsFound" xml:space="preserve">
+    <value>لا يوجد سجلات.</value>
+  </data>
+  <data name="NumberPlateColumn" xml:space="preserve">
+    <value>لوحة الرقم</value>
+  </data>
+  <data name="PrintButton" xml:space="preserve">
+    <value>طباعة</value>
+  </data>
+  <data name="ReceiptsReportTitle" xml:space="preserve">
+    <value>تقرير الإيصالات</value>
+  </data>
+  <data name="RegisteredStatus" xml:space="preserve">
+    <value>مسجل</value>
+  </data>
+  <data name="StatusColumn" xml:space="preserve">
+    <value>الحالة</value>
+  </data>
+  <data name="ColumnVisibilityButton" xml:space="preserve">
+    <value>رؤية الأعمدة</value>
+  </data>
+  <data name="UnregisteredStatus" xml:space="preserve">
+    <value>غير مسجل</value>
+  </data>
+  <data name="AddNewNumberPlateTitle" xml:space="preserve">
+    <value>إضافة لوحة رقم جديدة</value>
+  </data>
+  <data name="NumberPlateLabel" xml:space="preserve">
+    <value>لوحة الرقم</value>
+  </data>
+  <data name="CarStatusLabel" xml:space="preserve">
+    <value>حالة السيارة</value>
+  </data>
+  <data name="AddNumberPlateButton" xml:space="preserve">
+    <value>إضافة لوحة رقم</value>
+  </data>
+  <data name="UpdateCarTitle" xml:space="preserve">
+    <value>تحديث السيارة</value>
+  </data>
+  <data name="DashboardTitle" xml:space="preserve">
+    <value>اللوحة الرئيسية</value>
+  </data>
+  <data name="CustomersLabel" xml:space="preserve">
+    <value>العملاء</value>
+  </data>
+  <data name="ServicesLabel" xml:space="preserve">
+    <value>الخدمات</value>
+  </data>
+  <data name="MoreInfoLink" xml:space="preserve">
+    <value>المزيد من المعلومات</value>
+  </data>
+  <data name="AddNewReceiptTitle" xml:space="preserve">
+    <value>إضافة إيصال جديد</value>
+  </data>
+  <data name="ReceiptsBreadcrumb" xml:space="preserve">
+    <value>الإيصالات</value>
+  </data>
+  <data name="DateLabel" xml:space="preserve">
+    <value>التاريخ</value>
+  </data>
+  <data name="CustomerSearchPlaceholder" xml:space="preserve">
+    <value>ابحث عن عميل...</value>
+  </data>
+  <data name="AddButton" xml:space="preserve">
+    <value>إضافة</value>
+  </data>
+  <data name="ServiceColumn" xml:space="preserve">
+    <value>الخدمة</value>
+  </data>
+  <data name="DescriptionColumn" xml:space="preserve">
+    <value>الوصف</value>
+  </data>
+  <data name="PriceColumn" xml:space="preserve">
+    <value>السعر</value>
+  </data>
+  <data name="RemoveColumn" xml:space="preserve">
+    <value>إزالة</value>
+  </data>
+  <data name="TotalLabel" xml:space="preserve">
+    <value>الإجمالي:</value>
+  </data>
+  <data name="SaveReceiptButton" xml:space="preserve">
+    <value>حفظ الإيصال</value>
+  </data>
+  <data name="SavePrintButton" xml:space="preserve">
+    <value>حفظ وطباعة</value>
+  </data>
+  <data name="LogoAlt" xml:space="preserve">
+    <value>الشعار</value>
+  </data>
+  <data name="ReceiptNoLabel" xml:space="preserve">
+    <value>رقم الإيصال</value>
+  </data>
+  <data name="NumberColumn" xml:space="preserve">
+    <value>#</value>
+  </data>
+  <data name="TotalAmountLabel" xml:space="preserve">
+    <value>المبلغ الإجمالي:</value>
+  </data>
+  <data name="CurrencyAlt" xml:space="preserve">
+    <value>العملة</value>
+  </data>
+  <data name="SuccessPartnerMessage" xml:space="preserve">
+    <value>نت شريكا في النجاح فلا تبخل علينا بالترك للتواصل و تقديم افكارك</value>
   </data>
   <data name="LogoutLink" xml:space="preserve">
     <value>تسجيل الخروج</value>
   </data>
+  <data name="AppName" xml:space="preserve">
+    <value>اسم التطبيق</value>
+  </data>
+  <data name="DashboardLink" xml:space="preserve">
+    <value>اللوحة الرئيسية</value>
+  </data>
   <data name="NumberPlateSection" xml:space="preserve">
     <value>لوحة الرقم</value>
   </data>
-  <data name="PlatesHistoryLink" xml:space="preserve">
-    <value>سجل اللوحات</value>
+  <data name="ViewNumberPlateLink" xml:space="preserve">
+    <value>عرض لوحة الرقم</value>
   </data>
-  <data name="PlatesManagementSection" xml:space="preserve">
-    <value>إدارة اللوحات</value>
-  </data>
-  <data name="ReceiptsSection" xml:space="preserve">
-    <value>الإيصالات</value>
-  </data>
-  <data name="ServicesSection" xml:space="preserve">
-    <value>الخدمات</value>
+  <data name="AddNewNumberLink" xml:space="preserve">
+    <value>إضافة إيصال جديد</value>
   </data>
   <data name="TransferSection" xml:space="preserve">
-    <value>النقل</value>
+    <value>التحويل</value>
   </data>
-  <data name="UnAllocatedPlatesLink" xml:space="preserve">
-    <value>اللوحات غير المخصصة</value>
+  <data name="TransferNewCarLink" xml:space="preserve">
+    <value>تحويل سيارة جديدة</value>
   </data>
-  <data name="UserImageAlt" xml:space="preserve">
-    <value>صورة المستخدم</value>
+  <data name="QuickSearchLink" xml:space="preserve">
+    <value>البحث السريع</value>
   </data>
-  <data name="UserName" xml:space="preserve">
-    <value>شر خان</value>
+  <data name="AllRightsReserved" xml:space="preserve">
+    <value>كل الحقوق محفوظة.</value>
+  </data>
+  <data name="CompanyLink" xml:space="preserve">
+    <value>اسم الشركة</value>
+  </data>
+  <data name="CopyrightText" xml:space="preserve">
+    <value>حقوق الطبع والنشر©</value>
   </data>
   <data name="UsersSection" xml:space="preserve">
     <value>المستخدمون</value>
   </data>
-  <data name="ViewCustomersLink" xml:space="preserve">
-    <value>عرض العملاء</value>
+  <data name="AddNewUserLink" xml:space="preserve">
+    <value>إضافة مستخدم جديد</value>
   </data>
-  <data name="ViewHistoryLink" xml:space="preserve">
-    <value>عرض السجل</value>
+  <data name="ViewUsersLink" xml:space="preserve">
+    <value>عرض المستخدمين</value>
   </data>
-  <data name="ViewNumberPlateLink" xml:space="preserve">
-    <value>عرض لوحة الرقم</value>
+  <data name="ServicesSection" xml:space="preserve">
+    <value>الخدمات</value>
+  </data>
+  <data name="VersionLabel" xml:space="preserve">
+    <value>الإصدار</value>
+  </data>
+  <data name="CustomersSection" xml:space="preserve">
+    <value>العملاء</value>
+  </data>
+  <data name="AppTitle" xml:space="preserve">
+    <value>متتبع لوحة أرقام السيارة</value>
   </data>
 </root>

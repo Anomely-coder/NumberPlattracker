@@ -3,11 +3,11 @@
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
-            <div class="col-sm-6"><h1>Add New Receipt</h1></div>
+            <div class="col-sm-6"><h1>@Localizer["AddNewReceiptTitle"]</h1></div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">Receipts</li>
+                    <li class="breadcrumb-item"><a href="#">@Localizer["HomeLink"]</a></li>
+                    <li class="breadcrumb-item active">@Localizer["ReceiptsBreadcrumb"]</li>
                 </ol>
             </div>
         </div>
@@ -17,32 +17,25 @@
 
 <section class="content">
     <div class="container">
-
-        @* Print Button *@
-        @if (TempData["PrintReceipt"] != null)
-        {
-            <button type="button" id="printBtn" class="btn btn-primary mb-3">Print Receipt</button>
-        }
-
-        <form method="post" asp-action="AddReceipt" asp-controller="Receipts">
+        <form method="post" asp-action="AddReceipt" asp-controller="Receipts" id="receiptForm">
             <div class="row my-2">
                 <!-- Customer Autocomplete -->
                 <div class="col-md-4">
-                    <label>Customer</label>
-                    <input type="text" class="form-control" id="customerSearch" placeholder="Search customer..." />
+                    <label>@Localizer["CustomerLabel"]</label>
+                    <input type="text" class="form-control" id="customerSearch" placeholder="@Localizer["CustomerSearchPlaceholder"]" />
                     <input type="hidden" asp-for="CustomerID" id="customerIdHidden" />
                 </div>
 
                 <!-- Car Number -->
                 <div class="col-md-4">
-                    <label>Car Number</label>
+                    <label>@Localizer["NumberPlateLabel"]</label>
                     <input type="text" class="form-control" asp-for="NumberPlate" id="NumberPlateTextbox" />
                     <input type="hidden" asp-for="CarID" id="carIdHidden" />
                 </div>
 
                 <!-- Date -->
                 <div class="col-md-4">
-                    <label>Date</label>
+                    <label>@Localizer["DateLabel"]</label>
                     <input asp-for="Date" class="form-control" readonly value="@Model.Date.ToString("yyyy-MM-dd HH:mm")" />
                 </div>
             </div>
@@ -52,7 +45,7 @@
             <div class="row my-2">
                 <div class="col-md-10">
                     <select class="form-control" id="serviceDropdown">
-                        <option value="">-- Select Service --</option>
+                        <option value="">@Localizer["SelectServiceOption"]</option>
                         @foreach (var service in ViewBag.Services)
                         {
                             <option value="@service.ServiceID" data-price="@service.Price" data-description="@service.Description">@service.ServiceName</option>
@@ -60,7 +53,7 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <button type="button" id="addServiceBtn" class="btn btn-primary w-100">Add</button>
+                    <button type="button" id="addServiceBtn" class="btn btn-primary w-100">@Localizer["AddButton"]</button>
                 </div>
             </div>
 
@@ -68,19 +61,26 @@
             <table class="table table-bordered" id="servicesTable">
                 <thead>
                     <tr>
-                        <th>Service</th>
-                        <th>Description</th>
-                        <th>Price</th>
-                        <th>Remove</th>
+                        <th>@Localizer["ServiceColumn"]</th>
+                        <th>@Localizer["DescriptionColumn"]</th>
+                        <th>@Localizer["PriceColumn"]</th>
+                        <th>@Localizer["RemoveColumn"]</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
             </table>
 
             <input type="hidden" asp-for="TotalAmount" id="totalAmountHidden" />
-            <h4>Total: <span id="totalDisplay">0</span></h4>
+            <h4>@Localizer["TotalLabel"]: <span id="totalDisplay">0</span></h4>
 
-            <button type="submit" class="btn btn-success w-100 mt-2">Save Receipt</button>
+            <div class="row">
+                <div class="col-md-6">
+                    <button type="submit" class="btn btn-success w-100 mt-2" id="saveBtn">@Localizer["SaveReceiptButton"]</button>
+                </div>
+                <div class="col-md-6">
+                    <button type="button" class="btn btn-primary w-100 mt-2" id="savePrintBtn">@Localizer["SavePrintButton"]</button>
+                </div>
+            </div>
         </form>
     </div>
 </section>
@@ -90,135 +90,144 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
 
     <script>
-                // Customer autocomplete
-                $("#customerSearch").autocomplete({
-                    source: function (request, response) {
-                        $.get('/Receipts/SearchCustomers', { term: request.term }, function (data) {
-                            response($.map(data, function (item) {
-                                return { label: item.name, value: item.name, id: item.customerID };
-                            }));
-                        });
-                    },
-                    select: function (event, ui) {
-                        $("#customerIdHidden").val(ui.item.id);
-                        $.get('/Receipts/GetCarByCustomer?customerId=' + ui.item.id, function (data) {
-                            $('#NumberPlateTextbox').val(data.NumberPlate);
-                            $('#carIdHidden').val(data.carId);
-                        });
-                    },
-                    minLength: 2
+        // Customer autocomplete
+        $("#customerSearch").autocomplete({
+            source: function (request, response) {
+                $.get('/Receipts/SearchCustomers', { term: request.term }, function (data) {
+                    response($.map(data, function (item) {
+                        return { label: item.name, value: item.name, id: item.customerID };
+                    }));
                 });
-
-                // Service table
-                let total = 0;
-                let index = 0;
-
-                $('#addServiceBtn').click(function () {
-                    const serviceId = $('#serviceDropdown').val();
-                    if (!serviceId) return;
-
-                    const selectedOption = $('#serviceDropdown option:selected');
-                    const price = parseFloat(selectedOption.data('price'));
-                    const description = selectedOption.data('description');
-                    const serviceName = selectedOption.text();
-
-                    total += price;
-                    $('#totalAmountHidden').val(total);
-                    $('#totalDisplay').text(total);
-
-                    const row = `
-                        <tr>
-                            <td>
-                                <input type="hidden" name="ServicesSelected[${index}].ServiceID" value="${serviceId}" />
-                                <input type="hidden" name="ServicesSelected[${index}].ServiceName" value="${serviceName}" />
-                                ${serviceName}
-                            </td>
-                            <td>
-                                <input type="hidden" name="ServicesSelected[${index}].Description" value="${description}" />
-                                ${description}
-                            </td>
-                            <td>
-                                <input type="hidden" name="ServicesSelected[${index}].Price" value="${price}" />
-                                ${price}
-                            </td>
-                            <td><button type="button" class="btn btn-danger btn-sm removeService">X</button></td>
-                        </tr>
-                    `;
-                    $('#servicesTable tbody').append(row);
-                    index++;
+            },
+            select: function (event, ui) {
+                $("#customerIdHidden").val(ui.item.id);
+                $.get('/Receipts/GetCarByCustomer?customerId=' + ui.item.id, function (data) {
+                    $('#NumberPlateTextbox').val(data.numberPlate);
+                    $('#carIdHidden').val(data.carId);
                 });
+            },
+            minLength: 2
+        });
 
-                $(document).on('click', '.removeService', function () {
-                    const price = parseFloat($(this).closest('tr').find("input[name$='.Price']").val());
-                    total -= price;
-                    $('#totalAmountHidden').val(total);
-                    $('#totalDisplay').text(total);
-                    $(this).closest('tr').remove();
-                });
+        // Service table
+        let total = 0;
+        let index = 0;
 
-                // Print receipt
-                       @if (TempData["PrintReceipt"] != null)
-        {
-                <text>
-                $('#printBtn').click(function () {
-                    var receipt = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(TempData["PrintReceipt"]));
+        $('#addServiceBtn').click(function () {
+            const serviceId = $('#serviceDropdown').val();
+            if (!serviceId) return;
 
-                    var servicesRows = '';
-                    receipt.Services.forEach(function (s, i) {
-                        servicesRows += `
-                            <tr>
-                                <td style="border:1px solid #000; text-align:center;">${i + 1}</td>
-                                <td style="border:1px solid #000; text-align:center;">${s.ServiceName}</td>
-                                <td style="border:1px solid #000; text-align:center;">${s.Description}</td>
-                                <td style="border:1px solid #000; text-align:center;">${s.Price.toFixed(2)}</td>
-                            </tr>`;
-                    });
+            const selectedOption = $('#serviceDropdown option:selected');
+            const price = parseFloat(selectedOption.data('price'));
+            const description = selectedOption.data('description');
+            const serviceName = selectedOption.text();
 
-                    var currentDate = new Date().toLocaleDateString('en-GB');
-                    var currentTime = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+            total += price;
+            $('#totalAmountHidden').val(total);
+            $('#totalDisplay').text(total);
 
-                    var html = `
+            const row = `
+                <tr>
+                    <td>
+                        <input type="hidden" name="ServicesSelected[${index}].ServiceID" value="${serviceId}" />
+                        <input type="hidden" name="ServicesSelected[${index}].ServiceName" value="${serviceName}" />
+                        ${serviceName}
+                    </td>
+                    <td>
+                        <input type="hidden" name="ServicesSelected[${index}].Description" value="${description}" />
+                        ${description}
+                    </td>
+                    <td>
+                        <input type="hidden" name="ServicesSelected[${index}].Price" value="${price}" />
+                        ${price}
+                    </td>
+                    <td><button type="button" class="btn btn-danger btn-sm removeService">@Localizer["RemoveButton", "X"]</button></td>
+                </tr>
+            `;
+            $('#servicesTable tbody').append(row);
+            index++;
+        });
+
+        $(document).on('click', '.removeService', function () {
+            const price = parseFloat($(this).closest('tr').find("input[name$='.Price']").val());
+            total -= price;
+            $('#totalAmountHidden').val(total);
+            $('#totalDisplay').text(total);
+            $(this).closest('tr').remove();
+        });
+
+        // Save & Print button
+        $('#savePrintBtn').click(function () {
+            var form = $('#receiptForm');
+            var formData = form.serialize();
+
+            $.post('/Receipts/AddReceipt', formData, function (receipt) {
+                if (receipt && receipt.receiptID) {
+                    printReceipt(receipt);
+                } else {
+                    alert("@Localizer["SaveReceiptFailedAlert"]");
+                }
+            });
+        });
+
+        // Print receipt function (Arabic + English header + footer included)
+        function printReceipt(receipt) {
+            var servicesRows = '';
+            receipt.services.forEach(function (s, i) {
+                servicesRows += `
+                    <tr>
+                        <td style="border:1px solid #000; text-align:center;">${i + 1}</td>
+                        <td style="border:1px solid #000; text-align:center;">${s.serviceName}</td>
+                        <td style="border:1px solid #000; text-align:center;">${s.description}</td>
+                        <td style="border:1px solid #000; text-align:center;">${s.price.toFixed(2)}</td>
+                    </tr>`;
+            });
+
+            var currentDate = new Date().toLocaleDateString('en-GB');
+            var currentTime = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+
+            var html = `
             <div style="width: 900px; margin: 50px auto; font-family: Arial, sans-serif; font-size: 14px; border:1px solid #000; padding:20px;">
 
-                <!-- Header with Arabic left, Logo center, English right -->
+                <!-- Header -->
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                     <div style="flex:1; text-align:left; font-size:20px; font-weight:bold;">
-                        شرطة الفجيرة ق.ع.د<br/>شؤون المالية
+                        @Localizer["FujairahPoliceArHeader"]
                     </div>
                     <div style="flex:1; text-align:center;">
-                        <img src="/images/logo1.png" alt="Logo" style="height:70px;" />
+                        <img src="/images/logo1.png" alt="@Localizer["LogoAlt"]" style="height:70px;" />
                     </div>
                     <div style="flex:1; text-align:right; font-size:20px; font-weight:bold;">
-                        Fujairah Police G.H.Q<br/>FINANCE AFFAIRS
+                        @Localizer["FujairahPoliceEnHeader"]
                     </div>
                 </div>
 
                 <!-- Receipt Info -->
                 <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
                     <div style="border:1px solid #000; padding:5px; width:180px; text-align:center;">
-                        Receipt No <br/> ${receipt.ReceiptID}
+                        @Localizer["ReceiptNoLabel"] <br/> ${receipt.receiptID}
                     </div>
                     <div style="border:1px solid #000; padding:5px; width:180px; text-align:center;">
-                        Date <br/> ${currentDate}
+                        @Localizer["DateLabel"] <br/> ${currentDate}
                     </div>
                     <div style="border:1px solid #000; padding:5px; width:180px; text-align:center;">
-                        Time <br/> ${currentTime}
+                        @Localizer["TimeLabel"] <br/> ${currentTime}
                     </div>
                 </div>
 
                 <!-- Customer -->
                 <div style="border:1px solid #000; padding:5px; margin-bottom:10px;">
-                    Received From: ${receipt.CustomerName}
+                    @Localizer["ReceivedFromLabel"]: ${receipt.customerName}
                 </div>
 
-                <!-- Services Table -->
+                <!-- Services -->
                 <table style="width:100%; border-collapse:collapse; margin-bottom:10px; text-align:center;">
                     <thead>
                         <tr>
-                            <th style="border:1px solid #000;">#</th>
-                            <th style="border:1px solid #000;">Service</th>
-                            <th style="border:1px solid #000;">Description</th>
-                            <th style="border:1px solid #000;">Price</th>
+                            <th style="border:1px solid #000;">@Localizer["NumberColumn"]</th>
+                            <th style="border:1px solid #000;">@Localizer["ServiceColumn"]</th>
+                            <th style="border:1px solid #000;">@Localizer["DescriptionColumn"]</th>
+                            <th style="border:1px solid #000;">@Localizer["PriceColumn"]</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -228,31 +237,26 @@
 
                 <!-- Total -->
                 <div style="border:1px solid #000; padding:5px; width:250px; text-align:left; margin-bottom:20px;">
-                    Total Amount: ${receipt.TotalAmount.toFixed(2)}
-                    <img src="/images/logo2.png" alt="Currency" style="height:18px; vertical-align:middle;" />
+                    @Localizer["TotalAmountLabel"]: ${receipt.totalAmount.toFixed(2)}
+                    <img src="/images/logo2.png" alt="@Localizer["CurrencyAlt"]" style="height:18px; vertical-align:middle;" />
                 </div>
 
-                <!-- Footer with Arabic contact info on right -->
+                <!-- Arabic Footer -->
                 <div style="display:flex; justify-content:space-between; margin-top:30px; font-size:14px;">
-                    <div style="flex:1; text-align:left;">
-                        &nbsp; <!-- empty for spacing -->
-                    </div>
+                    <div style="flex:1; text-align:left;">&nbsp;</div>
                     <div style="flex:1; text-align:right; line-height:1.5;">
-                        انت شريكا في النجاح فلا تبخل علينا بالترك للتواصل و تقديم افكارك<br/>
-                        تقديم الشكاوي والمقترحات يرجى التواصل على الرقم 2051111-00<br/>
-                        Tekrah@fujairah-police.gov.ae
+                        @Localizer["SuccessPartnerMessage"]<br/>
+                        @Localizer["ComplaintsSuggestionsMessage"]<br/>
+                        @Localizer["ContactEmail"]
                     </div>
                 </div>
-
             </div>
             `;
 
-                    var printWindow = window.open('', '', 'height=700,width=900');
-                    printWindow.document.write(html);
-                    printWindow.document.close();
-                    printWindow.print();
-                });
-                </text>
+            var printWindow = window.open('', '', 'height=700,width=900');
+            printWindow.document.write(html);
+            printWindow.document.close();
+            printWindow.print();
         }
     </script>
 }

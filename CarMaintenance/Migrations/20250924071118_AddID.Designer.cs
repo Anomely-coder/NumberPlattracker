@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CarMaintenance.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250922103743_AddNullableCarID")]
-    partial class AddNullableCarID
+    [Migration("20250924071118_AddID")]
+    partial class AddID
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,16 +36,11 @@ namespace CarMaintenance.Migrations
                     b.Property<int>("CarStatus")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CustomerID")
-                        .HasColumnType("int");
-
                     b.Property<string>("NumberPlate")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("CarID");
-
-                    b.HasIndex("CustomerID");
 
                     b.ToTable("Tbl_Cars");
                 });
@@ -58,6 +53,9 @@ namespace CarMaintenance.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CustomerID"));
 
+                    b.Property<int?>("CarID")
+                        .HasColumnType("int");
+
                     b.Property<int>("CustomerStatus")
                         .HasColumnType("int");
 
@@ -65,11 +63,19 @@ namespace CarMaintenance.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("EmiratesID")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("CustomerID");
+
+                    b.HasIndex("CarID");
 
                     b.ToTable("Tbl_Customers");
                 });
@@ -192,17 +198,11 @@ namespace CarMaintenance.Migrations
 
             modelBuilder.Entity("CarMaintenance.Models.ReceiptsDetails", b =>
                 {
-                    b.Property<int>("ReceiptDetailID")
+                    b.Property<int>("ReceiptsDetailsID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReceiptDetailID"));
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReceiptsDetailsID"));
 
                     b.Property<int>("ReceiptID")
                         .HasColumnType("int");
@@ -210,7 +210,7 @@ namespace CarMaintenance.Migrations
                     b.Property<int>("ServiceID")
                         .HasColumnType("int");
 
-                    b.HasKey("ReceiptDetailID");
+                    b.HasKey("ReceiptsDetailsID");
 
                     b.HasIndex("ReceiptID");
 
@@ -331,13 +331,14 @@ namespace CarMaintenance.Migrations
                     b.ToTable("Tbl_Users");
                 });
 
-            modelBuilder.Entity("CarMaintenance.Models.Cars", b =>
+            modelBuilder.Entity("CarMaintenance.Models.Customers", b =>
                 {
-                    b.HasOne("CarMaintenance.Models.Customers", "Customers")
-                        .WithMany("Cars")
-                        .HasForeignKey("CustomerID");
+                    b.HasOne("CarMaintenance.Models.Cars", "Cars")
+                        .WithMany("Customers")
+                        .HasForeignKey("CarID")
+                        .OnDelete(DeleteBehavior.SetNull);
 
-                    b.Navigation("Customers");
+                    b.Navigation("Cars");
                 });
 
             modelBuilder.Entity("CarMaintenance.Models.PlateAllocation", b =>
@@ -422,6 +423,8 @@ namespace CarMaintenance.Migrations
 
             modelBuilder.Entity("CarMaintenance.Models.Cars", b =>
                 {
+                    b.Navigation("Customers");
+
                     b.Navigation("Receipts");
 
                     b.Navigation("TransferCars");
@@ -429,8 +432,6 @@ namespace CarMaintenance.Migrations
 
             modelBuilder.Entity("CarMaintenance.Models.Customers", b =>
                 {
-                    b.Navigation("Cars");
-
                     b.Navigation("Receipts");
                 });
 

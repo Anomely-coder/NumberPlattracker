@@ -34,13 +34,13 @@
                         <th>ID</th>
                         <th>Name</th>
                         <th>Email</th>
-                        <th>Car Number</th>
+                        <th>Emirates ID</th>
+                        <th>Number Plate</th>
                         <th>Edit</th>
                         <th>Delete</th>
                     </tr>
                 </thead>
                 <tbody>
-
                     @if (Model.Any())
                     {
                         @foreach (var item in Model)
@@ -49,6 +49,7 @@
                                 <th>@item.CustomerID</th>
                                 <td>@item.Name</td>
                                 <td>@item.Email</td>
+                                <td>@item.EmiratesID</td>
                                 <td>@item.Cars?.NumberPlate</td>
                                 <td><p><a class="text-primary fas fa-pen" asp-action="EditCustomer" asp-controller="Customers" asp-route-Id="@item.CustomerID"></a></p></td>
                                 <td><p><a class="text-danger fas fa-trash" asp-action="DeleteCustomer" asp-controller="Customers" asp-route-Id="@item.CustomerID"></a></p></td>
@@ -58,7 +59,7 @@
                     else
                     {
                         <tr>
-                            <td class="text-center" colspan="6">No Record Found.</td>
+                            <td class="text-center" colspan="7">No Record Found.</td>
                         </tr>
                     }
                 </tbody>
@@ -66,8 +67,9 @@
                     <tr>
                         <th>ID</th>
                         <th>Name</th>
-                        <th>Emial</th>
-                        <th>Car Number</th>
+                        <th>Email</th>
+                        <th>Emirates ID</th>
+                        <th>Number Plate</th>
                         <th>Edit</th>
                         <th>Delete</th>
                     </tr>
@@ -76,11 +78,9 @@
         </div>
         <!-- /.card-body -->
     </div>
-
 </section>
 <!-- /.content -->
 @section Scripts {
-
     <!-- DataTables  & Plugins -->
     <script src="~/AdminTheme/plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="~/AdminTheme/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
@@ -106,25 +106,25 @@
                     {
                         extend: 'copy',
                         exportOptions: {
-                            columns: [0, 1, 2, 3] 
+                            columns: [0, 1, 2, 3, 4]
                         }
                     },
                     {
                         extend: 'csv',
                         exportOptions: {
-                            columns: [0, 1, 2, 3]
+                            columns: [0, 1, 2, 3, 4]
                         }
                     },
                     {
                         extend: 'excel',
                         exportOptions: {
-                            columns: [0, 1, 2, 3]
+                            columns: [0, 1, 2, 3, 4]
                         }
                     },
                     {
                         extend: 'pdf',
                         exportOptions: {
-                            columns: [0, 1, 2, 3]
+                            columns: [0, 1, 2, 3, 4]
                         }
                     },
                     {
@@ -132,12 +132,12 @@
                         text: 'Print',
                         title: '',
                         exportOptions: {
-                            columns: [0, 1, 2, 3] 
+                            columns: [0, 1, 2, 3, 4]
                         },
                         customize: function (win) {
                             $(win.document.body).prepend(
                                 '<div style="display:flex; justify-content:space-between; margin-bottom:20px;">' +
-                                '<h2 style="margin:0;">Receipts Report</h2>' +
+                                '<h2 style="margin:0;">Customers Report</h2>' +
                                 '<img src="/images/logo1.png" style="height:60px;" />' +
                                 '</div>'
                             );
@@ -153,5 +153,4 @@
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
         });
     </script>
-
 }

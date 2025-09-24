@@ -1,6 +1,7 @@
 ﻿using CarMaintenance.Data;
 using CarMaintenance.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CarMaintenance.Controllers
 {
@@ -15,8 +16,8 @@ namespace CarMaintenance.Controllers
 
         public IActionResult Index()
         {
-            var data = db.Tbl_Cars;
-            return View(data);
+            var cars = db.Tbl_Cars.Include(c => c.Customers).ToList();
+            return View(cars); ;
         }
 
         public IActionResult AddCar()

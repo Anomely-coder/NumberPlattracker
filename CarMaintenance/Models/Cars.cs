@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using System.ComponentModel;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace CarMaintenance.Models
 {
@@ -9,9 +10,9 @@ namespace CarMaintenance.Models
         [Key]
         public int CarID { get; set; }
 
-        
         public string NumberPlate { get; set; }
 
+        // 0 = Unregistered, 1 = Registered
         public int CarStatus { get; set; }
 
         // Navigation
@@ -23,5 +24,8 @@ namespace CarMaintenance.Models
 
         [ValidateNever]
         public ICollection<TransferCars> TransferCars { get; set; }
+
+        // Computed property to show status as text
+        public string StatusText => CarStatus == 1 ? "Registered" : "Unregistered";
     }
 }

@@ -1,16 +1,18 @@
-﻿@model IEnumerable<Cars>
+﻿@using CarMaintenance
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
+@model IEnumerable<Cars>
 
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>View Number Plates</h1>
+                <h1>@Localizer["ViewNumberPlatesTitle"]</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">Cars</li>
+                    <li class="breadcrumb-item"><a href="#">@Localizer["HomeLink"]</a></li>
+                    <li class="breadcrumb-item active">@Localizer["CarsBreadcrumb"]</li>
                 </ol>
             </div>
         </div>
@@ -23,7 +25,7 @@
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">
-                <a class="btn btn-primary my-3" asp-action="AddCar" asp-controller="Cars">Add New Number</a>
+                <a class="btn btn-primary my-3" asp-action="AddCar" asp-controller="Cars">@Localizer["AddNewNumberLink"]</a>
             </h3>
         </div>
         <!-- /.card-header -->
@@ -31,14 +33,14 @@
             <table id="example1" class="table table-bordered table-striped">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Number Plate</th>
-                        <th>Edit</th>
-                        <th>Delete</th>
+                        <th>@Localizer["IdColumn"]</th>
+                        <th>@Localizer["NumberPlateColumn"]</th>
+                        <th>@Localizer["StatusColumn"]</th>
+                        <th>@Localizer["EditColumn"]</th>
+                        <th>@Localizer["DeleteColumn"]</th>
                     </tr>
                 </thead>
                 <tbody>
-
                     @if (Model.Any())
                     {
                         @foreach (var item in Model)
@@ -46,35 +48,48 @@
                             <tr>
                                 <th>@item.CarID</th>
                                 <td>@item.NumberPlate</td>
-                                <td><p><a class="text-primary fas fa-pen" asp-action="EditCar" asp-controller="Cars" asp-route-Id="@item.CarID"></a></p></td>
-                                <td><p><a class="text-danger fas fa-trash" asp-action="DeleteCar" asp-controller="Cars" asp-route-Id="@item.CarID"></a></p></td>
+                                <td>
+                                    @if (item.CarStatus == 1)
+                                    {
+                                        <span class="badge bg-success">@Localizer["RegisteredStatus"]</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">@Localizer["UnregisteredStatus"]</span>
+                                    }
+                                </td>
+                                <td>
+                                    <p><a class="text-primary fas fa-pen" asp-action="EditCar" asp-controller="Cars" asp-route-Id="@item.CarID"></a></p>
+                                </td>
+                                <td>
+                                    <p><a class="text-danger fas fa-trash" asp-action="DeleteCar" asp-controller="Cars" asp-route-Id="@item.CarID"></a></p>
+                                </td>
                             </tr>
                         }
                     }
                     else
                     {
                         <tr>
-                            <td class="text-center" colspan="6">No Record Found.</td>
+                            <td class="text-center" colspan="6">@Localizer["NoRecordsFound"]</td>
                         </tr>
                     }
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th>ID</th>
-                        <th>Number Plate</t>
-                        <th>Edit</th>
-                        <th>Delete</th>
+                        <th>@Localizer["IdColumn"]</th>
+                        <th>@Localizer["NumberPlateColumn"]</th>
+                        <th>@Localizer["StatusColumn"]</th>
+                        <th>@Localizer["EditColumn"]</th>
+                        <th>@Localizer["DeleteColumn"]</th>
                     </tr>
                 </tfoot>
             </table>
         </div>
         <!-- /.card-body -->
     </div>
-
 </section>
 <!-- /.content -->
 @section Scripts {
-
     <script src="~/AdminTheme/plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="~/AdminTheme/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
     <script src="~/AdminTheme/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
@@ -88,7 +103,6 @@
     <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.print.min.js"></script>
     <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
 
-
     <!-- Page specific script -->
     <script>
         $(function () {
@@ -99,39 +113,43 @@
                 "buttons": [
                     {
                         extend: 'copy',
+                        text: '@Localizer["CopyButton"]',
                         exportOptions: {
-                            columns: [0, 1] // Only export ID + Number Plate
+                            columns: [0, 1, 2] // Include ID, Number Plate, Status
                         }
                     },
                     {
                         extend: 'csv',
+                        text: '@Localizer["CsvButton"]',
                         exportOptions: {
-                            columns: [0, 1]
+                            columns: [0, 1, 2]
                         }
                     },
                     {
                         extend: 'excel',
+                        text: '@Localizer["ExcelButton"]',
                         exportOptions: {
-                            columns: [0, 1]
+                            columns: [0, 1, 2]
                         }
                     },
                     {
                         extend: 'pdf',
+                        text: '@Localizer["PdfButton"]',
                         exportOptions: {
-                            columns: [0, 1]
+                            columns: [0, 1, 2]
                         }
                     },
                     {
                         extend: 'print',
-                        text: 'Print',
+                        text: '@Localizer["PrintButton"]',
                         title: '',
                         exportOptions: {
-                            columns: [0, 1] // Skip Edit/Delete
+                            columns: [0, 1, 2] // Skip Edit/Delete
                         },
                         customize: function (win) {
                             $(win.document.body).prepend(
                                 '<div style="display:flex; justify-content:space-between; margin-bottom:20px;">' +
-                                '<h2 style="margin:0;">Receipts Report</h2>' +
+                                '<h2 style="margin:0;">@Localizer["ReceiptsReportTitle"]</h2>' +
                                 '<img src="/images/logo1.png" style="height:60px;" />' +
                                 '</div>'
                             );
@@ -142,11 +160,12 @@
                                 .css('width', '100%');
                         }
                     },
-                    "colvis"
+                    {
+                        extend: 'colvis',
+                        text: '@Localizer["ColumnVisibilityButton"]'
+                    }
                 ]
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
         });
     </script>
-
-
 }

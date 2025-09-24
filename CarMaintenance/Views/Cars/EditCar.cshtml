@@ -5,12 +5,12 @@
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>Update Car</h1>
+                <h1>@Localizer["UpdateCarTitle"]</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">Cars</li>
+                    <li class="breadcrumb-item"><a href="#">@Localizer["HomeLink"]</a></li>
+                    <li class="breadcrumb-item active">@Localizer["CarsBreadcrumb"]</li>
                 </ol>
             </div>
         </div>
@@ -25,15 +25,15 @@
             <div class="row my-2">
                 <input asp-for="CarID" hidden />
                 <div class="col-md-6 form-group">
-                    <label class="form-label">Car Number <span class="text-danger fw-bold" asp-validation-for="NumberPlate"></span></label>
+                    <label class="form-label">@Localizer["CarNumberLabel"] <span class="text-danger fw-bold" asp-validation-for="NumberPlate"></span></label>
                     <input class="form-control" asp-for="NumberPlate" />
                 </div>
                 <div class="col-md-6 form-group">
-                    <label class="form-label" hidden>Car Status <span class="text-danger fw-bold" asp-validation-for="CarStatus"></span></label>
+                    <label class="form-label" hidden>@Localizer["CarStatusLabel"] <span class="text-danger fw-bold" asp-validation-for="CarStatus"></span></label>
                     <input class="form-control" asp-for="CarStatus" value="1" hidden />
                 </div>
                 <div class="col-md-12 my-2">
-                    <button type="submit" class="btn btn-primary">Update Car</button>
+                    <button type="submit" class="btn btn-primary">@Localizer["UpdateCarButton"]</button>
                 </div>
             </div>
         </form>

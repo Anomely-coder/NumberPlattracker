@@ -64,7 +64,7 @@
             const doc = new jsPDF();
             let y = 20;
 
-            // Header
+            // PDF Header
             doc.setFontSize(16);
             doc.text("Customer Report", 14, y);
             y += 8;
@@ -79,19 +79,21 @@
                     var customer = r.Customer;
 
                     <text>
-                    // Customer Info Table
-                    doc.autoTable({
-                        startY: y,
-                        head: [['Customer Name', 'Email', 'Number Plate']],
-                        body: [['@customer.Name', '@customer.Email', '@(customer.Cars?.NumberPlate ?? "N/A")']],
-                        theme: 'grid',
-                        headStyles: { fillColor: [52, 73, 94] },
-                        styles: { fontSize: 10 }
-                    });
-                    y = doc.lastAutoTable.finalY + 4;
+                    // Print Customer Info (not in table)
+                    doc.setFontSize(12);
+                    doc.text("Customer Name: @customer.Name", 14, y);
+                    y += 6;
+                    doc.text("Email: @customer.Email", 14, y);
+                    y += 6;
+                    doc.text("Number Plate: @(customer.Cars?.NumberPlate ?? "N/A")", 14, y);
+                    y += 8;
 
                     // Receipts Table
                     if (@(customer.Receipts?.Count() ?? 0) > 0) {
+                        doc.setFontSize(12);
+                        doc.text("Receipts", 14, y);
+                        y += 6;
+
                         const receiptsBody = [];
                         @foreach (var rec in customer.Receipts)
                         {
@@ -109,11 +111,15 @@
                             headStyles: { fillColor: [22, 160, 133] },
                             styles: { fontSize: 9 }
                         });
-                        y = doc.lastAutoTable.finalY + 4;
+                        y = doc.lastAutoTable.finalY + 8;
                     }
 
                     // Transfers Table
                     if (@(r.Transfers?.Count() ?? 0) > 0) {
+                        doc.setFontSize(12);
+                        doc.text("Transfers", 14, y);
+                        y += 6;
+
                         const transfersBody = [];
                         @foreach (var t in r.Transfers)
                         {
@@ -140,4 +146,5 @@
             doc.save("CustomerReport.pdf");
         });
     </script>
+}
 }
