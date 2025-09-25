@@ -1,13 +1,23 @@
 ﻿@model IEnumerable<CarMaintenance.Models.Receipts>
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
+@using System.Globalization
 
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="~/AdminTheme/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css" />
+<link rel="stylesheet" href="~/AdminTheme/plugins/datatables-responsive/css/responsive.bootstrap4.min.css" />
+<link rel="stylesheet" href="~/AdminTheme/plugins/datatables-buttons/css/buttons.bootstrap4.min.css" />
+
+<!-- Content Header -->
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
-            <div class="col-sm-6"><h1>Receipts</h1></div>
             <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">Receipt</li>
+                <h1>@Localizer["ReceiptsTitle"]</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-@(CultureInfo.CurrentCulture.TextInfo.IsRightToLeft ? "left" : "right")">
+                    <li class="breadcrumb-item"><a href="#">@Localizer["HomeLink"]</a></li>
+                    <li class="breadcrumb-item active">@Localizer["ReceiptsBreadcrumb"]</li>
                 </ol>
             </div>
         </div>
@@ -15,21 +25,21 @@
     </div>
 </section>
 
+<!-- Main content -->
 <section class="content">
     <div class="card">
         <div class="card-header">
-            <a class="btn btn-primary my-2" asp-action="AddReceipt">Create New Receipt</a>
+            <a class="btn btn-primary my-2" asp-action="AddReceipt">@Localizer["CreateNewReceiptButton"]</a>
         </div>
-
         <div class="card-body">
             <table id="example1" class="table table-bordered table-striped">
-                <thead class="thead-dark">
+                <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Customer</th>
-                        <th>Number Plate</th>
-                        <th>Date</th>
-                        <th>Amount</th>
+                        <th>@Localizer["CustomerID"]</th>
+                        <th>@Localizer["CustomerLabel"]</th>
+                        <th>@Localizer["NumberPlate"]</th>
+                        <th>@Localizer["DateLabel"]</th>
+                        <th>@Localizer["Amount"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -39,39 +49,42 @@
                         {
                             <tr>
                                 <td>@item.ReceiptID</td>
-                                <td>@item.Customers?.Name</td>
-                                <td>@item.Cars?.NumberPlate</td>
-                                <td>@item.Date.ToString("yyyy-MM-dd")</td>
-                                <td>@item.TotalAmount</td>
+                                <td>@(item.Customers?.Name ?? Localizer["Unknown"])</td>
+                                <td>@(item.Cars?.NumberPlate ?? Localizer["Unknown"])</td>
+                                <td>@item.Date.ToString("d", CultureInfo.CurrentCulture)</td>
+                                <td>@item.TotalAmount.ToString("C", CultureInfo.CurrentCulture)</td>
                             </tr>
                         }
                     }
                     else
                     {
                         <tr>
-                            <td colspan="5" class="text-center">No Record Found.</td>
+                            <td colspan="5" class="text-center">@Localizer["NoRecordFound"]</td>
                         </tr>
                     }
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <th>@Localizer["IDColumn"]</th>
+                        <th>@Localizer["CustomerColumn"]</th>
+                        <th>@Localizer["NumberPlateColumn"]</th>
+                        <th>@Localizer["DateColumn"]</th>
+                        <th>@Localizer["AmountColumn"]</th>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     </div>
 </section>
 
 @section Scripts {
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css" />
-    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css" />
-
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <!-- DataTables + Buttons -->
-    <!-- DataTables  & Plugins -->
+    <!-- DataTables & Plugins -->
     <script src="~/AdminTheme/plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="~/AdminTheme/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
     <script src="~/AdminTheme/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
     <script src="~/AdminTheme/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+
+    <!-- Buttons -->
     <script src="~/AdminTheme/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
     <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
     <script src="~/AdminTheme/plugins/jszip/jszip.min.js"></script>
@@ -81,24 +94,47 @@
     <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.print.min.js"></script>
     <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
 
-    <!-- Page specific script -->
     <script>
         $(function () {
-          $("#example1").DataTable({
-            "responsive": true, "lengthChange": false, "autoWidth": false,
-            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-          }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-          $('#example2').DataTable({
-            "paging": true,
-            "lengthChange": false,
-            "searching": false,
-            "ordering": true,
-            "info": true,
-            "autoWidth": false,
-            "responsive": true,
-          });
+            var langUrl = "@(CultureInfo.CurrentCulture.TwoLetterISOLanguageName == "ar"
+                                                    ? "https://cdn.datatables.net/plug-ins/1.13.4/i18n/ar.json"
+                                                    : "https://cdn.datatables.net/plug-ins/1.13.4/i18n/en-GB.json")";
+
+        var table = $("#example1").DataTable({
+            responsive: true,
+            lengthChange: false,
+            autoWidth: false,
+            dom: 'Bfrtip',   // 👈 this makes buttons appear
+            language: {
+                url: langUrl,
+                emptyTable: "@Localizer["NoRecordFound"]"
+            },
+            buttons: [
+                { extend: 'copy', text: '@Localizer["CopyButton"]', exportOptions: { columns: [0,1,2,3,4] } },
+                { extend: 'csv', text: '@Localizer["CsvButton"]', exportOptions: { columns: [0,1,2,3,4] } },
+                { extend: 'excel', text: '@Localizer["ExcelButton"]', exportOptions: { columns: [0,1,2,3,4] } },
+                { extend: 'pdf', text: '@Localizer["PdfButton"]', exportOptions: { columns: [0,1,2,3,4] } },
+                {
+                    extend: 'print',
+                    text: '@Localizer["PrintButton"]',
+                    title: '',
+                    exportOptions: { columns: [0,1,2,3,4] },
+                    customize: function (win) {
+                        $(win.document.body).prepend(
+                            '<div style="display:flex; justify-content:space-between; margin-bottom:20px;">' +
+                            '<h2 style="margin:0;">@Localizer["ReceiptsReport"]</h2>' +
+                            '<img src="/images/logo1.png" style="height:60px;" />' +
+                            '</div>'
+                        );
+                    }
+                },
+                "colvis"
+            ]
+        });
+
+            // Optional: move buttons to AdminLTE card-header
+            table.buttons().container().appendTo('.card-header');
         });
     </script>
-
 
 }

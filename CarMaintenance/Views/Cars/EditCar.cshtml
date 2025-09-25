@@ -1,4 +1,6 @@
 ﻿@model Cars
+@using CarMaintenance
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
 
 <!-- Content Header (Page header) -->
 <section class="content-header">
@@ -25,7 +27,7 @@
             <div class="row my-2">
                 <input asp-for="CarID" hidden />
                 <div class="col-md-6 form-group">
-                    <label class="form-label">@Localizer["CarNumberLabel"] <span class="text-danger fw-bold" asp-validation-for="NumberPlate"></span></label>
+                    <label class="form-label">@Localizer["NumberLabel"] <span class="text-danger fw-bold" asp-validation-for="NumberPlate"></span></label>
                     <input class="form-control" asp-for="NumberPlate" />
                 </div>
                 <div class="col-md-6 form-group">

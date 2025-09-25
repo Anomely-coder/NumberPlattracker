@@ -1,16 +1,20 @@
-﻿@model IEnumerable<TransferCars>
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@model IEnumerable<TransferCars>
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
+@using System.Globalization
 
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>Transfer Number Plate</h1>
+                <h1>@Localizer["TransferNumberPlateTitle"]</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">Transfer Cars</li>
+                    <li class="breadcrumb-item"><a href="#">@Localizer["Home"]</a></li>
+                    <li class="breadcrumb-item active">@Localizer["TransferCarsTitle"]</li>
                 </ol>
             </div>
         </div>
@@ -23,7 +27,9 @@
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">
-                <a class="btn btn-primary my-3" asp-action="Transfer" asp-controller="TransferCars">Transfer New Number Plate</a>
+                <a class="btn btn-primary my-3" asp-action="Transfer" asp-controller="TransferCars">
+                    @Localizer["TransferNewNumberPlate"]
+                </a>
             </h3>
         </div>
         <!-- /.card-header -->
@@ -31,11 +37,11 @@
             <table id="example1" class="table table-bordered table-striped">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Date</th>
-                        <th>From</th>
-                        <th>To</th>
-                        <th>Number plate</th>
+                        <th>@Localizer["ID"]</th>
+                        <th>@Localizer["DateLabel"]</th>
+                        <th>@Localizer["From"]</th>
+                        <th>@Localizer["To"]</th>
+                        <th>@Localizer["NumberPlate"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -55,29 +61,27 @@
                     else
                     {
                         <tr>
-                            <td class="text-center" colspan="5">No Record Found.</td>
+                            <td class="text-center" colspan="5">@Localizer["NoRecordFound"]</td>
                         </tr>
                     }
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th>ID</th>
-                        <th>Date</th>
-                        <th>From</th>
-                        <th>To</th>
-                        <th>Number Plate</th>
+                        <th>@Localizer["ID"]</th>
+                        <th>@Localizer["Date"]</th>
+                        <th>@Localizer["From"]</th>
+                        <th>@Localizer["To"]</th>
+                        <th>@Localizer["NumberPlate"]</th>
                     </tr>
                 </tfoot>
             </table>
         </div>
         <!-- /.card-body -->
     </div>
-
 </section>
-<!-- /.content -->
-@section Scripts {
 
-    <!-- DataTables  & Plugins -->
+@section Scripts {
+    <!-- DataTables & Plugins -->
     <script src="~/AdminTheme/plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="~/AdminTheme/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
     <script src="~/AdminTheme/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
@@ -94,19 +98,13 @@
     <!-- Page specific script -->
     <script>
         $(function () {
-          $("#example1").DataTable({
-            "responsive": true, "lengthChange": false, "autoWidth": false,
-            "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-          }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-          $('#example2').DataTable({
-            "paging": true,
-            "lengthChange": false,
-            "searching": false,
-            "ordering": true,
-            "info": true,
-            "autoWidth": false,
-            "responsive": true,
-          });
+            $("#example1").DataTable({
+                "responsive": true, "lengthChange": false, "autoWidth": false,
+                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"],
+                "language": {
+                    "url": "/i18n/datatables/@System.Threading.Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName".json"
+                }
+            }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
         });
     </script>
 }

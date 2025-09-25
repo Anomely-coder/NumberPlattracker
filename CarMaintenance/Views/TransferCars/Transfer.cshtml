@@ -1,21 +1,23 @@
 ﻿@model TransferCars
-
+@inject IViewLocalizer Localizer
+@using CarMaintenance
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>Transfer Cars</h1>
+                <h1>@Localizer["TransferCarsTitle"]</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">Transfer Cars</li>
+                    <li class="breadcrumb-item"><a href="#">@Localizer["Home"]</a></li>
+                    <li class="breadcrumb-item active">@Localizer["TransferCars"]</li>
                 </ol>
             </div>
         </div>
         <hr />
-    </div><!-- /.container-fluid -->
+    </div>
 </section>
 
 <!-- Main content -->
@@ -25,40 +27,46 @@
             <div class="row my-2">
 
                 <div class="col-md-6 form-group">
-                    <label class="form-label">From Customer <span class="text-danger fw-bold" asp-validation-for="FromCustomerID"></span></label>
+                    <label class="form-label">
+                        @Localizer["From"]
+                        <span class="text-danger fw-bold" asp-validation-for="FromCustomerID"></span>
+                    </label>
                     <select class="form-control" asp-for="FromCustomerID" asp-items="ViewBag.Customers">
-                        <option value="">-- Select Customer --</option>
+                        <option value="">@Localizer["SelectCustomer"]</option>
                     </select>
                 </div>
 
                 <div class="col-md-6 form-group">
-                    <label class="form-label">Car Number <span class="text-danger fw-bold"></span></label>
+                    <label class="form-label">@Localizer["NumberPlate"]</label>
                     <input class="form-control" id="NumberPlate" readonly />
                     <input type="hidden" id="CarID" name="CarID" asp-for="CarID" />
                 </div>
 
                 <div class="col-md-6 form-group">
-                    <label class="form-label">To Customer <span class="text-danger fw-bold" asp-validation-for="ToCustomerID"></span></label>
+                    <label class="form-label">
+                        @Localizer["To"]
+                        <span class="text-danger fw-bold" asp-validation-for="ToCustomerID"></span>
+                    </label>
                     <select class="form-control" asp-for="ToCustomerID" asp-items="ViewBag.Customers">
-                        <option value="">-- Select Customer --</option>
+                        <option value="">@Localizer["SelectCustomer"]</option>
                     </select>
-
                 </div>
 
                 <div class="col-md-6 form-group">
-                    <label class="form-label">Date <span class="text-danger fw-bold" asp-validation-for="TransferDate"></span></label>
+                    <label class="form-label">
+                        @Localizer["TransferDate"]
+                        <span class="text-danger fw-bold" asp-validation-for="TransferDate"></span>
+                    </label>
                     <input class="form-control" asp-for="TransferDate" />
                 </div>
 
                 <div class="col-md-12 my-2">
-                    <button type="submit" class="btn btn-primary">Transfer Car</button>
+                    <button type="submit" class="btn btn-primary">@Localizer["TransferCarButton"]</button>
                 </div>
             </div>
         </form>
     </div>
 </section>
-<!-- /.content -->
-
 
 @section Scripts {
     <script>

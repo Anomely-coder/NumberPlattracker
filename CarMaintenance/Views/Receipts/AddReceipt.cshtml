@@ -1,4 +1,6 @@
 ﻿@model CarMaintenance.ViewModel.ReceiptViewModel
+@using CarMaintenance
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
 
 <section class="content-header">
     <div class="container-fluid">
@@ -29,7 +31,7 @@
                 <!-- Car Number -->
                 <div class="col-md-4">
                     <label>@Localizer["NumberPlateLabel"]</label>
-                    <input type="text" class="form-control" asp-for="NumberPlate" id="NumberPlateTextbox" />
+                    <input type="text" class="form-control" asp-for="NumberPlate" id="NumberPlateTextbox" readonly />
                     <input type="hidden" asp-for="CarID" id="carIdHidden" />
                 </div>
 
@@ -41,6 +43,7 @@
             </div>
 
             <hr />
+
             <!-- Service Selection -->
             <div class="row my-2">
                 <div class="col-md-10">
@@ -90,7 +93,7 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
 
     <script>
-        // Customer autocomplete
+        // ✅ Customer autocomplete + auto car number
         $("#customerSearch").autocomplete({
             source: function (request, response) {
                 $.get('/Receipts/SearchCustomers', { term: request.term }, function (data) {
@@ -102,17 +105,18 @@
             select: function (event, ui) {
                 $("#customerIdHidden").val(ui.item.id);
                 $.get('/Receipts/GetCarByCustomer?customerId=' + ui.item.id, function (data) {
-                    $('#NumberPlateTextbox').val(data.numberPlate);
-                    $('#carIdHidden').val(data.carId);
+                    if (data) {
+                        $('#NumberPlateTextbox').val(data.numberPlate);
+                        $('#carIdHidden').val(data.carId);
+                    }
                 });
             },
             minLength: 2
         });
 
-        // Service table
+        // ✅ Service adding logic
         let total = 0;
         let index = 0;
-
         $('#addServiceBtn').click(function () {
             const serviceId = $('#serviceDropdown').val();
             if (!serviceId) return;
@@ -141,7 +145,7 @@
                         <input type="hidden" name="ServicesSelected[${index}].Price" value="${price}" />
                         ${price}
                     </td>
-                    <td><button type="button" class="btn btn-danger btn-sm removeService">@Localizer["RemoveButton", "X"]</button></td>
+                    <td><button type="button" class="btn btn-danger btn-sm removeService">X</button></td>
                 </tr>
             `;
             $('#servicesTable tbody').append(row);
@@ -156,7 +160,7 @@
             $(this).closest('tr').remove();
         });
 
-        // Save & Print button
+        // ✅ Save & Print
         $('#savePrintBtn').click(function () {
             var form = $('#receiptForm');
             var formData = form.serialize();
@@ -167,11 +171,13 @@
                 } else {
                     alert("@Localizer["SaveReceiptFailedAlert"]");
                 }
+            }).fail(function () {
+                alert("@Localizer["SaveReceiptFailedAlert"]");
             });
         });
 
-        // Print receipt function (Arabic + English header + footer included)
-        function printReceipt(receipt) {
+        // ✅ Print function
+               function printReceipt(receipt) {
             var servicesRows = '';
             receipt.services.forEach(function (s, i) {
                 servicesRows += `
@@ -189,39 +195,34 @@
             var html = `
             <div style="width: 900px; margin: 50px auto; font-family: Arial, sans-serif; font-size: 14px; border:1px solid #000; padding:20px;">
 
-                <!-- Header -->
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                    <div style="flex:1; text-align:left; font-size:20px; font-weight:bold;">
-                        @Localizer["FujairahPoliceArHeader"]
-                    </div>
-                    <div style="flex:1; text-align:center;">
-                        <img src="/images/logo1.png" alt="@Localizer["LogoAlt"]" style="height:70px;" />
-                    </div>
-                    <div style="flex:1; text-align:right; font-size:20px; font-weight:bold;">
-                        @Localizer["FujairahPoliceEnHeader"]
-                    </div>
-                </div>
+                <!-- ✅ Centered Logo -->
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <!-- Arabic header (left) -->
+            <div style="flex:1; text-align:left; font-size:18px; font-weight:bold;">
+                شرطة الفجيرة ق.ع.د<br />
+                شؤون المالية
+            </div>
 
-                <!-- Receipt Info -->
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                    <div style="border:1px solid #000; padding:5px; width:180px; text-align:center;">
-                        @Localizer["ReceiptNoLabel"] <br/> ${receipt.receiptID}
-                    </div>
-                    <div style="border:1px solid #000; padding:5px; width:180px; text-align:center;">
-                        @Localizer["DateLabel"] <br/> ${currentDate}
-                    </div>
-                    <div style="border:1px solid #000; padding:5px; width:180px; text-align:center;">
-                        @Localizer["TimeLabel"] <br/> ${currentTime}
-                    </div>
-                </div>
+            <!-- Center logo -->
+            <div style="flex:1; text-align:center;">
+                <img src="/images/logo1.png" alt="@Localizer["LogoAlt"]" style="height:80px;" />
+            </div>
 
-                <!-- Customer -->
-                <div style="border:1px solid #000; padding:5px; margin-bottom:10px;">
-                    @Localizer["ReceivedFromLabel"]: ${receipt.customerName}
-                </div>
+            <!-- English header (right) -->
+            <div style="flex:1; text-align:right; font-size:18px; font-weight:bold;">
+                Fujairah Police G.H.Q<br />
+                FINANCE AFFAIRS
+            </div>
+        </div>
 
-                <!-- Services -->
-                <table style="width:100%; border-collapse:collapse; margin-bottom:10px; text-align:center;">
+                <div>
+                    <b>@Localizer["ReceiptNoLabel"]:</b> ${receipt.receiptID} <br/>
+                    <b>@Localizer["DateLabel"]:</b> ${currentDate} <br/>
+                    <b>@Localizer["TimeLabel"]:</b> ${currentTime}
+                </div>
+                <hr/>
+                <b>@Localizer["ReceivedFromLabel"]:</b> ${receipt.customerName}
+                <table style="width:100%; border-collapse:collapse; margin-top:10px;">
                     <thead>
                         <tr>
                             <th style="border:1px solid #000;">@Localizer["NumberColumn"]</th>
@@ -230,28 +231,17 @@
                             <th style="border:1px solid #000;">@Localizer["PriceColumn"]</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        ${servicesRows}
-                    </tbody>
+                    <tbody>${servicesRows}</tbody>
                 </table>
-
-                <!-- Total -->
-                <div style="border:1px solid #000; padding:5px; width:250px; text-align:left; margin-bottom:20px;">
+                <div style="margin-top:10px; font-weight:bold;">
                     @Localizer["TotalAmountLabel"]: ${receipt.totalAmount.toFixed(2)}
-                    <img src="/images/logo2.png" alt="@Localizer["CurrencyAlt"]" style="height:18px; vertical-align:middle;" />
                 </div>
-
-                <!-- Arabic Footer -->
-                <div style="display:flex; justify-content:space-between; margin-top:30px; font-size:14px;">
-                    <div style="flex:1; text-align:left;">&nbsp;</div>
-                    <div style="flex:1; text-align:right; line-height:1.5;">
-                        @Localizer["SuccessPartnerMessage"]<br/>
-                        @Localizer["ComplaintsSuggestionsMessage"]<br/>
-                        @Localizer["ContactEmail"]
-                    </div>
+                <div style="margin-top:20px; text-align:right;">
+                    @Localizer["SuccessPartnerMessage"] <br/>
+                    @Localizer["ComplaintsSuggestionsMessage"] <br/>
+                    @Localizer["ContactEmail"]
                 </div>
-            </div>
-            `;
+            </div>`;
 
             var printWindow = window.open('', '', 'height=700,width=900');
             printWindow.document.write(html);

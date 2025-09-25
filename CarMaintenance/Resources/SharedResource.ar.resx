@@ -178,7 +178,7 @@
     <value>إضافة لوحة رقم</value>
   </data>
   <data name="UpdateCarTitle" xml:space="preserve">
-    <value>تحديث السيارة</value>
+    <value>تحديث رقم اللوحة</value>
   </data>
   <data name="DashboardTitle" xml:space="preserve">
     <value>اللوحة الرئيسية</value>
@@ -302,5 +302,351 @@
   </data>
   <data name="AppTitle" xml:space="preserve">
     <value>متتبع لوحة أرقام السيارة</value>
+  </data>
+  <data name="UpdateCarButton" xml:space="preserve">
+    <value>تحديث رقم اللوحة</value>
+  </data>
+  <data name="NumberPlate.Required" xml:space="preserve">
+    <value>حقل لوحة الأرقام مطلوب.</value>
+  </data>
+  <data name="NumberLabel" xml:space="preserve">
+    <value>لوحة الأرقام</value>
+  </data>
+  <data name="CustomersBreadcrumb" xml:space="preserve">
+    <value>العملاء</value>
+  </data>
+  <data name="CreateCustomerButton" xml:space="preserve">
+    <value>إنشاء عميل جديد</value>
+  </data>
+  <data name="CustomerID" xml:space="preserve">
+    <value>المعرف</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>الاسم</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>البريد الإلكتروني</value>
+  </data>
+  <data name="EmiratesID" xml:space="preserve">
+    <value>الهوية الإماراتية</value>
+  </data>
+  <data name="CustomersReport" xml:space="preserve">
+    <value>تقرير العملاء</value>
+  </data>
+  <data name="NoRecordFound" xml:space="preserve">
+    <value>لم يتم العثور على سجلات</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>تعديل</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>حذف</value>
+  </data>
+  <data name="SelectNumberPlate" xml:space="preserve">
+    <value>-- اختر لوحة الأرقام --</value>
+  </data>
+  <data name="Name.Required" xml:space="preserve">
+    <value>حقل الاسم مطلوب.</value>
+  </data>
+  <data name="Email.Required" xml:space="preserve">
+    <value>حقل البريد الإلكتروني مطلوب.</value>
+  </data>
+  <data name="Email.EmailAddress" xml:space="preserve">
+    <value>حقل البريد الإلكتروني ليس عنوان بريد .إلكتروني صالح</value>
+  </data>
+  <data name="EmiratesID.Required" xml:space="preserve">
+    <value>حقل الهوية الإماراتية مطلوب.</value>
+  </data>
+  <data name="CarID.Required" xml:space="preserve">
+    <value>حقل لوحة الأرقام مطلوب.</value>
+  </data>
+  <data name="AddCustomerButton" xml:space="preserve">
+    <value>إضافة عميل</value>
+  </data>
+  <data name="NumberPlate" xml:space="preserve">
+    <value>لوحة رقم</value>
+  </data>
+  <data name="UpdateCustomerTitle" xml:space="preserve">
+    <value>تحديث العميل</value>
+  </data>
+  <data name="NameLabel" xml:space="preserve">
+    <value>الاسم</value>
+  </data>
+  <data name="EmailLabel" xml:space="preserve">
+    <value>البريد الإلكتروني</value>
+  </data>
+  <data name="EmiratesIDLabel" xml:space="preserve">
+    <value>الهوية الإماراتية</value>
+  </data>
+  <data name="CarLabel" xml:space="preserve">
+    <value>لوحة الرقم</value>
+  </data>
+  <data name="SelectCar" xml:space="preserve">
+    <value>--ختر السيارة</value>
+  </data>
+  <data name="UpdateCustomerButton" xml:space="preserve">
+    <value>تحديث العميل</value>
+  </data>
+  <data name="AddServiceTitle" xml:space="preserve">
+    <value>إضافة خدمة جديدة</value>
+  </data>
+  <data name="ServicesBreadcrumb" xml:space="preserve">
+    <value>الخدمات</value>
+  </data>
+  <data name="ServiceNameLabel" xml:space="preserve">
+    <value>الاسم</value>
+  </data>
+  <data name="DescriptionLabel" xml:space="preserve">
+    <value>الوصف</value>
+  </data>
+  <data name="PriceLabel" xml:space="preserve">
+    <value>السعر</value>
+  </data>
+  <data name="ServiceStatusLabel" xml:space="preserve">
+    <value>حالة الخدمة</value>
+  </data>
+  <data name="AddServiceButton" xml:space="preserve">
+    <value>إضافة خدمة</value>
+  </data>
+  <data name="ServiceName.Required" xml:space="preserve">
+    <value>حقل الاسم مطلوب.</value>
+  </data>
+  <data name="Description.Required" xml:space="preserve">
+    <value>حقل الوصف مطلوب.</value>
+  </data>
+  <data name="Price.Required" xml:space="preserve">
+    <value>حقل السعر مطلوب.</value>
+  </data>
+  <data name="Price.Range" xml:space="preserve">
+    <value>يجب أن يكون السعر رقمًا موجباً.</value>
+  </data>
+  <data name="ServiceStatus.Required" xml:space="preserve">
+    <value>حقل حالة الخدمة مطلوب.</value>
+  </data>
+  <data name="ViewServicesTitle" xml:space="preserve">
+    <value>عرض الخدمات</value>
+  </data>
+  <data name="ServiceID" xml:space="preserve">
+    <value>المعرف</value>
+  </data>
+  <data name="ServiceName" xml:space="preserve">
+    <value>الاسم</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>الوصف</value>
+  </data>
+  <data name="Price" xml:space="preserve">
+    <value>السعر</value>
+  </data>
+  <data name="ServicesReport" xml:space="preserve">
+    <value>تقرير الخدمات</value>
+  </data>
+  <data name="ViewServicesLink" xml:space="preserve">
+    <value>عرض الخدمات</value>
+  </data>
+  <data name="AddNewServiceLink" xml:space="preserve">
+    <value>إضافة خدمة جديدة</value>
+  </data>
+  <data name="ReceiptsSection" xml:space="preserve">
+    <value>الإيصالات</value>
+  </data>
+  <data name="ViewReceiptsLink" xml:space="preserve">
+    <value>عرض الإيصالات</value>
+  </data>
+  <data name="AddNewReceiptLink" xml:space="preserve">
+    <value>إضافة إيصال جديد</value>
+  </data>
+  <data name="ViewHistoryLink" xml:space="preserve">
+    <value>عرض التاريخ</value>
+  </data>
+  <data name="ViewCustomersLink" xml:space="preserve">
+    <value>عرض العملاء</value>
+  </data>
+  <data name="AddNewCustomerLink" xml:space="preserve">
+    <value>إضافة عميل جديد</value>
+  </data>
+  <data name="UpdateServiceTitle" xml:space="preserve">
+    <value>تحديث الخدمة</value>
+  </data>
+  <data name="UpdateServiceButton" xml:space="preserve">
+    <value>تحديث الخدمة</value>
+  </data>
+  <data name="ServiceLabel" xml:space="preserve">
+    <value>الخدمة</value>
+  </data>
+  <data name="CustomerLabel" xml:space="preserve">
+    <value>العملاء</value>
+  </data>
+  <data name="SelectServiceAlert" xml:space="preserve">
+    <value>يرجى اختيار خدمة.</value>
+  </data>
+  <data name="SaveReceiptFailedAlert" xml:space="preserve">
+    <value>فشل في حفظ الإيصال.</value>
+  </data>
+  <data name="FujairahPoliceArHeader" xml:space="preserve">
+    <value>شرطة الفجيرة ق.ع.د
+شؤون المالية</value>
+  </data>
+  <data name="ComplaintsSuggestionsMessage" xml:space="preserve">
+    <value>للشكاوى والاقتراحات، اتصل بنا</value>
+  </data>
+  <data name="FormInvalidAlert" xml:space="preserve">
+    <value>يرجى ملء جميع الحقول المطلوبة.</value>
+  </data>
+  <data name="NoCarFoundAlert" xml:space="preserve">
+    <value>لم يتم العثور على سيارة للعميل المحدد.</value>
+  </data>
+  <data name="GetCarFailedAlert" xml:space="preserve">
+    <value>فشل في استرجاع تفاصيل السيارة.</value>
+  </data>
+  <data name="ServicesSelected.Required" xml:space="preserve">
+    <value>يجب اختيار خدمة واحدة على الأقل.</value>
+  </data>
+  <data name="ReceiptsTitle" xml:space="preserve">
+    <value>الإيصالات</value>
+  </data>
+  <data name="Amount" xml:space="preserve">
+    <value>كمية</value>
+  </data>
+  <data name="CreateNewReceiptButton" xml:space="preserve">
+    <value>إنشاء إيصال جديد</value>
+  </data>
+  <data name="PdfButton" xml:space="preserve">
+    <value>PDF</value>
+  </data>
+  <data name="FirstNameLabel" xml:space="preserve">
+    <value>الاسم الأول</value>
+  </data>
+  <data name="FirstNamePlaceholder" xml:space="preserve">
+    <value>أدخل الاسم الأول</value>
+  </data>
+  <data name="LastNameLabel" xml:space="preserve">
+    <value>سم العائلة</value>
+  </data>
+  <data name="MobileLabel" xml:space="preserve">
+    <value>الجوال</value>
+  </data>
+  <data name="PasswordLabel" xml:space="preserve">
+    <value>كلمة المرور (اتركها فارغة للتوليد التلقائي)</value>
+  </data>
+  <data name="RoleLabel" xml:space="preserve">
+    <value>الدور</value>
+  </data>
+  <data name="RoleAdmin" xml:space="preserve">
+    <value>مدير</value>
+  </data>
+  <data name="RoleUser" xml:space="preserve">
+    <value>مستخدم عادي</value>
+  </data>
+  <data name="AddUserButton" xml:space="preserve">
+    <value>إضافة مستخدم</value>
+  </data>
+  <data name="LastNamePlaceholder" xml:space="preserve">
+    <value>أدخل اسم العائلة</value>
+  </data>
+  <data name="MobilePlaceholder" xml:space="preserve">
+    <value>أدخل رقم الجوال</value>
+  </data>
+  <data name="EmailPlaceholder" xml:space="preserve">
+    <value>أدخل البريد الإلكتروني</value>
+  </data>
+  <data name="PasswordPlaceholder" xml:space="preserve">
+    <value>أدخل كلمة المرور أو اتركها فارغة</value>
+  </data>
+  <data name="UsersTitle" xml:space="preserve">
+    <value>المستخدمون</value>
+  </data>
+  <data name="UsersBreadcrumb" xml:space="preserve">
+    <value>المستخدمون</value>
+  </data>
+  <data name="CurrentUsersTitle" xml:space="preserve">
+    <value>المستخدمون الحاليون</value>
+  </data>
+  <data name="AddNewUserButton" xml:space="preserve">
+    <value>إضافة مستخدم جديد</value>
+  </data>
+  <data name="DateAddedColumn" xml:space="preserve">
+    <value>تاريخ ووقت الإضافة</value>
+  </data>
+  <data name="LastLoginColumn" xml:space="preserve">
+    <value>آخر تسجيل دخول</value>
+  </data>
+  <data name="PasswordStatusColumn" xml:space="preserve">
+    <value>حالة كلمة المرور</value>
+  </data>
+  <data name="ActionsColumn" xml:space="preserve">
+    <value>الإجراءات</value>
+  </data>
+  <data name="NeverText" xml:space="preserve">
+    <value>لم يتم</value>
+  </data>
+  <data name="ExpiredText" xml:space="preserve">
+    <value>منتهية</value>
+  </data>
+  <data name="ValidText" xml:space="preserve">
+    <value>صالحة</value>
+  </data>
+  <data name="EditButton" xml:space="preserve">
+    <value>تعديل</value>
+  </data>
+  <data name="DeleteButton" xml:space="preserve">
+    <value>حذف</value>
+  </data>
+  <data name="ResetPasswordButton" xml:space="preserve">
+    <value>إعادة تعيين كلمة المرور</value>
+  </data>
+  <data name="NoUsersFound" xml:space="preserve">
+    <value>لم يتم العثور على مستخدمين</value>
+  </data>
+  <data name="DeleteConfirmMessage" xml:space="preserve">
+    <value>هل أنت متأكد أنك تريد حذف هذا المستخدم؟</value>
+  </data>
+  <data name="PasswordEditLabel" xml:space="preserve">
+    <value>كلمة المرور (اتركها فارغة للتوليد التلقائي)</value>
+  </data>
+  <data name="PasswordEditPlaceholder" xml:space="preserve">
+    <value>أدخل كلمة مرور جديدة أو اتركها فارغة</value>
+  </data>
+  <data name="UpdateUserButton" xml:space="preserve">
+    <value>تحديث المستخدم</value>
+  </data>
+  <data name="TransferNumberPlateTitle" xml:space="preserve">
+    <value>نقل لوحة الأرقام</value>
+  </data>
+  <data name="TransferCarsTitle" xml:space="preserve">
+    <value>لوحة رقم النقل</value>
+  </data>
+  <data name="To" xml:space="preserve">
+    <value>إلى</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>من</value>
+  </data>
+  <data name="ID" xml:space="preserve">
+    <value>رقم</value>
+  </data>
+  <data name="TransferNewNumberPlate" xml:space="preserve">
+    <value>نقل لوحة أرقام جديدة</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>الرئيسية</value>
+  </data>
+  <data name="TransferCarButton" xml:space="preserve">
+    <value>تحويل السيارة</value>
+  </data>
+  <data name="TransferDate" xml:space="preserve">
+    <value>التاريخ</value>
+  </data>
+  <data name="SelectCustomer" xml:space="preserve">
+    <value>-- اختر العميل --</value>
+  </data>
+  <data name="TransferCars" xml:space="preserve">
+    <value>تحويل السيارة</value>
+  </data>
+  <data name="TimeLabel" xml:space="preserve">
+    <value>الوقت</value>
+  </data>
+  <data name="ReceivedFromLabel" xml:space="preserve">
+    <value>استلم من</value>
   </data>
 </root>

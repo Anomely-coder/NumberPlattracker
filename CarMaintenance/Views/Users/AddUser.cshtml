@@ -1,6 +1,10 @@
 ﻿@model CarMaintenance.Models.Users
+@inject IViewLocalizer Localizer
+@using CarMaintenance
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
 
 <section class="content">
+
     <div class="container">
         @if (ViewBag.Message != null)
         {
@@ -18,40 +22,40 @@
             <div asp-validation-summary="All" class="text-danger"></div>
             <div class="row my-2">
                 <div class="col-md-6 form-group">
-                    <label asp-for="FirstName">First Name</label>
-                    <input class="form-control" asp-for="FirstName" />
+                    <label asp-for="FirstName">@Localizer["FirstNameLabel"]</label>
+                    <input class="form-control" asp-for="FirstName" placeholder="@Localizer["FirstNamePlaceholder"]" />
                     <span asp-validation-for="FirstName" class="text-danger"></span>
                 </div>
                 <div class="col-md-6 form-group">
-                    <label asp-for="LastName">Last Name</label>
-                    <input class="form-control" asp-for="LastName" />
+                    <label asp-for="LastName">@Localizer["LastNameLabel"]</label>
+                    <input class="form-control" asp-for="LastName" placeholder="@Localizer["LastNamePlaceholder"]" />
                     <span asp-validation-for="LastName" class="text-danger"></span>
                 </div>
                 <div class="col-md-6 form-group">
-                    <label asp-for="MobileNumber">Mobile</label>
-                    <input class="form-control" asp-for="MobileNumber" />
+                    <label asp-for="MobileNumber">@Localizer["MobileLabel"]</label>
+                    <input class="form-control" asp-for="MobileNumber" placeholder="@Localizer["MobilePlaceholder"]" />
                     <span asp-validation-for="MobileNumber" class="text-danger"></span>
                 </div>
                 <div class="col-md-6 form-group">
-                    <label asp-for="Email">Email</label>
-                    <input class="form-control" asp-for="Email" />
+                    <label asp-for="Email">@Localizer["EmailLabel"]</label>
+                    <input class="form-control" asp-for="Email" placeholder="@Localizer["EmailPlaceholder"]" />
                     <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
                 <div class="col-md-6 form-group">
-                    <label asp-for="Password">Password (leave empty to auto-generate)</label>
-                    <input class="form-control" asp-for="Password" />
+                    <label asp-for="Password">@Localizer["PasswordLabel"]</label>
+                    <input class="form-control" asp-for="Password" placeholder="@Localizer["PasswordPlaceholder"]" />
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
                 <div class="col-md-6 form-group">
-                    <label asp-for="Role">Role</label>
+                    <label asp-for="Role">@Localizer["RoleLabel"]</label>
                     <select class="form-control" asp-for="Role">
-                        <option value="Admin">Admin</option>
-                        <option value="User">Normal User</option>
+                        <option value="Admin">@Localizer["RoleAdmin"]</option>
+                        <option value="User">@Localizer["RoleUser"]</option>
                     </select>
                     <span asp-validation-for="Role" class="text-danger"></span>
                 </div>
                 <div class="col-md-12 my-2">
-                    <button type="submit" class="btn btn-primary">Add User</button>
+                    <button type="submit" class="btn btn-primary">@Localizer["AddUserButton"]</button>
                 </div>
             </div>
             @Html.AntiForgeryToken()

@@ -1,21 +1,25 @@
 ﻿@model IEnumerable<Services>
+@inject IViewLocalizer Localizer
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
+@using CarMaintenance
+@using System.Globalization
 
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>View Services</h1>
+                <h1>@Localizer["ViewServicesTitle"]</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">Services</li>
+                    <li class="breadcrumb-item"><a href="#">@Localizer["HomeLink"]</a></li>
+                    <li class="breadcrumb-item active">@Localizer["ServicesBreadcrumb"]</li>
                 </ol>
             </div>
         </div>
         <hr />
-    </div><!-- /.container-fluid -->
+    </div>
 </section>
 
 <!-- Main content -->
@@ -23,7 +27,7 @@
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">
-                <a class="btn btn-primary my-3" asp-action="AddService" asp-controller="Services">Add New Service</a>
+                <a class="btn btn-primary my-3" asp-action="AddService" asp-controller="Services">@Localizer["AddServiceButton"]</a>
             </h3>
         </div>
         <!-- /.card-header -->
@@ -31,16 +35,15 @@
             <table id="example1" class="table table-bordered table-striped">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Price</th>
-                        <th>Edit</th>
-                        <th>Delete</th>
+                        <th>@Localizer["ServiceID"]</th>
+                        <th>@Localizer["ServiceName"]</th>
+                        <th>@Localizer["Description"]</th>
+                        <th>@Localizer["Price"]</th>
+                        <th>@Localizer["Edit"]</th>
+                        <th>@Localizer["Delete"]</th>
                     </tr>
                 </thead>
                 <tbody>
-
                     @if (Model.Any())
                     {
                         @foreach (var item in Model)
@@ -58,30 +61,28 @@
                     else
                     {
                         <tr>
-                            <td class="text-center" colspan="6">No Record Found.</td>
+                            <td class="text-center" colspan="6">@Localizer["NoRecordFound"]</td>
                         </tr>
                     }
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Price</th>
-                        <th>Edit</th>
-                        <th>Delete</th>
+                        <th>@Localizer["ServiceID"]</th>
+                        <th>@Localizer["ServiceName"]</th>
+                        <th>@Localizer["Description"]</th>
+                        <th>@Localizer["Price"]</th>
+                        <th>@Localizer["Edit"]</th>
+                        <th>@Localizer["Delete"]</th>
                     </tr>
                 </tfoot>
             </table>
         </div>
         <!-- /.card-body -->
     </div>
-
 </section>
-<!-- /.content -->
-@section Scripts {
 
-    <!-- DataTables  & Plugins -->
+@section Scripts {
+    <!-- DataTables & Plugins -->
     <script src="~/AdminTheme/plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="~/AdminTheme/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
     <script src="~/AdminTheme/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
@@ -102,42 +103,45 @@
                 "responsive": true,
                 "lengthChange": false,
                 "autoWidth": false,
+                "language": {
+                    "url": "@(CultureInfo.CurrentCulture.Name == "ar-SA" ? "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json" : "//cdn.datatables.net/plug-ins/1.13.6/i18n/en-GB.json")"
+                },
                 "buttons": [
                     {
                         extend: 'copy',
                         exportOptions: {
-                            columns: [0, 1] // Only export ID + Number Plate
+                            columns: [0, 1, 2, 3]
                         }
                     },
                     {
                         extend: 'csv',
                         exportOptions: {
-                            columns: [0, 1]
+                            columns: [0, 1, 2, 3]
                         }
                     },
                     {
                         extend: 'excel',
                         exportOptions: {
-                            columns: [0, 1]
+                            columns: [0, 1, 2, 3]
                         }
                     },
                     {
                         extend: 'pdf',
                         exportOptions: {
-                            columns: [0, 1]
+                            columns: [0, 1, 2, 3]
                         }
                     },
                     {
                         extend: 'print',
-                        text: 'Print',
+                        text: '@Localizer["PrintButton"]',
                         title: '',
                         exportOptions: {
-                            columns: [0, 1] // Skip Edit/Delete
+                            columns: [0, 1, 2, 3]
                         },
                         customize: function (win) {
                             $(win.document.body).prepend(
                                 '<div style="display:flex; justify-content:space-between; margin-bottom:20px;">' +
-                                '<h2 style="margin:0;">Receipts Report</h2>' +
+                                '<h2 style="margin:0;">@Localizer["ServicesReport"]</h2>' +
                                 '<img src="/images/logo1.png" style="height:60px;" />' +
                                 '</div>'
                             );
@@ -153,5 +157,4 @@
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
         });
     </script>
-
 }

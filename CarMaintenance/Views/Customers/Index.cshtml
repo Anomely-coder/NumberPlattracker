@@ -1,16 +1,19 @@
 ﻿@model IEnumerable<Customers>
+@inject IViewLocalizer Localizer
+@using CarMaintenance
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
 
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>Customers</h1>
+                <h1>@Localizer["CustomersTitle"]</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">Customers</li>
+                    <li class="breadcrumb-item"><a href="#">@Localizer["HomeLink"]</a></li>
+                    <li class="breadcrumb-item active">@Localizer["CustomersBreadcrumb"]</li>
                 </ol>
             </div>
         </div>
@@ -23,7 +26,7 @@
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">
-                <a class="btn btn-primary my-3" asp-action="AddCustomer" asp-controller="Customers">Create New Customer</a>
+                <a class="btn btn-primary my-3" asp-action="AddCustomer" asp-controller="Customers">@Localizer["CreateCustomerButton"]</a>
             </h3>
         </div>
         <!-- /.card-header -->
@@ -31,13 +34,13 @@
             <table id="example1" class="table table-bordered table-striped">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Emirates ID</th>
-                        <th>Number Plate</th>
-                        <th>Edit</th>
-                        <th>Delete</th>
+                        <th>@Localizer["CustomerID"]</th>
+                        <th>@Localizer["Name"]</th>
+                        <th>@Localizer["Email"]</th>
+                        <th>@Localizer["EmiratesID"]</th>
+                        <th>@Localizer["NumberPlate"]</th>
+                        <th>@Localizer["Edit"]</th>
+                        <th>@Localizer["Delete"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -59,19 +62,19 @@
                     else
                     {
                         <tr>
-                            <td class="text-center" colspan="7">No Record Found.</td>
+                            <td class="text-center" colspan="7">@Localizer["NoRecordFound"]</td>
                         </tr>
                     }
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Emirates ID</th>
-                        <th>Number Plate</th>
-                        <th>Edit</th>
-                        <th>Delete</th>
+                        <th>@Localizer["CustomerID"]</th>
+                        <th>@Localizer["Name"]</th>
+                        <th>@Localizer["Email"]</th>
+                        <th>@Localizer["EmiratesID"]</th>
+                        <th>@Localizer["NumberPlate"]</th>
+                        <th>@Localizer["Edit"]</th>
+                        <th>@Localizer["Delete"]</th>
                     </tr>
                 </tfoot>
             </table>
@@ -81,7 +84,7 @@
 </section>
 <!-- /.content -->
 @section Scripts {
-    <!-- DataTables  & Plugins -->
+    <!-- DataTables & Plugins -->
     <script src="~/AdminTheme/plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="~/AdminTheme/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
     <script src="~/AdminTheme/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
@@ -117,6 +120,7 @@
                     },
                     {
                         extend: 'excel',
+                        text: '@Localizer["ExcelButton"]',
                         exportOptions: {
                             columns: [0, 1, 2, 3, 4]
                         }
@@ -129,7 +133,7 @@
                     },
                     {
                         extend: 'print',
-                        text: 'Print',
+                        text: '@Localizer["PrintButton"]',
                         title: '',
                         exportOptions: {
                             columns: [0, 1, 2, 3, 4]
@@ -137,7 +141,7 @@
                         customize: function (win) {
                             $(win.document.body).prepend(
                                 '<div style="display:flex; justify-content:space-between; margin-bottom:20px;">' +
-                                '<h2 style="margin:0;">Customers Report</h2>' +
+                                '<h2 style="margin:0;">@Localizer["CustomersReport"]</h2>' +
                                 '<img src="/images/logo1.png" style="height:60px;" />' +
                                 '</div>'
                             );

@@ -1,4 +1,6 @@
-﻿<!-- Content Header (Page header) -->
+﻿@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
+@using System.Globalization
+<!-- Content Header (Page header) -->
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
@@ -71,7 +73,7 @@
             <div class="small-box bg-danger">
                 <div class="inner">
                     <h3>@ViewData["TotalUsers"]</h3>
-                    <p>@Localizer["UsersLabel"]</p>
+                    <p>@Localizer["Users"]</p>
                 </div>
                 <div class="icon">
                     <i class="fas fa-user-lock"></i>

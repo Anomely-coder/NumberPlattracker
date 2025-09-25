@@ -1,4 +1,5 @@
 ﻿@model Users
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
 
 <section class="content">
     <div class="container">
@@ -6,34 +7,34 @@
             <input asp-for="UserID" hidden />
             <div class="row my-2">
                 <div class="col-md-6 form-group">
-                    <label>First Name</label>
-                    <input class="form-control" asp-for="FirstName" />
+                    <label>@Localizer["FirstNameLabel"]</label>
+                    <input class="form-control" asp-for="FirstName" placeholder="@Localizer["FirstNamePlaceholder"]" />
                 </div>
                 <div class="col-md-6 form-group">
-                    <label>Last Name</label>
-                    <input class="form-control" asp-for="LastName" />
+                    <label>@Localizer["LastNameLabel"]</label>
+                    <input class="form-control" asp-for="LastName" placeholder="@Localizer["LastNamePlaceholder"]" />
                 </div>
                 <div class="col-md-6 form-group">
-                    <label>Mobile</label>
-                    <input class="form-control" asp-for="MobileNumber" />
+                    <label>@Localizer["MobileLabel"]</label>
+                    <input class="form-control" asp-for="MobileNumber" placeholder="@Localizer["MobilePlaceholder"]" />
                 </div>
                 <div class="col-md-6 form-group">
-                    <label>Email</label>
-                    <input class="form-control" asp-for="Email" />
+                    <label>@Localizer["EmailLabel"]</label>
+                    <input class="form-control" asp-for="Email" placeholder="@Localizer["EmailPlaceholder"]" />
                 </div>
                 <div class="col-md-6 form-group">
-                    <label>Password (leave empty to keep old)</label>
-                    <input class="form-control" asp-for="Password" />
+                    <label>@Localizer["PasswordEditLabel"]</label>
+                    <input class="form-control" asp-for="Password" placeholder="@Localizer["PasswordEditPlaceholder"]" />
                 </div>
                 <div class="col-md-6 form-group">
-                    <label>Role</label>
+                    <label>@Localizer["RoleLabel"]</label>
                     <select class="form-control" asp-for="Role">
-                        <option value="Admin">Admin</option>
-                        <option value="User">Normal User</option>
+                        <option value="Admin">@Localizer["RoleAdmin"]</option>
+                        <option value="User">@Localizer["RoleUser"]</option>
                     </select>
                 </div>
                 <div class="col-md-12 my-2">
-                    <button type="submit" class="btn btn-primary">Update User</button>
+                    <button type="submit" class="btn btn-primary">@Localizer["UpdateUserButton"]</button>
                 </div>
             </div>
         </form>

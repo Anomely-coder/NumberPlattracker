@@ -1,16 +1,20 @@
 ﻿@model Customers
+@inject IViewLocalizer Localizer
+@using CarMaintenance
+@inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
+
 
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>Update Customer</h1>
+                <h1>@Localizer["UpdateCustomerTitle"]</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="#">Home</a></li>
-                    <li class="breadcrumb-item active">Customers</li>
+                    <li class="breadcrumb-item"><a href="#">@Localizer["HomeLink"]</a></li>
+                    <li class="breadcrumb-item active">@Localizer["CustomersBreadcrumb"]</li>
                 </ol>
             </div>
         </div>
@@ -22,41 +26,39 @@
 <section class="content">
     <div class="container">
         <form method="post" asp-action="EditCustomer" asp-controller="Customers">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div> <!-- Added validation summary -->
             <div class="row my-2">
                 <input asp-for="CustomerID" hidden />
                 <div class="col-md-6 form-group">
-                    <label class="form-label">
-                        Name
-                        <span class="text-danger fw-bold" asp-validation-for="Name"></span>
-                    </label>
+                    <label class="form-label" asp-for="Name">@Localizer["NameLabel"]</label>
                     <input class="form-control" asp-for="Name" />
+                    <span class="text-danger" asp-validation-for="Name"></span>
                 </div>
                 <div class="col-md-6 form-group">
-                    <label class="form-label">
-                        Email
-                        <span class="text-danger fw-bold" asp-validation-for="Email"></span>
-                    </label>
+                    <label class="form-label" asp-for="Email">@Localizer["EmailLabel"]</label>
                     <input class="form-control" asp-for="Email" type="email" />
+                    <span class="text-danger" asp-validation-for="Email"></span>
                 </div>
                 <div class="col-md-6 form-group">
-                    <label class="form-label">
-                        Emirates ID
-                        <span class="text-danger fw-bold" asp-validation-for="EmiratesID"></span>
-                    </label>
+                    <label class="form-label" asp-for="EmiratesID">@Localizer["EmiratesIDLabel"]</label>
                     <input class="form-control" asp-for="EmiratesID" />
+                    <span class="text-danger" asp-validation-for="EmiratesID"></span>
                 </div>
                 <div class="col-md-6 form-group">
-                    <label class="form-label">
-                        Car
-                        <span class="text-danger fw-bold" asp-validation-for="CarID"></span>
-                    </label>
+                    <label class="form-label" asp-for="CarID">@Localizer["CarLabel"]</label>
                     <select class="form-control" asp-for="CarID" asp-items="ViewBag.Cars">
-                        <option value="">-- Select Car --</option>
+                        <option value="">@Localizer["SelectCar"]</option>
                     </select>
+                    <span class="text-danger" asp-validation-for="CarID"></span>
+                </div>
                 <div class="col-md-12 my-2">
-                    <button type="submit" class="btn btn-primary">Update Customer</button>
+                    <button type="submit" class="btn btn-primary">@Localizer["UpdateCustomerButton"]</button>
                 </div>
             </div>
         </form>
     </div>
 </section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" /> <!-- Include validation scripts -->
+}
