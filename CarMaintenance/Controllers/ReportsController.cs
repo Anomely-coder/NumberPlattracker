@@ -1,14 +1,14 @@
 ﻿using CarMaintenance.Data;
-using CarMaintenance.Models;
 using CarMaintenance.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Collections.Generic;
 using iText.Kernel.Pdf;
 using iText.Layout;
 using iText.Layout.Element;
-using System;
 using System.IO;
-using System.Linq;
 
 namespace CarMaintenance.Controllers
 {
@@ -26,9 +26,12 @@ namespace CarMaintenance.Controllers
             return View("Search");
         }
 
+        // Search method
         public IActionResult Search(string searchTerm)
         {
-            // Load customers with related data
+            searchTerm = searchTerm?.Trim() ?? "";
+
+            // Load customers and transfers
             var customers = _db.Tbl_Customers
                 .Include(c => c.Cars)
                 .Include(c => c.Receipts)
@@ -36,19 +39,20 @@ namespace CarMaintenance.Controllers
                         .ThenInclude(d => d.Services)
                 .ToList();
 
-            // Load transfers with related data
             var transfers = _db.Tbl_TransferCars
                 .Include(t => t.FromCustomers)
                 .Include(t => t.ToCustomers)
                 .Include(t => t.Cars)
                 .ToList();
 
-            // Filter and prepare results
+            // Filter customers
             var results = customers
-                .Where(c => string.IsNullOrEmpty(searchTerm) ||
-                            c.Name.Contains(searchTerm) ||
-                            c.Email.Contains(searchTerm) ||
-                            (c.Cars != null && c.Cars.NumberPlate.Contains(searchTerm)))
+                .Where(c =>
+                    string.IsNullOrEmpty(searchTerm) ||
+                    (c.Name != null && c.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
+                    (c.Email != null && c.Email.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
+                    (c.Cars != null && c.Cars.NumberPlate != null && c.Cars.NumberPlate.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                )
                 .Select(c => new SearchResultViewModel
                 {
                     Customer = c,
@@ -58,10 +62,9 @@ namespace CarMaintenance.Controllers
                 })
                 .ToList();
 
-            // Get logged-in user
+            // Logged-in user
             var userId = HttpContext.Session.GetInt32("UserId");
             string userName = "Unknown User";
-
             if (userId.HasValue)
             {
                 var user = _db.Tbl_Users.Find(userId.Value);
@@ -77,9 +80,36 @@ namespace CarMaintenance.Controllers
             return View("SearchResults", results);
         }
 
+        // Autocomplete suggestions
+        public IActionResult GetSearchSuggestions(string term)
+        {
+            term = term?.Trim() ?? "";
+
+            var customers = _db.Tbl_Customers.Include(c => c.Cars).ToList();
+
+            var suggestions = customers
+                .SelectMany(c =>
+                    new List<string>
+                    {
+                        c.Name ?? "",
+                        c.Email ?? "",
+                        c.Cars?.NumberPlate ?? ""
+                    }
+                )
+                .Where(s => !string.IsNullOrEmpty(s) && s.Contains(term, StringComparison.OrdinalIgnoreCase))
+                .Distinct()
+                .Select(s => new { label = s, value = s })
+                .Take(10)
+                .ToList();
+
+            return Json(suggestions);
+        }
+
+        // PDF Export
         public IActionResult ExportPdf(string searchTerm)
         {
-            // Load data same as Search()
+            searchTerm = searchTerm?.Trim() ?? "";
+
             var customers = _db.Tbl_Customers
                 .Include(c => c.Cars)
                 .Include(c => c.Receipts)
@@ -94,10 +124,12 @@ namespace CarMaintenance.Controllers
                 .ToList();
 
             var results = customers
-                .Where(c => string.IsNullOrEmpty(searchTerm) ||
-                            c.Name.Contains(searchTerm) ||
-                            c.Email.Contains(searchTerm) ||
-                            (c.Cars != null && c.Cars.NumberPlate.Contains(searchTerm)))
+                .Where(c =>
+                    string.IsNullOrEmpty(searchTerm) ||
+                    (c.Name != null && c.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
+                    (c.Email != null && c.Email.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
+                    (c.Cars != null && c.Cars.NumberPlate != null && c.Cars.NumberPlate.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                )
                 .Select(c => new SearchResultViewModel
                 {
                     Customer = c,
@@ -113,9 +145,7 @@ namespace CarMaintenance.Controllers
             {
                 var user = _db.Tbl_Users.Find(userId.Value);
                 if (user != null)
-                {
                     userName = $"{user.FirstName} {user.LastName}";
-                }
             }
 
             using (var ms = new MemoryStream())
@@ -124,7 +154,7 @@ namespace CarMaintenance.Controllers
                 var pdf = new PdfDocument(writer);
                 var document = new Document(pdf);
 
-                document.Add(new Paragraph("Customer Report").SetFontSize(18).SetBold());
+                document.Add(new Paragraph("Customer Report").SetBold().SetFontSize(18));
                 document.Add(new Paragraph($"Generated By: {userName}").SetFontSize(12));
                 document.Add(new Paragraph($"Generated On: {DateTime.Now}").SetFontSize(12));
                 document.Add(new Paragraph(" "));
@@ -137,7 +167,7 @@ namespace CarMaintenance.Controllers
                     document.Add(new Paragraph("Receipts:"));
                     foreach (var rec in r.Customer.Receipts)
                     {
-                        document.Add(new Paragraph($"- Date: {rec.Date.ToShortDateString()}, Amount: {rec.TotalAmount}"));
+                        document.Add(new Paragraph($"- Date: {rec.Date.ToShortDateString()}, Amount: {rec.TotalAmount:F2}"));
                         foreach (var d in rec.ReceiptsDetails)
                         {
                             document.Add(new Paragraph($"   • Service: {d.Services?.ServiceName ?? "N/A"}"));

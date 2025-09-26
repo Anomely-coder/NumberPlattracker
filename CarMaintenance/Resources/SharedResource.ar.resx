@@ -649,4 +649,43 @@
   <data name="ReceivedFromLabel" xml:space="preserve">
     <value>استلم من</value>
   </data>
+  <data name="SearchResultsTitle" xml:space="preserve">
+    <value>نتائج البحث</value>
+  </data>
+  <data name="GeneratedBy" xml:space="preserve">
+    <value>تم التوليد بواسطة</value>
+  </data>
+  <data name="GeneratedOn" xml:space="preserve">
+    <value>تم التوليد في</value>
+  </data>
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>ابحث...</value>
+  </data>
+  <data name="SearchButton" xml:space="preserve">
+    <value>بحث</value>
+  </data>
+  <data name="NoResultsFound" xml:space="preserve">
+    <value>لم يتم العثور على نتائج.</value>
+  </data>
+  <data name="CustomerName" xml:space="preserve">
+    <value>اسم العميل</value>
+  </data>
+  <data name="NotAvailable" xml:space="preserve">
+    <value>غير متوفر</value>
+  </data>
+  <data name="ExportPdfButton" xml:space="preserve">
+    <value>تصدير إلى PDF</value>
+  </data>
+  <data name="CustomerReport" xml:space="preserve">
+    <value>تقرير العملاء</value>
+  </data>
+  <data name="Receipts" xml:space="preserve">
+    <value>الفواتير</value>
+  </data>
+  <data name="Transfers" xml:space="preserve">
+    <value>التحويلات</value>
+  </data>
+  <data name="UnknownUser" xml:space="preserve">
+    <value>مستخدم غير معروف</value>
+  </data>
 </root>
