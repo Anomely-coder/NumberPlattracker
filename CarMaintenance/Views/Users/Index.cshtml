@@ -1,6 +1,8 @@
 ﻿@model List<CarMaintenance.Models.Users>
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
 @using System.Globalization
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService AuthorizationService
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -66,9 +68,16 @@
                                     <td>@(user.LastLogin.HasValue? user.LastLogin.Value.ToString("dd/MM/yyyy HH:mm:ss") : Localizer["NeverText"])</td>
                                     <td>@(isExpired? Localizer["ExpiredText"] : Localizer["ValidText"])</td>
                                     <td>
-                                        <a asp-action="EditUser" asp-controller="Users" asp-route-Id="@user.UserID" class="btn btn-sm btn-warning">@Localizer["EditButton"]</a>
-                                        <a asp-action="DeleteUser" asp-controller="Users" asp-route-Id="@user.UserID" class="btn btn-sm btn-danger" onclick="return confirm('@Localizer["DeleteConfirmMessage"]');">@Localizer["DeleteButton"]</a>
-                                        <a asp-action="ResetPassword" asp-controller="Users" asp-route-Id="@user.UserID" class="btn btn-sm btn-info" onclick="return confirm('@Localizer["ResetPasswordConfirmMessage", user.Email]');">@Localizer["ResetPasswordButton"]</a>
+                                        @if (User.IsInRole("Admin"))
+                                        {
+                                            <a asp-action="EditUser" asp-controller="Users" asp-route-Id="@user.UserID" class="btn btn-sm btn-warning">@Localizer["EditButton"]</a>
+                                            <a asp-action="DeleteUser" asp-controller="Users" asp-route-Id="@user.UserID" class="btn btn-sm btn-danger" onclick="return confirm('@Localizer["DeleteConfirmMessage"]');">@Localizer["DeleteButton"]</a>
+                                            <a asp-action="ResetPassword" asp-controller="Users" asp-route-Id="@user.UserID" class="btn btn-sm btn-info" onclick="return confirm('@Localizer["ResetPasswordConfirmMessage", user.Email]');">@Localizer["ResetPasswordButton"]</a>
+                                        }
+                                        else
+                                        {
+                                            <span>@Localizer["NoAccessText"]</span>
+                                        }
                                     </td>
                                 </tr>
                             }

@@ -4,6 +4,7 @@ using CarMaintenance.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization; // Added for role-based authorization
 
 namespace CarMaintenance.Controllers
 {
@@ -99,6 +100,7 @@ namespace CarMaintenance.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")] // Restrict to Admin role
         public IActionResult EditUser(int Id)
         {
             var data = db.Tbl_Users.Find(Id);
@@ -119,6 +121,7 @@ namespace CarMaintenance.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")] // Restrict to Admin role
         public IActionResult EditUser(Users model)
         {
             var existingUser = db.Tbl_Users.Find(model.UserID);
@@ -195,6 +198,7 @@ namespace CarMaintenance.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")] // Restrict to Admin role
         public IActionResult DeleteUser(int Id)
         {
             var data = db.Tbl_Users.Find(Id);
@@ -213,6 +217,7 @@ namespace CarMaintenance.Controllers
             return RedirectToAction("Index");
         }
 
+        [Authorize(Roles = "Admin")] // Restrict to Admin role
         public IActionResult ResetPassword(int Id)
         {
             var user = db.Tbl_Users.Find(Id);

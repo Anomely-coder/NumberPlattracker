@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using NLog;
 using NLog.Web;
 using System.Globalization;
+using Microsoft.AspNetCore.Authentication.Cookies; // Added for authentication
 
 var logger = NLog.LogManager.Setup().LoadConfigurationFromFile("NLog.config").GetCurrentClassLogger();
 
@@ -26,6 +27,21 @@ try
     // --- Database context ---
     builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("dbcs")));
+
+    // --- Authentication configuration ---
+    builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        .AddCookie(options =>
+        {
+            options.LoginPath = "/Account/Login";
+            options.AccessDeniedPath = "/Account/AccessDenied";
+            options.ExpireTimeSpan = TimeSpan.FromDays(7); // Optional: set cookie expiration
+        });
+
+    // --- Authorization configuration ---
+    builder.Services.AddAuthorization(options =>
+    {
+        options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+    });
 
     // --- Session configuration ---
     builder.Services.AddSession(options =>
@@ -80,10 +96,10 @@ try
 
     app.UseRouting();
 
-    // --- Session middleware must come BEFORE authorization ---
-    app.UseSession();
-
+    // --- Add authentication middleware before authorization ---
+    app.UseAuthentication();
     app.UseAuthorization();
+    app.UseSession();
 
     app.MapControllerRoute(
         name: "default",

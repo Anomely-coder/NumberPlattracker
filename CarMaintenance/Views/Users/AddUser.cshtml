@@ -4,7 +4,6 @@
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
 
 <section class="content">
-
     <div class="container">
         @if (ViewBag.Message != null)
         {
@@ -18,7 +17,7 @@
                 @Html.ValidationSummary()
             </div>
         }
-        <form method="post" asp-action="AddUser" asp-controller="Users">
+        <form method="post" asp-action="AddUser" asp-controller="Users" id="userForm">
             <div asp-validation-summary="All" class="text-danger"></div>
             <div class="row my-2">
                 <div class="col-md-6 form-group">
@@ -33,7 +32,7 @@
                 </div>
                 <div class="col-md-6 form-group">
                     <label asp-for="MobileNumber">@Localizer["MobileLabel"]</label>
-                    <input class="form-control" asp-for="MobileNumber" placeholder="@Localizer["MobilePlaceholder"]" />
+                    <input class="form-control" asp-for="MobileNumber" id="mobileNumber" maxlength="12" oninput="formatMobileNumber(this)" placeholder="@Localizer["MobilePlaceholder"]" />
                     <span asp-validation-for="MobileNumber" class="text-danger"></span>
                 </div>
                 <div class="col-md-6 form-group">
@@ -63,5 +62,87 @@
     </div>
 </section>
 
-<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
-<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+@section Scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        // Format Mobile Number as 050 245 2201, enforcing 05 prefix
+        function formatMobileNumber(input) {
+            // Remove all non-digit characters
+            let value = input.value.replace(/\D/g, '');
+
+            // Ensure the number starts with "05"
+            if (value.length > 0 && !value.startsWith('05')) {
+                value = '05' + value.slice(value.startsWith('0') ? 1 : 0); // Replace or prepend "05"
+            }
+
+            // Limit to 10 digits
+            if (value.length > 10) {
+                value = value.slice(0, 10);
+            }
+
+            // Format as 050 245 2201
+            let formatted = '';
+            if (value.length > 0) {
+                formatted = value.slice(0, 3); // 050
+            }
+            if (value.length > 3) {
+                formatted += ' ' + value.slice(3, 6); // 245
+            }
+            if (value.length > 6) {
+                formatted += ' ' + value.slice(6, 10); // 2201
+            }
+
+            // Update input with formatted value
+            input.value = formatted.slice(0, 12);
+        }
+
+        // Add custom validation and handle form submission
+        $(document).ready(function () {
+            // Format mobile number on page load (for pre-populated values)
+            let mobileNumberInput = document.getElementById('mobileNumber');
+            if (mobileNumberInput && mobileNumberInput.value) {
+                formatMobileNumber(mobileNumberInput);
+            }
+
+            // Add custom validation to jQuery validator
+            if ($.validator) {
+                $.validator.addMethod('mobileNumber', function (value, element) {
+                    // Strip spaces and validate length and prefix
+                    let cleanValue = value.replace(/\D/g, '');
+                    return cleanValue.length === 10 && cleanValue.startsWith('05');
+                }, '@Localizer["MobileNumberFormatError"]' || 'Mobile number must start with 05 and contain exactly 10 digits.');
+
+                // Apply custom validation to MobileNumber field
+                $('#mobileNumber').rules('add', {
+                    mobileNumber: true
+                });
+            }
+
+            // Handle form submission
+            $('#userForm').on('submit', function (event) {
+                let mobileNumberInput = document.getElementById('mobileNumber');
+                let cleanValue = mobileNumberInput.value.replace(/\D/g, '');
+
+                // Client-side validation
+                if (cleanValue.length !== 10 || !cleanValue.startsWith('05')) {
+                    event.preventDefault();
+                    let errorSpan = document.querySelector('span[data-valmsg-for="MobileNumber"]');
+                    errorSpan.innerText = '@Localizer["MobileNumberFormatError"]' || 'Mobile number must start with 05 and contain exactly 10 digits.';
+                    errorSpan.classList.add('text-danger');
+                    return;
+                }
+
+                // Strip spaces before submission
+                mobileNumberInput.value = cleanValue;
+
+                // Trigger jQuery validation to ensure other fields are valid
+                if ($(this).valid()) {
+                    return true; // Allow submission
+                } else {
+                    event.preventDefault(); // Prevent submission if other validations fail
+                }
+            });
+        });
+    </script>
+}

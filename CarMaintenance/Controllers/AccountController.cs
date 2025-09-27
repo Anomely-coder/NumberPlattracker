@@ -4,12 +4,18 @@ using CarMaintenance.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using NLog; // Ensure this is included for NLog.ILogger
 
 namespace CarMaintenance.Controllers
 {
     public class AccountController : Controller
     {
         private readonly AppDbContext db;
+        private readonly NLog.ILogger logger = LogManager.GetCurrentClassLogger(); // Explicitly use NLog.ILogger
 
         public AccountController(AppDbContext _db)
         {
@@ -23,46 +29,86 @@ namespace CarMaintenance.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Login(LoginModel login)
+        public async Task<IActionResult> Login(LoginModel login)
         {
+            logger.Info($"Login attempt for Email: '{login.Email}'");
+
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors)
                     .Select(e => e.ErrorMessage).ToList();
-                Console.WriteLine("ModelState Errors: " + string.Join(", ", errors));
+                logger.Error("Login failed due to validation errors: " + string.Join(", ", errors));
                 ViewBag.Message = "Validation failed: " + string.Join(", ", errors);
                 return View(login);
             }
 
-            Console.WriteLine($"Email: '{login.Email}', Password: '{login.Password}'");
-
+            logger.Info($"Looking up user with Email: '{login.Email.Trim().ToLower()}'");
             var user = db.Tbl_Users
                 .FirstOrDefault(x => x.Email.Trim().ToLower() == login.Email.Trim().ToLower()
                                   && x.Password == login.Password);
 
-            if (user != null)
+            if (user == null)
             {
-                bool isFirstLogin = !user.LastLogin.HasValue;
-                bool isPasswordExpired = user.PasswordLastChanged.HasValue &&
-                    (DateTime.Now - user.PasswordLastChanged.Value).TotalDays > 61;
-
-                user.LastLogin = DateTime.Now;
-                db.SaveChanges();
-                HttpContext.Session.SetInt32("UserId", user.UserID);
-                Console.WriteLine("Session set for UserID: " + user.UserID);
-
-                if (isFirstLogin || isPasswordExpired)
-                {
-                    Console.WriteLine($"Redirecting to ChangePassword for UserID {user.UserID}: FirstLogin={isFirstLogin}, Expired={isPasswordExpired}");
-                    return RedirectToAction("ChangePassword");
-                }
-
-                return RedirectToAction("Index", "Home");
+                logger.Warn($"Login failed: No user found for Email: '{login.Email}' or incorrect password");
+                ViewBag.Message = "Invalid Email or Password";
+                return View(login);
             }
 
-            Console.WriteLine("Login failed: Invalid Email or Password");
-            ViewBag.Message = "Invalid Email or Password";
-            return View(login);
+            logger.Info($"User found: Email: '{user.Email}', UserID: {user.UserID}, Role: {user.Role}");
+
+            bool isFirstLogin = !user.LastLogin.HasValue;
+            bool isPasswordExpired = user.PasswordLastChanged.HasValue &&
+                (DateTime.Now - user.PasswordLastChanged.Value).TotalDays > 61;
+
+            user.LastLogin = DateTime.Now;
+            try
+            {
+                db.SaveChanges();
+                logger.Info($"Updated LastLogin for UserID: {user.UserID}");
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, $"Failed to update LastLogin for UserID: {user.UserID}");
+                ViewBag.Message = "Error saving login time: " + ex.Message;
+                return View(login);
+            }
+
+            // Create claims for the user
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.Email),
+                new Claim(ClaimTypes.NameIdentifier, user.UserID.ToString()),
+                new Claim(ClaimTypes.Role, user.Role ?? "User")
+            };
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var authProperties = new AuthenticationProperties
+            {
+                IsPersistent = true
+            };
+
+            try
+            {
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity), authProperties);
+                HttpContext.Session.SetInt32("UserId", user.UserID); // Set session for ChangePassword compatibility
+                logger.Info($"Authentication successful for UserID: {user.UserID}, Session set");
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, $"Authentication failed for UserID: {user.UserID}");
+                ViewBag.Message = "Authentication error: " + ex.Message;
+                return View(login);
+            }
+
+            if (isFirstLogin || isPasswordExpired)
+            {
+                logger.Info($"Redirecting to ChangePassword for UserID: {user.UserID}, FirstLogin: {isFirstLogin}, Expired: {isPasswordExpired}");
+                return RedirectToAction("ChangePassword");
+            }
+
+            logger.Info($"Redirecting to Home/Index for UserID: {user.UserID}");
+            return RedirectToAction("Index", "Home");
         }
 
         public IActionResult ForgotPassword()
@@ -199,6 +245,7 @@ namespace CarMaintenance.Controllers
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
+            HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme).Wait();
             return RedirectToAction("Login", "Account");
         }
     }

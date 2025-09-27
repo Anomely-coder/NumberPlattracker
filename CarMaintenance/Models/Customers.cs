@@ -17,7 +17,7 @@ namespace CarMaintenance.Models
         public string Email { get; set; }
 
         [Required]
-        [StringLength(15, MinimumLength = 15, ErrorMessage = "Emirates ID must be exactly 15 characters long.")]
+        
         public string EmiratesID { get; set; }
 
         public int? CarID { get; set; }

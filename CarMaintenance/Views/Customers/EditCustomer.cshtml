@@ -3,7 +3,6 @@
 @using CarMaintenance
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
 
-
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <div class="container-fluid">
@@ -25,7 +24,7 @@
 <!-- Main content -->
 <section class="content">
     <div class="container">
-        <form method="post" asp-action="EditCustomer" asp-controller="Customers">
+        <form method="post" asp-action="EditCustomer" asp-controller="Customers" id="customerForm">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div> <!-- Added validation summary -->
             <div class="row my-2">
                 <input asp-for="CustomerID" hidden />
@@ -41,7 +40,7 @@
                 </div>
                 <div class="col-md-6 form-group">
                     <label class="form-label" asp-for="EmiratesID">@Localizer["EmiratesIDLabel"]</label>
-                    <input class="form-control" asp-for="EmiratesID" />
+                    <input class="form-control" asp-for="EmiratesID" id="emiratesID" maxlength="18" oninput="formatEmiratesID(this)" />
                     <span class="text-danger" asp-validation-for="EmiratesID"></span>
                 </div>
                 <div class="col-md-6 form-group">
@@ -61,4 +60,76 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" /> <!-- Include validation scripts -->
+    <script>
+        // Format Emirates ID as 123-1234-7654321-4
+        function formatEmiratesID(input) {
+            // Remove all non-digit characters
+            let value = input.value.replace(/\D/g, '');
+
+            // Format as 123-1234-7654321-4
+            let formatted = '';
+            if (value.length > 0) {
+                formatted = value.slice(0, 3);
+            }
+            if (value.length > 3) {
+                formatted += '-' + value.slice(3, 7);
+            }
+            if (value.length > 7) {
+                formatted += '-' + value.slice(7, 14);
+            }
+            if (value.length > 14) {
+                formatted += '-' + value.slice(14, 15);
+            }
+
+            // Update input with formatted value
+            input.value = formatted.slice(0, 18);
+        }
+
+        // Format Emirates ID on page load
+        $(document).ready(function () {
+            let emiratesIDInput = document.getElementById('emiratesID');
+            if (emiratesIDInput && emiratesIDInput.value) {
+                formatEmiratesID(emiratesIDInput);
+            }
+
+            // Add custom validation to jQuery validator
+            if ($.validator) {
+                $.validator.addMethod('emiratesID', function (value, element) {
+                    // Strip hyphens and validate length
+                    let cleanValue = value.replace(/\D/g, '');
+                    return cleanValue.length === 15;
+                }, '@Localizer["EmiratesIDLengthError"]' || 'Emirates ID must contain exactly 15 digits.');
+
+                // Apply custom validation to EmiratesID field
+                $('#emiratesID').rules('add', {
+                    emiratesID: true
+                });
+            }
+
+            // Handle form submission
+            $('#customerForm').on('submit', function (event) {
+                let emiratesIDInput = document.getElementById('emiratesID');
+                let cleanValue = emiratesIDInput.value.replace(/\D/g, '');
+
+                // Client-side validation
+                if (cleanValue.length !== 15) {
+                    event.preventDefault();
+                    let errorSpan = document.querySelector('span[data-valmsg-for="EmiratesID"]');
+                    errorSpan.innerText = '@Localizer["EmiratesIDLengthError"]' || 'Emirates ID must contain exactly 15 digits.';
+                    errorSpan.classList.add('text-danger');
+                    return;
+                }
+
+                // Strip hyphens before submission
+                emiratesIDInput.value = cleanValue;
+
+                // Trigger jQuery validation to ensure other fields are valid
+                if ($(this).valid()) {
+                    return true; // Allow submission
+                } else {
+                    event.preventDefault(); // Prevent submission if other validations fail
+                }
+            });
+        });
+    </script>
 }

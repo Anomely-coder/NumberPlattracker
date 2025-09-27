@@ -687,4 +687,7 @@
   <data name="UnknownUser" xml:space="preserve">
     <value>Unknown User</value>
   </data>
+  <data name="NoAccessText" xml:space="preserve">
+    <value>No Access</value>
+  </data>
 </root>
