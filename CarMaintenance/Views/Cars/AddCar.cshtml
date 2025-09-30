@@ -1,6 +1,11 @@
 ﻿@model Cars
 @using CarMaintenance
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
+@using System.Globalization
+
+@{
+    bool isRtl = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+}
 
 <!-- Content Header (Page header) -->
 <section class="content-header">
@@ -16,8 +21,8 @@
                 </ol>
             </div>
         </div>
-        <hr />
-    </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.container-fluid -->
 </section>
 
 <!-- Main content -->
@@ -25,6 +30,7 @@
     <div class="container">
         <form method="post" asp-action="AddCar" asp-controller="Cars">
             <div class="row my-2">
+                <!-- Number Plate Input -->
                 <div class="col-md-6 form-group">
                     <label class="form-label">
                         @Localizer["NumberPlateLabel"]
@@ -33,13 +39,20 @@
                     <input class="form-control" asp-for="NumberPlate" />
                 </div>
 
+                <!-- Car Status Hidden -->
                 <div class="col-md-6 form-group" hidden>
-                    <label class="form-label">@Localizer["CarStatusLabel"] <span class="text-danger fw-bold" asp-validation-for="CarStatus"></span></label>
-                    <input class="form-control" asp-for="CarStatus" value="1" />
+                    <label class="form-label">
+                        @Localizer["CarStatusLabel"]
+                        <span class="text-danger fw-bold" asp-validation-for="CarStatus"></span>
+                    </label>
+                    <input class="form-control" asp-for="CarStatus" value="0" />
                 </div>
 
-                <div class="col-md-12 my-2">
-                    <button type="submit" class="btn btn-primary">@Localizer["AddNumberPlateButton"]</button>
+                <!-- Submit Button -->
+                <div class="col-md-12 my-2 @(isRtl ? "text-start" : "text-end")">
+                    <button type="submit" class="btn btn-primary">
+                        @Localizer["AddNumberPlateButton"]
+                    </button>
                 </div>
             </div>
         </form>

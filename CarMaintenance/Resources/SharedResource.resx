@@ -690,4 +690,13 @@
   <data name="NoAccessText" xml:space="preserve">
     <value>No Access</value>
   </data>
+  <data name="TranferReportTitle" xml:space="preserve">
+    <value>Transfer Report</value>
+  </data>
+  <data name="AddCustomerTitle" xml:space="preserve">
+    <value>Add Customer</value>
+  </data>
+  <data name="ResetButton" xml:space="preserve">
+    <value>Reset</value>
+  </data>
 </root>

@@ -20,7 +20,8 @@
         <h2>@Localizer["SearchResultsTitle"]</h2>
         <form id="searchForm" asp-controller="Reports" asp-action="Search" method="get" class="form-inline mb-3">
             <div id="searchTerm-wrapper" style="position:relative; display:inline-block;">
-                <input type="text" id="searchTerm" name="searchTerm" class="form-control mr-2" value="@searchTerm" placeholder="Search..." autocomplete="off" />
+                <input type="text" id="searchTerm" name="searchTerm" class="form-control mr-2"
+                       value="@searchTerm" placeholder="Search..." autocomplete="off" />
             </div>
             <button type="submit" class="btn btn-primary">Search</button>
         </form>
@@ -28,9 +29,13 @@
 </section>
 
 <section class="content">
-    @if (!Model.Any())
+    @if (string.IsNullOrEmpty(searchTerm))
     {
-        <div class="alert alert-warning">No results found.</div>
+        <div class="alert alert-info">🔍 Please enter a search term.</div>
+    }
+    else if (!Model.Any())
+    {
+        <div class="alert alert-warning">⚠️ No results found for "@searchTerm".</div>
     }
     else
     {
@@ -106,64 +111,56 @@
             }
         </div>
 
-        <button id="exportPdfBtn" class="btn btn-danger mt-3">Export to PDF</button>
+        <button id="exportPdfBtn" class="btn btn-danger mt-3">📄 Export to PDF</button>
     }
 </section>
 
 @section Scripts {
     <script>
-        $(function() {
-            // Autocomplete
-            $("#searchTerm").autocomplete({
-                minLength: 1,
-                delay: 100,
-                source: function(request, response) {
-                    $.getJSON('@Url.Action("GetSearchSuggestions", "Reports")', { term: request.term }, response);
-                },
-                select: function(event, ui) {
-                    $("#searchTerm").val(ui.item.value);
-                    $("#searchForm").submit();
-                },
-                appendTo: "#searchTerm-wrapper"
-            }).data("ui-autocomplete")._renderItem = function(ul, item) {
-                return $("<li>")
-                    .append("<div style='padding:5px;'>" + item.label + "</div>")
-                    .appendTo(ul);
-            };
-
-            $(".ui-autocomplete").css({
-                "max-height": "200px",
-                "overflow-y": "auto",
-                "overflow-x": "hidden",
-                "z-index": "10000"
-            });
+        $(document).ready(function () {
 
             // PDF Export
-            $("#exportPdfBtn").click(function() {
-                html2canvas(document.getElementById("pdfContent"), { scale: 2, useCORS: true }).then(function(canvas) {
+            $("#exportPdfBtn").on("click", function () {
+                let content = document.getElementById("pdfContent");
+
+                if (!content) {
+                    alert("PDF content not found!");
+                    return;
+                }
+
+                html2canvas(content, { scale: 2, useCORS: true }).then(function (canvas) {
+                    // ✅ Access jsPDF correctly from UMD
                     const { jsPDF } = window.jspdf;
-                    var pdf = new jsPDF('p', 'pt', 'a4');
-                    var imgData = canvas.toDataURL('image/png');
-                    var pageWidth = pdf.internal.pageSize.getWidth();
-                    var pageHeight = pdf.internal.pageSize.getHeight();
-                    var imgWidth = pageWidth;
-                    var imgHeight = canvas.height * imgWidth / canvas.width;
-                    var heightLeft = imgHeight;
-                    var position = 0;
+                    let pdf = new jsPDF("p", "pt", "a4");
 
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
+                    let imgData = canvas.toDataURL("image/png");
+                    let pageWidth = pdf.internal.pageSize.getWidth();
+                    let pageHeight = pdf.internal.pageSize.getHeight();
+                    let imgWidth = pageWidth - 40; // margins
+                    let imgHeight = canvas.height * imgWidth / canvas.width;
 
+                    let heightLeft = imgHeight;
+                    let position = 20;
+
+                    // First page
+                    pdf.addImage(imgData, "PNG", 20, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight - 40;
+
+                    // Extra pages
                     while (heightLeft > 0) {
-                        position = heightLeft - imgHeight;
+                        position = heightLeft - imgHeight + 20;
                         pdf.addPage();
-                        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                        heightLeft -= pageHeight;
+                        pdf.addImage(imgData, "PNG", 20, position, imgWidth, imgHeight);
+                        heightLeft -= pageHeight - 40;
                     }
 
                     pdf.save("CustomerReport.pdf");
+                }).catch(function (error) {
+                    console.error("PDF Error:", error);
+                    alert("Error generating PDF: " + error.message);
                 });
             });
         });
     </script>
 }
+

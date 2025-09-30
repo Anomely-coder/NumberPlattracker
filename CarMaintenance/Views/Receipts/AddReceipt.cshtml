@@ -74,15 +74,18 @@
             </table>
 
             <input type="hidden" asp-for="TotalAmount" id="totalAmountHidden" />
-            <h4>@Localizer["TotalLabel"]: <span id="totalDisplay">0</span></h4>
+            <h4>@Localizer["TotalLabel"] <span id="totalDisplay">0</span></h4>
 
-            <div class="row">
-                <div class="col-md-6">
-                    <button type="submit" class="btn btn-success w-100 mt-2" id="saveBtn">@Localizer["SaveReceiptButton"]</button>
-                </div>
-                <div class="col-md-6">
-                    <button type="button" class="btn btn-primary w-100 mt-2" id="savePrintBtn">@Localizer["SavePrintButton"]</button>
-                </div>
+            <div class="mt-2">
+                <button type="submit" class="btn btn-success mr-2" id="saveBtn">
+                    @Localizer["SaveReceiptButton"]
+                </button>
+                <button type="button" class="btn btn-primary mr-2" id="savePrintBtn">
+                    @Localizer["SavePrintButton"]
+                </button>
+                <button type="reset" class="btn btn-secondary" id="resetBtn">
+                    @Localizer["ResetButton"]
+                </button>
             </div>
         </form>
     </div>

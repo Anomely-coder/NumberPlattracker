@@ -103,30 +103,31 @@
                 "responsive": true,
                 "lengthChange": false,
                 "autoWidth": false,
-                "language": {
-                    "url": "@(CultureInfo.CurrentCulture.Name == "ar-SA" ? "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json" : "//cdn.datatables.net/plug-ins/1.13.6/i18n/en-GB.json")"
-                },
                 "buttons": [
                     {
                         extend: 'copy',
+                        text: '@Localizer["CopyButton"]',
                         exportOptions: {
-                            columns: [0, 1, 2, 3]
+                            columns: [0, 1, 2] // Include ID, Number Plate, Status
                         }
                     },
                     {
                         extend: 'csv',
+                        text: '@Localizer["CsvButton"]',
                         exportOptions: {
                             columns: [0, 1, 2, 3]
                         }
                     },
                     {
                         extend: 'excel',
+                        text: '@Localizer["ExcelButton"]',
                         exportOptions: {
                             columns: [0, 1, 2, 3]
                         }
                     },
                     {
                         extend: 'pdf',
+                        text: '@Localizer["PdfButton"]',
                         exportOptions: {
                             columns: [0, 1, 2, 3]
                         }
@@ -136,7 +137,7 @@
                         text: '@Localizer["PrintButton"]',
                         title: '',
                         exportOptions: {
-                            columns: [0, 1, 2, 3]
+                            columns: [0, 1, 2, 3] // Skip Edit/Delete
                         },
                         customize: function (win) {
                             $(win.document.body).prepend(
@@ -152,7 +153,10 @@
                                 .css('width', '100%');
                         }
                     },
-                    "colvis"
+                    {
+                        extend: 'colvis',
+                        text: '@Localizer["ColumnVisibilityButton"]'
+                    }
                 ]
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
         });

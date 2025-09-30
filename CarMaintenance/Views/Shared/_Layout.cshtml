@@ -8,9 +8,15 @@
     var culture = CultureInfo.CurrentCulture;
     var logger = LoggerFactory.CreateLogger("LayoutDebug");
 
-    // optional debug logs (remove if noisy)
-    logger.LogDebug("Layout rendered at {Time}", DateTime.Now);
-    logger.LogInformation("Current Culture: {Culture}", culture.Name);
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+
+    Func<string, bool> isController = (ctrl) =>
+        string.Equals(currentController, ctrl, StringComparison.OrdinalIgnoreCase);
+
+    Func<string, string, bool> isPage = (ctrl, act) =>
+        string.Equals(currentController, ctrl, StringComparison.OrdinalIgnoreCase) &&
+        string.Equals(currentAction, act, StringComparison.OrdinalIgnoreCase);
 }
 
 <!DOCTYPE html>
@@ -22,6 +28,7 @@
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="~/AdminTheme/plugins/fontawesome-free/css/all.min.css">
 
@@ -32,6 +39,40 @@
 
     <!-- Theme style -->
     <link rel="stylesheet" href="~/AdminTheme/dist/css/adminlte.min.css">
+
+    @using System.Globalization
+    @{
+        var isRTL = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+    }
+    @if (isRTL)
+    {
+        <style>
+            /* Sidebar RTL Fix */
+            .main-sidebar {
+                direction: rtl;
+            }
+
+                .main-sidebar .nav-sidebar .nav-item .nav-link {
+                    text-align: right;
+                }
+
+                    .main-sidebar .nav-sidebar .nav-item .nav-link .nav-icon {
+                        margin-right: 0;
+                        margin-left: .5rem; /* Push icon to the left of Arabic text */
+                    }
+
+                    .main-sidebar .nav-sidebar .nav-item .nav-link p {
+                        margin-right: .5rem;
+                    }
+
+                /* Align submenu arrows correctly */
+                .main-sidebar .nav-sidebar .nav-item .right {
+                    right: auto;
+                    left: 1rem;
+                    transform: rotate(180deg); /* Flip arrow */
+                }
+        </style>
+    }
 
     <style>
         [dir="rtl"] {
@@ -44,7 +85,7 @@
             text-align: left;
         }
 
-        /* RTL adjustments for AdminLTE elements */
+        /* ✅ Navbar fix for RTL */
         [dir="rtl"] .nav {
             flex-direction: row-reverse;
         }
@@ -57,6 +98,7 @@
         [dir="rtl"] .user-panel .info {
             margin-left: 0;
             margin-right: 1rem;
+            text-align: right;
         }
 
         [dir="rtl"] .brand-text {
@@ -64,101 +106,57 @@
             margin-right: 0.5rem;
         }
 
-        [dir="rtl"] .sidebar .nav-link p {
-            white-space: normal;
-            overflow: visible;
-            padding-right: 0.5rem;
-        }
-
-        [dir="rtl"] .content-wrapper {
-            margin-right: 0;
-        }
-        /* AdminLTE handles the rest */
-
-        /* Enhanced RTL fixes for sidebar alignment */
-        [dir="rtl"] .main-sidebar {
-            right: auto;
-            left: 0;
-        }
-
-        [dir="rtl"] .sidebar .user-panel {
-            flex-direction: row-reverse;
-        }
-
-        [dir="rtl"] .user-panel .image {
-            margin-left: 1rem;
-            margin-right: 0;
+        [dir="rtl"] .sidebar .nav-link .right {
+            float: left !important;
+            margin-left: 0.5rem;
+            margin-right: 0 !important;
         }
 
         [dir="rtl"] .sidebar .nav-treeview .nav-item {
             text-align: right;
         }
 
-        [dir="rtl"] .sidebar .nav-link .right {
-            float: left !important;
-            margin-left: 0.5rem;
-            margin-right: 0;
+        /* ✅ Sidebar main menu alignment */
+        [dir="rtl"] .main-sidebar {
+            left: auto;
+            right: 0;
         }
 
-        [dir="rtl"] .sidebar .nav-link p {
-            padding-left: 0.5rem;
-            padding-right: 0;
-            margin: 0;
+        [dir="rtl"] .content-wrapper,
+        [dir="rtl"] .main-footer,
+        [dir="rtl"] .main-header {
+            margin-left: 0 !important;
+            margin-right: 250px; /* default sidebar width */
         }
 
-        [dir="rtl"] .main-sidebar .nav-sidebar .nav-link {
-            padding: 0.5rem 1rem 0.5rem 0.5rem;
-            text-align: right;
-        }
-
-        [dir="rtl"] .main-sidebar .nav-sidebar .nav-treeview .nav-link {
-            padding-right: 2.5rem;
-            padding-left: 0.5rem;
-        }
-
-        [dir="rtl"] .navbar-nav.ml-auto {
+        /* ✅ Collapse mode fix */
+        [dir="rtl"].sidebar-collapse .content-wrapper,
+        [dir="rtl"].sidebar-collapse .main-footer,
+        [dir="rtl"].sidebar-collapse .main-header {
             margin-right: 0 !important;
-            margin-left: auto !important;
-        }
-
-        [dir="rtl"] .brand-link .brand-text {
-            margin-right: 0;
-            margin-left: 0.5rem;
-        }
-
-        [dir="rtl"] .nav-link i {
-            margin-left: 0.5rem;
-            margin-right: 0;
-        }
-
-        [dir="rtl"] .content-wrapper, [dir="rtl"] .main-footer {
-            margin-left: 0;
-        }
-
-        [dir="rtl"] .main-header .navbar-nav:first-child {
-            margin-right: auto;
         }
     </style>
 </head>
 <body class="hold-transition sidebar-mini @(culture.TextInfo.IsRightToLeft ? "layout-fixed" : "")">
     <div class="wrapper">
+
         <!-- Navbar -->
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button">
+                        <i class="fas fa-bars"></i>
+                    </a>
                 </li>
-
                 <li class="nav-item d-none d-sm-inline-block">
                     <a asp-action="Index" asp-controller="Home" class="nav-link">@Localizer["HomeLink"]</a>
                 </li>
-
                 <li class="nav-item d-none d-sm-inline-block">
                     <a class="nav-link" asp-action="Logout" asp-controller="Account">@Localizer["LogoutLink"]</a>
                 </li>
             </ul>
 
-            <!-- Right navbar (language selector + optional other controls) -->
+            <!-- Language Selector -->
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
                     <form asp-action="SetLanguage" asp-controller="Home" method="post" class="form-inline">
@@ -172,18 +170,17 @@
                 </li>
             </ul>
         </nav>
-        <!-- /.navbar -->
-        <!-- Main Sidebar Container -->
+
+        <!-- Sidebar -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
-            <!-- Brand Logo -->
+            <!-- Brand -->
             <a href="~/" class="brand-link">
                 <img src="~/AdminTheme/dist/img/AdminLTELogo.png" alt="@Localizer["LogoAlt"]" class="brand-image img-circle elevation-3" style="opacity: .8">
                 <span class="brand-text font-weight-light">@Localizer["AppName"]</span>
             </a>
 
-            <!-- Sidebar -->
             <div class="sidebar">
-                <!-- Sidebar user -->
+                <!-- User panel -->
                 <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                     <div class="image">
                         <img src="~/AdminTheme/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="@Localizer["UserImageAlt"]">
@@ -195,11 +192,10 @@
 
                 <!-- Sidebar Menu -->
                 <nav class="mt-2">
-                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
                         <!-- Dashboard -->
                         <li class="nav-item">
-                            <a class="nav-link" asp-action="Index" asp-controller="Home">
+                            <a class="nav-link @(isPage("Home","Index") ? "active" : "")" asp-action="Index" asp-controller="Home">
                                 <i class="nav-icon fas fa-tachometer-alt"></i>
                                 <p>@Localizer["DashboardLink"]</p>
                             </a>
@@ -207,54 +203,49 @@
 
                         <!-- Reports -->
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Reports" asp-action="Search">
+                            <a class="nav-link @(isController("Reports") ? "active" : "")" asp-controller="Reports" asp-action="Search">
                                 <i class="nav-icon fas fa-file-pdf"></i>
                                 <p>@Localizer["QuickSearchLink"]</p>
                             </a>
                         </li>
 
                         <!-- Number Plate -->
-                        <li class="nav-item has-treeview">
-                            <a href="#" class="nav-link">
+                        <li class="nav-item has-treeview @(isController("Cars") ? "menu-open" : "")">
+                            <a href="#" class="nav-link @(isController("Cars") ? "active" : "")">
                                 <i class="nav-icon fas fa-car"></i>
-                                <p>
-                                    @Localizer["NumberPlateSection"]
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
+                                <p>@Localizer["NumberPlateSection"] <i class="right fas fa-angle-left"></i></p>
                             </a>
-                            <ul class="nav nav-treeview">
+                            <ul class="nav nav-treeview" style="@(isController("Cars") ? "display:block;" : "display:none;")">
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-action="Index" asp-controller="Cars">
+                                    <a class="nav-link @(isPage("Cars","Index") ? "active" : "")" asp-action="Index" asp-controller="Cars">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>@Localizer["ViewNumberPlateLink"]</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-action="AddCar" asp-controller="Cars">
+                                    <a class="nav-link @(isPage("Cars","AddCar") ? "active" : "")" asp-action="AddCar" asp-controller="Cars">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>@Localizer["AddNewNumberLink"]</p>
                                     </a>
                                 </li>
                             </ul>
                         </li>
+
                         <!-- Customers -->
-                        <li class="nav-item has-treeview">
-                            <a href="#" class="nav-link">
+                        <li class="nav-item has-treeview @(isController("Customers") ? "menu-open" : "")">
+                            <a href="#" class="nav-link @(isController("Customers") ? "active" : "")">
                                 <i class="nav-icon fas fa-users"></i>
-                                <p>
-                                    @Localizer["CustomersSection"]
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
+                                <p>@Localizer["CustomersSection"] <i class="right fas fa-angle-left"></i></p>
                             </a>
-                            <ul class="nav nav-treeview">
+                            <ul class="nav nav-treeview" style="@(isController("Customers") ? "display:block;" : "display:none;")">
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-action="Index" asp-controller="Customers">
+                                    <a class="nav-link @(isPage("Customers","Index") ? "active" : "")" asp-action="Index" asp-controller="Customers">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>@Localizer["ViewCustomersLink"]</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-action="AddCustomer" asp-controller="Customers">
+                                    <a class="nav-link @(isPage("Customers","AddCustomer") ? "active" : "")" asp-action="AddCustomer" asp-controller="Customers">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>@Localizer["AddNewCustomerLink"]</p>
                                     </a>
@@ -263,23 +254,20 @@
                         </li>
 
                         <!-- Services -->
-                        <li class="nav-item has-treeview">
-                            <a href="#" class="nav-link">
+                        <li class="nav-item has-treeview @(isController("Services") ? "menu-open" : "")">
+                            <a href="#" class="nav-link @(isController("Services") ? "active" : "")">
                                 <i class="nav-icon fas fa-wrench"></i>
-                                <p>
-                                    @Localizer["ServicesSection"]
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
+                                <p>@Localizer["ServicesSection"] <i class="right fas fa-angle-left"></i></p>
                             </a>
-                            <ul class="nav nav-treeview">
+                            <ul class="nav nav-treeview" style="@(isController("Services") ? "display:block;" : "display:none;")">
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-action="Index" asp-controller="Services">
+                                    <a class="nav-link @(isPage("Services","Index") ? "active" : "")" asp-action="Index" asp-controller="Services">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>@Localizer["ViewServicesLink"]</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-action="AddService" asp-controller="Services">
+                                    <a class="nav-link @(isPage("Services","AddService") ? "active" : "")" asp-action="AddService" asp-controller="Services">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>@Localizer["AddNewServiceLink"]</p>
                                     </a>
@@ -288,23 +276,20 @@
                         </li>
 
                         <!-- Receipts -->
-                        <li class="nav-item has-treeview">
-                            <a href="#" class="nav-link">
+                        <li class="nav-item has-treeview @(isController("Receipts") ? "menu-open" : "")">
+                            <a href="#" class="nav-link @(isController("Receipts") ? "active" : "")">
                                 <i class="nav-icon fas fa-receipt"></i>
-                                <p>
-                                    @Localizer["ReceiptsSection"]
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
+                                <p>@Localizer["ReceiptsSection"] <i class="right fas fa-angle-left"></i></p>
                             </a>
-                            <ul class="nav nav-treeview">
+                            <ul class="nav nav-treeview" style="@(isController("Receipts") ? "display:block;" : "display:none;")">
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-action="Index" asp-controller="Receipts">
+                                    <a class="nav-link @(isPage("Receipts","Index") ? "active" : "")" asp-action="Index" asp-controller="Receipts">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>@Localizer["ViewReceiptsLink"]</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-action="AddReceipt" asp-controller="Receipts">
+                                    <a class="nav-link @(isPage("Receipts","AddReceipt") ? "active" : "")" asp-action="AddReceipt" asp-controller="Receipts">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>@Localizer["AddNewReceiptLink"]</p>
                                     </a>
@@ -313,23 +298,20 @@
                         </li>
 
                         <!-- Transfer -->
-                        <li class="nav-item has-treeview">
-                            <a href="#" class="nav-link">
+                        <li class="nav-item has-treeview @(isController("TransferCars") ? "menu-open" : "")">
+                            <a href="#" class="nav-link @(isController("TransferCars") ? "active" : "")">
                                 <i class="nav-icon fas fa-share"></i>
-                                <p>
-                                    @Localizer["TransferSection"]
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
+                                <p>@Localizer["TransferSection"] <i class="right fas fa-angle-left"></i></p>
                             </a>
-                            <ul class="nav nav-treeview">
+                            <ul class="nav nav-treeview" style="@(isController("TransferCars") ? "display:block;" : "display:none;")">
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-action="Index" asp-controller="TransferCars">
+                                    <a class="nav-link @(isPage("TransferCars","Index") ? "active" : "")" asp-action="Index" asp-controller="TransferCars">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>@Localizer["ViewHistoryLink"]</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-action="Transfer" asp-controller="TransferCars">
+                                    <a class="nav-link @(isPage("TransferCars","Transfer") ? "active" : "")" asp-action="Transfer" asp-controller="TransferCars">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>@Localizer["TransferNewCarLink"]</p>
                                     </a>
@@ -338,35 +320,29 @@
                         </li>
 
                         <!-- Users -->
-                        <li class="nav-item has-treeview">
-                            <a href="#" class="nav-link">
+                        <li class="nav-item has-treeview @(isController("Users") ? "menu-open" : "")">
+                            <a href="#" class="nav-link @(isController("Users") ? "active" : "")">
                                 <i class="nav-icon fas fa-user-lock"></i>
-                                <p>
-                                    @Localizer["UsersSection"]
-                                    <i class="right fas fa-angle-left"></i>
-                                </p>
+                                <p>@Localizer["UsersSection"] <i class="right fas fa-angle-left"></i></p>
                             </a>
-                            <ul class="nav nav-treeview">
+                            <ul class="nav nav-treeview" style="@(isController("Users") ? "display:block;" : "display:none;")">
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-action="Index" asp-controller="Users">
+                                    <a class="nav-link @(isPage("Users","Index") ? "active" : "")" asp-action="Index" asp-controller="Users">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>@Localizer["ViewUsersLink"]</p>
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-action="AddUser" asp-controller="Users">
+                                    <a class="nav-link @(isPage("Users","AddUser") ? "active" : "")" asp-action="AddUser" asp-controller="Users">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>@Localizer["AddNewUserLink"]</p>
                                     </a>
                                 </li>
                             </ul>
                         </li>
-
                     </ul>
                 </nav>
-                <!-- /.sidebar-menu -->
             </div>
-            <!-- /.sidebar -->
         </aside>
 
         <!-- Content Wrapper -->
@@ -379,7 +355,10 @@
             <div class="float-right d-none d-sm-block">
                 <b>@Localizer["VersionLabel"]</b> 1.0.0
             </div>
-            <strong>@Localizer["CopyrightText"] @DateTime.Now.ToString("yyyy") <a href="#">@Localizer["CompanyLink"]</a>.</strong>
+            <strong>
+                @Localizer["CopyrightText"] @DateTime.Now.ToString("yyyy")
+                <a href="#">@Localizer["CompanyLink"]</a>.
+            </strong>
             @Localizer["AllRightsReserved"]
         </footer>
     </div>
@@ -387,7 +366,7 @@
     <!-- Scripts -->
     <script src="~/AdminTheme/plugins/jquery/jquery.min.js"></script>
     <script src="~/AdminTheme/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-    @RenderSection("Scripts", required: false)
     <script src="~/AdminTheme/dist/js/adminlte.min.js"></script>
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

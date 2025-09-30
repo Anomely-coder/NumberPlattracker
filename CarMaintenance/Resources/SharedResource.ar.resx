@@ -691,4 +691,13 @@
   <data name="NoAccessText" xml:space="preserve">
     <value>لا يمكن الوصول</value>
   </data>
+  <data name="TranferReportTitle" xml:space="preserve">
+    <value>تقرير النقل</value>
+  </data>
+  <data name="AddCustomerTitle" xml:space="preserve">
+    <value>إضافة عميل</value>
+  </data>
+  <data name="ResetButton" xml:space="preserve">
+    <value>إعادة ضبط</value>
+  </data>
 </root>

@@ -2,6 +2,7 @@
 @inject IViewLocalizer Localizer
 @using CarMaintenance
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
+
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <div class="container-fluid">
@@ -26,6 +27,7 @@
         <form method="post" asp-action="Transfer" asp-controller="TransferCars">
             <div class="row my-2">
 
+                <!-- From Customer -->
                 <div class="col-md-6 form-group">
                     <label class="form-label">
                         @Localizer["From"]
@@ -36,12 +38,16 @@
                     </select>
                 </div>
 
+                <!-- Number Plate -->
+                <!-- Number Plate (VISIBLE and populated by AJAX) -->
                 <div class="col-md-6 form-group">
                     <label class="form-label">@Localizer["NumberPlate"]</label>
-                    <input class="form-control" id="NumberPlate" readonly />
-                    <input type="hidden" id="CarID" name="CarID" asp-for="CarID" />
+                    <input type="text" class="form-control" id="NumberPlate" name="NumberPlate" readonly />
                 </div>
 
+                <!-- Car ID (still hidden, so it gets posted with the form) -->
+                <input type="hidden" id="CarID" name="CarID" asp-for="CarID" />
+                <!-- To Customer -->
                 <div class="col-md-6 form-group">
                     <label class="form-label">
                         @Localizer["To"]
@@ -52,6 +58,7 @@
                     </select>
                 </div>
 
+                <!-- Transfer Date -->
                 <div class="col-md-6 form-group">
                     <label class="form-label">
                         @Localizer["TransferDate"]
@@ -60,8 +67,10 @@
                     <input class="form-control" asp-for="TransferDate" />
                 </div>
 
+                <!-- Buttons -->
                 <div class="col-md-12 my-2">
-                    <button type="submit" class="btn btn-primary">@Localizer["TransferCarButton"]</button>
+                    <button type="submit" class="btn btn-primary mr-2">@Localizer["TransferCarButton"]</button>
+                    <button type="reset" class="btn btn-secondary">@Localizer["ResetButton"]</button>
                 </div>
             </div>
         </form>
