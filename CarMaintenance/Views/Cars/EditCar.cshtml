@@ -1,5 +1,4 @@
-﻿@model Cars
-@using CarMaintenance
+﻿@model CarMaintenance.Models.Cars
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
 
 <!-- Content Header (Page header) -->
@@ -17,7 +16,7 @@
             </div>
         </div>
         <hr />
-    </div><!-- /.container-fluid -->
+    </div>
 </section>
 
 <!-- Main content -->
@@ -25,20 +24,30 @@
     <div class="container">
         <form method="post" asp-action="EditCar" asp-controller="Cars">
             <div class="row my-2">
-                <input asp-for="CarID" hidden />
+                <input asp-for="CarID" type="hidden" />
+
+                <!-- Number Plate -->
                 <div class="col-md-6 form-group">
-                    <label class="form-label">@Localizer["NumberLabel"] <span class="text-danger fw-bold" asp-validation-for="NumberPlate"></span></label>
+                    <label class="form-label">@Localizer["NumberPlate"]</label>
                     <input class="form-control" asp-for="NumberPlate" />
+                    <span class="text-danger" asp-validation-for="NumberPlate"></span>
                 </div>
-                <div class="col-md-6 form-group">
-                    <label class="form-label" hidden>@Localizer["CarStatusLabel"] <span class="text-danger fw-bold" asp-validation-for="CarStatus"></span></label>
-                    <input class="form-control" asp-for="CarStatus" value="1" hidden />
-                </div>
+
+                <!-- Car Status (Hidden) -->
+                <input asp-for="CarStatus" type="hidden" value="1" />
+
+                <!-- Buttons -->
                 <div class="col-md-12 my-2">
                     <button type="submit" class="btn btn-primary">@Localizer["UpdateCarButton"]</button>
+                    <button type="reset" class="btn btn-secondary">Reset</button>
                 </div>
             </div>
         </form>
     </div>
 </section>
-<!-- /.content -->
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

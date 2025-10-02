@@ -62,7 +62,12 @@
                                     <p><a class="text-primary fas fa-pen" asp-action="EditCar" asp-controller="Cars" asp-route-Id="@item.CarID"></a></p>
                                 </td>
                                 <td>
-                                    <p><a class="text-danger fas fa-trash" asp-action="DeleteCar" asp-controller="Cars" asp-route-Id="@item.CarID"></a></p>
+                                    <p>
+                                        <a class="text-danger fas fa-trash delete-confirm"
+                                           asp-action="DeleteCar"
+                                           asp-controller="Cars"
+                                           asp-route-Id="@item.CarID"></a>
+                                    </p>
                                 </td>
                             </tr>
                         }
@@ -70,19 +75,10 @@
                     else
                     {
                         <tr>
-                            <td class="text-center" colspan="6">@Localizer["NoRecordsFound"]</td>
+                            <td class="text-center" colspan="5">@Localizer["NoRecordsFound"]</td>
                         </tr>
                     }
                 </tbody>
-                <tfoot>
-                    <tr>
-                        <th>@Localizer["IdColumn"]</th>
-                        <th>@Localizer["NumberPlateColumn"]</th>
-                        <th>@Localizer["StatusColumn"]</th>
-                        <th>@Localizer["EditColumn"]</th>
-                        <th>@Localizer["DeleteColumn"]</th>
-                    </tr>
-                </tfoot>
             </table>
         </div>
         <!-- /.card-body -->
@@ -110,42 +106,33 @@
                 "responsive": true,
                 "lengthChange": false,
                 "autoWidth": false,
+                "pageLength": 50,
                 "buttons": [
                     {
                         extend: 'copy',
                         text: '@Localizer["CopyButton"]',
-                        exportOptions: {
-                            columns: [0, 1, 2] // Include ID, Number Plate, Status
-                        }
+                        exportOptions: { columns: [0, 1, 2] }
                     },
                     {
                         extend: 'csv',
                         text: '@Localizer["CsvButton"]',
-                        exportOptions: {
-                            columns: [0, 1, 2]
-                        }
+                        exportOptions: { columns: [0, 1, 2] }
                     },
                     {
                         extend: 'excel',
                         text: '@Localizer["ExcelButton"]',
-                        exportOptions: {
-                            columns: [0, 1, 2]
-                        }
+                        exportOptions: { columns: [0, 1, 2] }
                     },
                     {
                         extend: 'pdf',
                         text: '@Localizer["PdfButton"]',
-                        exportOptions: {
-                            columns: [0, 1, 2]
-                        }
+                        exportOptions: { columns: [0, 1, 2] }
                     },
                     {
                         extend: 'print',
                         text: '@Localizer["PrintButton"]',
                         title: '',
-                        exportOptions: {
-                            columns: [0, 1, 2] // Skip Edit/Delete
-                        },
+                        exportOptions: { columns: [0, 1, 2] },
                         customize: function (win) {
                             $(win.document.body).prepend(
                                 '<div style="display:flex; justify-content:space-between; margin-bottom:20px;">' +
@@ -153,19 +140,23 @@
                                 '<img src="/images/logo1.png" style="height:60px;" />' +
                                 '</div>'
                             );
-
                             $(win.document.body).find('table')
                                 .addClass('compact')
                                 .css('font-size', '12px')
                                 .css('width', '100%');
                         }
                     },
-                    {
-                        extend: 'colvis',
-                        text: '@Localizer["ColumnVisibilityButton"]'
-                    }
+                    { extend: 'colvis', text: '@Localizer["ColumnVisibilityButton"]' }
                 ]
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+
+            // Localized Delete Confirmation
+            $(".delete-confirm").on("click", function (e) {
+                var message = '@Localizer["AreYouSureDelete"]';
+                if (!confirm(message)) {
+                    e.preventDefault();
+                }
+            });
         });
     </script>
 }

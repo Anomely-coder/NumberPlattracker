@@ -9,22 +9,25 @@ namespace CarMaintenance.Controllers
 {
     public class CustomersController : Controller
     {
-        private AppDbContext db;
+        private readonly AppDbContext db;
 
         public CustomersController(AppDbContext _db)
         {
             db = _db;
         }
 
+        // ---------------- LIST ----------------
         public IActionResult Index()
         {
-            var data = db.Tbl_Customers.Include(x => x.Cars).ToList();
+            var data = db.Tbl_Customers
+                .Include(x => x.Cars)
+                .ToList();
             return View(data);
         }
 
+        // ---------------- ADD ----------------
         public IActionResult AddCustomer()
         {
-            // ✅ Only unregistered cars
             var unregisteredCars = db.Tbl_Cars
                 .Where(c => c.CarStatus == 0)
                 .ToList();
@@ -34,23 +37,28 @@ namespace CarMaintenance.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult AddCustomer(Customers customers)
         {
+            // Unique checks
             if (db.Tbl_Customers.Any(c => c.Email == customers.Email))
             {
                 ModelState.AddModelError("Email", "This Email already exists. Please enter a unique Email.");
             }
-
             if (db.Tbl_Customers.Any(c => c.EmiratesID == customers.EmiratesID))
             {
                 ModelState.AddModelError("EmiratesID", "This Emirates ID already exists. Please enter a unique Emirates ID.");
+            }
+            if (db.Tbl_Customers.Any(c => c.MobileNumber == customers.MobileNumber))
+            {
+                ModelState.AddModelError("MobileNumber", "This Mobile Number already exists. Please enter a unique Mobile Number.");
             }
 
             if (ModelState.IsValid)
             {
                 db.Tbl_Customers.Add(customers);
 
-                // ✅ Update car status
+                // Update car status if linked
                 if (customers.CarID.HasValue)
                 {
                     var car = db.Tbl_Cars.Find(customers.CarID.Value);
@@ -65,24 +73,26 @@ namespace CarMaintenance.Controllers
                 return RedirectToAction("Index");
             }
 
-            // ✅ Re-bind only unregistered cars if form fails
+            // Re-bind dropdown
             var unregisteredCars = db.Tbl_Cars
                 .Where(c => c.CarStatus == 0)
                 .ToList();
-
             ViewBag.Cars = new SelectList(unregisteredCars, "CarID", "NumberPlate");
             return View(customers);
         }
 
-        public IActionResult EditCustomer(int Id)
+        // ---------------- EDIT ----------------
+        public IActionResult EditCustomer(int id)
         {
-            // ✅ All cars allowed in Edit
+            var data = db.Tbl_Customers.Find(id);
+            if (data == null) return NotFound();
+
             ViewBag.Cars = new SelectList(db.Tbl_Cars.ToList(), "CarID", "NumberPlate");
-            var data = db.Tbl_Customers.Find(Id);
             return View(data);
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult EditCustomer(Customers customers)
         {
             if (db.Tbl_Customers.Any(c => c.EmiratesID == customers.EmiratesID && c.CustomerID != customers.CustomerID))
@@ -92,34 +102,35 @@ namespace CarMaintenance.Controllers
 
             if (ModelState.IsValid)
             {
-                var oldCustomer = db.Tbl_Customers.AsNoTracking().FirstOrDefault(c => c.CustomerID == customers.CustomerID);
+                var oldCustomer = db.Tbl_Customers.AsNoTracking()
+                    .FirstOrDefault(c => c.CustomerID == customers.CustomerID);
+
                 db.Tbl_Customers.Update(customers);
 
-                // ✅ If car changed, update statuses
+                // If car changed, update old/new status
                 if (oldCustomer?.CarID != customers.CarID)
                 {
-                    // Unregister old car
                     if (oldCustomer?.CarID != null)
                     {
                         var oldCar = db.Tbl_Cars.Find(oldCustomer.CarID.Value);
                         if (oldCar != null)
                         {
-                            bool stillAssigned = db.Tbl_Customers.Any(c => c.CarID == oldCar.CarID && c.CustomerID != customers.CustomerID);
+                            bool stillAssigned = db.Tbl_Customers
+                                .Any(c => c.CarID == oldCar.CarID && c.CustomerID != customers.CustomerID);
                             if (!stillAssigned)
                             {
-                                oldCar.CarStatus = 0; // Unregistered
+                                oldCar.CarStatus = 0;
                                 db.Tbl_Cars.Update(oldCar);
                             }
                         }
                     }
 
-                    // Register new car
                     if (customers.CarID != null)
                     {
                         var newCar = db.Tbl_Cars.Find(customers.CarID.Value);
                         if (newCar != null)
                         {
-                            newCar.CarStatus = 1; // Registered
+                            newCar.CarStatus = 1;
                             db.Tbl_Cars.Update(newCar);
                         }
                     }
@@ -133,21 +144,22 @@ namespace CarMaintenance.Controllers
             return View(customers);
         }
 
-        public IActionResult DeleteCustomer(int Id)
+        // ---------------- DELETE ----------------
+        public IActionResult DeleteCustomer(int id)
         {
-            var data = db.Tbl_Customers.Find(Id);
+            var data = db.Tbl_Customers.Find(id);
             if (data != null)
             {
-                // ✅ Unregister car if no one else owns it
                 if (data.CarID.HasValue)
                 {
                     var car = db.Tbl_Cars.Find(data.CarID.Value);
                     if (car != null)
                     {
-                        bool stillAssigned = db.Tbl_Customers.Any(c => c.CarID == car.CarID && c.CustomerID != data.CustomerID);
+                        bool stillAssigned = db.Tbl_Customers
+                            .Any(c => c.CarID == car.CarID && c.CustomerID != data.CustomerID);
                         if (!stillAssigned)
                         {
-                            car.CarStatus = 0; // Unregistered
+                            car.CarStatus = 0;
                             db.Tbl_Cars.Update(car);
                         }
                     }

@@ -1,7 +1,6 @@
-﻿@model IEnumerable<Customers>
-@inject IViewLocalizer Localizer
-@using CarMaintenance
+﻿@using CarMaintenance
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
+@model IEnumerable<Customers>
 
 <!-- Content Header (Page header) -->
 <section class="content-header">
@@ -37,6 +36,7 @@
                         <th>@Localizer["CustomerID"]</th>
                         <th>@Localizer["Name"]</th>
                         <th>@Localizer["Email"]</th>
+                        <th>@Localizer["MobileNumber"]</th>
                         <th>@Localizer["EmiratesID"]</th>
                         <th>@Localizer["NumberPlate"]</th>
                         <th>@Localizer["Edit"]</th>
@@ -52,31 +52,31 @@
                                 <th>@item.CustomerID</th>
                                 <td>@item.Name</td>
                                 <td>@item.Email</td>
+                                <td>@item.MobileNumber</td>
                                 <td>@item.EmiratesID</td>
                                 <td>@item.Cars?.NumberPlate</td>
-                                <td><p><a class="text-primary fas fa-pen" asp-action="EditCustomer" asp-controller="Customers" asp-route-Id="@item.CustomerID"></a></p></td>
-                                <td><p><a class="text-danger fas fa-trash" asp-action="DeleteCustomer" asp-controller="Customers" asp-route-Id="@item.CustomerID"></a></p></td>
+                                <td>
+                                    <a class="text-primary fas fa-pen"
+                                       asp-action="EditCustomer"
+                                       asp-controller="Customers"
+                                       asp-route-Id="@item.CustomerID"></a>
+                                </td>
+                                <td>
+                                    <a class="text-danger fas fa-trash delete-confirm"
+                                       asp-action="DeleteCustomer"
+                                       asp-controller="Customers"
+                                       asp-route-Id="@item.CustomerID"></a>
+                                </td>
                             </tr>
                         }
                     }
                     else
                     {
                         <tr>
-                            <td class="text-center" colspan="7">@Localizer["NoRecordFound"]</td>
+                            <td class="text-center" colspan="8">@Localizer["NoRecordFound"]</td>
                         </tr>
                     }
                 </tbody>
-                <tfoot>
-                    <tr>
-                        <th>@Localizer["CustomerID"]</th>
-                        <th>@Localizer["Name"]</th>
-                        <th>@Localizer["Email"]</th>
-                        <th>@Localizer["EmiratesID"]</th>
-                        <th>@Localizer["NumberPlate"]</th>
-                        <th>@Localizer["Edit"]</th>
-                        <th>@Localizer["Delete"]</th>
-                    </tr>
-                </tfoot>
             </table>
         </div>
         <!-- /.card-body -->
@@ -105,30 +105,31 @@
                 "responsive": true,
                 "lengthChange": false,
                 "autoWidth": false,
+                "pageLength": 50,
                 "buttons": [
                     {
                         extend: 'copy',
                         exportOptions: {
-                            columns: [0, 1, 2, 3, 4]
+                            columns: [0, 1, 2, 3, 4, 5]
                         }
                     },
                     {
                         extend: 'csv',
                         exportOptions: {
-                            columns: [0, 1, 2, 3, 4]
+                            columns: [0, 1, 2, 3, 4, 5]
                         }
                     },
                     {
                         extend: 'excel',
                         text: '@Localizer["ExcelButton"]',
                         exportOptions: {
-                            columns: [0, 1, 2, 3, 4]
+                            columns: [0, 1, 2, 3, 4, 5]
                         }
                     },
                     {
                         extend: 'pdf',
                         exportOptions: {
-                            columns: [0, 1, 2, 3, 4]
+                            columns: [0, 1, 2, 3, 4, 5]
                         }
                     },
                     {
@@ -136,7 +137,7 @@
                         text: '@Localizer["PrintButton"]',
                         title: '',
                         exportOptions: {
-                            columns: [0, 1, 2, 3, 4]
+                            columns: [0, 1, 2, 3, 4, 5]
                         },
                         customize: function (win) {
                             $(win.document.body).prepend(
@@ -155,6 +156,14 @@
                     "colvis"
                 ]
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+
+            // Localized Delete Confirmation
+            $(".delete-confirm").on("click", function (e) {
+                var message = '@Localizer["AreYouSureDelete"]';
+                if (!confirm(message)) {
+                    e.preventDefault();
+                }
+            });
         });
     </script>
 }

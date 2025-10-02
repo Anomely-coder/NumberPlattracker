@@ -1,8 +1,7 @@
 ﻿@model IEnumerable<Services>
-@inject IViewLocalizer Localizer
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
 @using CarMaintenance
-@using System.Globalization
+
 
 <!-- Content Header (Page header) -->
 <section class="content-header">
@@ -53,8 +52,18 @@
                                 <td>@item.ServiceName</td>
                                 <td>@item.Description</td>
                                 <td>@item.Price</td>
-                                <td><p><a class="text-primary fas fa-pen" asp-action="EditService" asp-controller="Services" asp-route-Id="@item.ServiceID"></a></p></td>
-                                <td><p><a class="text-danger fas fa-trash" asp-action="DeleteService" asp-controller="Services" asp-route-Id="@item.ServiceID"></a></p></td>
+                                <td>
+                                    <a class="text-primary fas fa-pen"
+                                       asp-action="EditService"
+                                       asp-controller="Services"
+                                       asp-route-Id="@item.ServiceID"></a>
+                                </td>
+                                <td>
+                                    <a class="text-danger fas fa-trash delete-confirm"
+                                       asp-action="DeleteService"
+                                       asp-controller="Services"
+                                       asp-route-Id="@item.ServiceID"></a>
+                                </td>
                             </tr>
                         }
                     }
@@ -65,16 +74,6 @@
                         </tr>
                     }
                 </tbody>
-                <tfoot>
-                    <tr>
-                        <th>@Localizer["ServiceID"]</th>
-                        <th>@Localizer["ServiceName"]</th>
-                        <th>@Localizer["Description"]</th>
-                        <th>@Localizer["Price"]</th>
-                        <th>@Localizer["Edit"]</th>
-                        <th>@Localizer["Delete"]</th>
-                    </tr>
-                </tfoot>
             </table>
         </div>
         <!-- /.card-body -->
@@ -103,42 +102,33 @@
                 "responsive": true,
                 "lengthChange": false,
                 "autoWidth": false,
+                "pageLength": 50,
                 "buttons": [
                     {
                         extend: 'copy',
                         text: '@Localizer["CopyButton"]',
-                        exportOptions: {
-                            columns: [0, 1, 2] // Include ID, Number Plate, Status
-                        }
+                        exportOptions: { columns: [0, 1, 2, 3] }
                     },
                     {
                         extend: 'csv',
                         text: '@Localizer["CsvButton"]',
-                        exportOptions: {
-                            columns: [0, 1, 2, 3]
-                        }
+                        exportOptions: { columns: [0, 1, 2, 3] }
                     },
                     {
                         extend: 'excel',
                         text: '@Localizer["ExcelButton"]',
-                        exportOptions: {
-                            columns: [0, 1, 2, 3]
-                        }
+                        exportOptions: { columns: [0, 1, 2, 3] }
                     },
                     {
                         extend: 'pdf',
                         text: '@Localizer["PdfButton"]',
-                        exportOptions: {
-                            columns: [0, 1, 2, 3]
-                        }
+                        exportOptions: { columns: [0, 1, 2, 3] }
                     },
                     {
                         extend: 'print',
                         text: '@Localizer["PrintButton"]',
                         title: '',
-                        exportOptions: {
-                            columns: [0, 1, 2, 3] // Skip Edit/Delete
-                        },
+                        exportOptions: { columns: [0, 1, 2, 3] },
                         customize: function (win) {
                             $(win.document.body).prepend(
                                 '<div style="display:flex; justify-content:space-between; margin-bottom:20px;">' +
@@ -159,6 +149,14 @@
                     }
                 ]
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+
+            // Localized Delete Confirmation
+            $(".delete-confirm").on("click", function (e) {
+                var message = "@Localizer["AreYouSureDelete"]";
+                if (!confirm(message)) {
+                    e.preventDefault();
+                }
+            });
         });
     </script>
 }

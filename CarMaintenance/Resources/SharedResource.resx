@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="CarsBreadcrumb" xml:space="preserve">
-    <value>Cars</value>
+    <value>NumberPlate</value>
   </data>
   <data name="CopyButton" xml:space="preserve">
     <value>Copy</value>
@@ -277,7 +277,7 @@
     <value>All rights reserved.</value>
   </data>
   <data name="CompanyLink" xml:space="preserve">
-    <value>(Company name)</value>
+    <value>IOT Systems</value>
   </data>
   <data name="CopyrightText" xml:space="preserve">
     <value>Copyright©</value>
@@ -451,7 +451,7 @@
     <value>Receipts</value>
   </data>
   <data name="ViewReceiptsLink" xml:space="preserve">
-    <value>ViewcReceipts</value>
+    <value>View Receipts</value>
   </data>
   <data name="AddNewReceiptLink" xml:space="preserve">
     <value>Add New Receipt</value>
@@ -698,5 +698,20 @@
   </data>
   <data name="ResetButton" xml:space="preserve">
     <value>Reset</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+  </data>
+  <data name="Search Results" xml:space="preserve">
+    <value>Search Results</value>
+  </data>
+  <data name="Search by name, email, number plate..." xml:space="preserve">
+    <value>Search by name, email, number plate...</value>
+  </data>
+  <data name="DashboardBreadcrumb" xml:space="preserve">
+    <value>DashboardBreadcrumb</value>
+  </data>
+  <data name="AreYouSureDelete" xml:space="preserve">
+    <value>Are You Sure To Delete This</value>
   </data>
 </root>

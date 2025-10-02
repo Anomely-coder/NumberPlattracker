@@ -17,8 +17,11 @@ namespace CarMaintenance.Models
         public string Email { get; set; }
 
         [Required]
-        
         public string EmiratesID { get; set; }
+
+        [Required]
+        [RegularExpression(@"^05\d{8}$", ErrorMessage = "Mobile number must start with 05 and be 10 digits long.")]
+        public string MobileNumber { get; set; }   // 📱 New field
 
         public int? CarID { get; set; }
 

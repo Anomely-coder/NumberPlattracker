@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
 namespace CarMaintenance.Models
 {
@@ -10,6 +9,7 @@ namespace CarMaintenance.Models
         [Key]
         public int CarID { get; set; }
 
+        [Required(ErrorMessage = "Number Plate is required")]
         public string NumberPlate { get; set; }
 
         // 0 = Unregistered, 1 = Registered

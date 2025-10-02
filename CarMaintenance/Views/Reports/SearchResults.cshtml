@@ -1,166 +1,175 @@
-﻿@using System.Globalization
-@model List<CarMaintenance.Models.ViewModels.SearchResultViewModel>
+﻿@model IEnumerable<CarMaintenance.Models.ViewModels.SearchResultViewModel>
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
 
 @{
     var searchTerm = ViewData["SearchTerm"] as string;
-    var generatedBy = ViewData["GeneratedBy"] as string ?? Localizer["UnknownUser"];
-    bool isRtl = CultureInfo.CurrentCulture.TextInfo.IsRightToLeft;
+    var generatedBy = ViewData["GeneratedBy"] as string;
 }
 
-<!-- jQuery UI & PDF libraries -->
-<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<div class="container mt-5" id="reportArea">
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-body">
+            <h2 class="mb-4 text-primary">🔍 @Localizer["Search Results"]</h2>
 
-<section class="content-header">
-    <div class="container-fluid">
-        <h2>@Localizer["SearchResultsTitle"]</h2>
-        <form id="searchForm" asp-controller="Reports" asp-action="Search" method="get" class="form-inline mb-3">
-            <div id="searchTerm-wrapper" style="position:relative; display:inline-block;">
-                <input type="text" id="searchTerm" name="searchTerm" class="form-control mr-2"
-                       value="@searchTerm" placeholder="Search..." autocomplete="off" />
-            </div>
-            <button type="submit" class="btn btn-primary">Search</button>
-        </form>
-    </div>
-</section>
-
-<section class="content">
-    @if (string.IsNullOrEmpty(searchTerm))
-    {
-        <div class="alert alert-info">🔍 Please enter a search term.</div>
-    }
-    else if (!Model.Any())
-    {
-        <div class="alert alert-warning">⚠️ No results found for "@searchTerm".</div>
-    }
-    else
-    {
-        <div id="pdfContent" style="font-family:'Arial'; width:100%; text-align:@(isRtl ? "right" : "left"); direction:@(isRtl ? "rtl" : "ltr");">
-            <h2 style="text-align:center;">@Localizer["CustomerReport"]</h2>
-            <div style="display:flex; justify-content:space-between;">
-                <span>@Localizer["GeneratedBy"]: @generatedBy</span>
-                <span>@Localizer["GeneratedOn"]: @DateTime.Now.ToString("MM/dd/yyyy HH:mm")</span>
-            </div>
-            <hr />
-
-            @foreach (var r in Model)
-            {
-                var customer = r.Customer;
-                <div style="margin-bottom:20px; border-bottom:1px solid #ccc; padding-bottom:10px;">
-                    <p><strong>@Localizer["CustomerName"]:</strong> @customer.Name</p>
-                    <p><strong>@Localizer["Email"]:</strong> @customer.Email</p>
-                    <p><strong>@Localizer["NumberPlate"]:</strong> @(customer.Cars?.NumberPlate ?? Localizer["NotAvailable"])</p>
-
-                    <!-- Receipts Table -->
-                    @if (customer.Receipts?.Any() ?? false)
-                    {
-                        <p style="font-weight:bold; margin-top:10px;">@Localizer["Receipts"]:</p>
-                        <table border="1" style="width:100%; border-collapse:collapse; text-align:@(isRtl ? "right" : "left");">
-                            <thead style="background-color:#16a085; color:white;">
-                                <tr>
-                                    <th>@Localizer["Date"]</th>
-                                    <th>@Localizer["Amount"]</th>
-                                    <th>@Localizer["ServicesLabel"]</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var rec in customer.Receipts)
-                                {
-                                    var servicesText = string.Join(", ", rec.ReceiptsDetails?.Select(d => d.Services?.ServiceName ?? "N/A"));
-                                    <tr>
-                                        <td>@rec.Date.ToShortDateString()</td>
-                                        <td>@rec.TotalAmount.ToString("F2")</td>
-                                        <td>@servicesText</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    }
-
-                    <!-- Transfers Table -->
-                    @if (r.Transfers?.Any() ?? false)
-                    {
-                        <p style="font-weight:bold; margin-top:10px;">@Localizer["Transfers"]:</p>
-                        <table border="1" style="width:100%; border-collapse:collapse; text-align:@(isRtl ? "right" : "left");">
-                            <thead style="background-color:#27ae60; color:white;">
-                                <tr>
-                                    <th>@Localizer["From"]</th>
-                                    <th>@Localizer["To"]</th>
-                                    <th>@Localizer["DateLabel"]</th>
-                                    <th>@Localizer["NumberPlate"]</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var t in r.Transfers)
-                                {
-                                    <tr>
-                                        <td>@(t.FromCustomers?.Name ?? Localizer["NotAvailable"])</td>
-                                        <td>@(t.ToCustomers?.Name ?? Localizer["NotAvailable"])</td>
-                                        <td>@t.TransferDate.ToShortDateString()</td>
-                                        <td>@(t.Cars?.NumberPlate ?? Localizer["NotAvailable"])</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    }
+            <!-- Search Form -->
+            <form method="get" asp-action="Search" asp-controller="Reports" class="mb-4 no-print">
+                <div class="input-group">
+                    <input type="text" id="searchTerm" name="searchTerm"
+                           class="form-control"
+                           value="@searchTerm"
+                           placeholder="@Localizer["Search by name, email, number plate..."]"
+                           autocomplete="off" />
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i> @Localizer["Search"]
+                    </button>
                 </div>
-            }
-        </div>
+            </form>
 
-        <button id="exportPdfBtn" class="btn btn-danger mt-3">📄 Export to PDF</button>
-    }
-</section>
+            <!-- Report Content -->
+            <div id="reportContent">
+                <div class="alert alert-info p-2">
+                    <strong>@Localizer["GeneratedBy"]:</strong> @generatedBy <br />
+                    <strong>@Localizer["CustomerName"]:</strong> @searchTerm
+                </div>
+
+                <hr />
+
+                @if (string.IsNullOrEmpty(searchTerm))
+                {
+                    <div></div>
+                }
+                else if (!Model.Any())
+                {
+                    <div class="alert alert-warning">⚠️ @Localizer["NoResultsFound"]</div>
+                }
+                else
+                {
+                    @foreach (var r in Model)
+                    {
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">@r.Customer.Name</h5>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>@Localizer["Email"]:</strong> @r.Customer.Email</p>
+                                <p><strong>@Localizer["NumberPlate"]:</strong> @r.Customer.Cars?.NumberPlate</p>
+
+                                @* Receipts *@
+                                @if (r.Customer.Receipts?.Any() ?? false)
+                                {
+                                    <h6 class="mt-3 text-success">@Localizer["Receipts"]</h6>
+                                    <table class="table table-bordered table-striped">
+                                        <thead class="table-success">
+                                            <tr>
+                                                <th>@Localizer["DateLabel"]</th>
+                                                <th>@Localizer["Amount"]</th>
+                                                <th>@Localizer["ServicesLabel"]</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var rec in r.Customer.Receipts)
+                                            {
+                                                <tr>
+                                                    <td>@rec.Date.ToShortDateString()</td>
+                                                    <td>@rec.TotalAmount.ToString("F2")</td>
+                                                    <td>
+                                                        <ul class="mb-0">
+                                                            @foreach (var d in rec.ReceiptsDetails)
+                                                            {
+                                                                <li>@d.Services?.ServiceName</li>
+                                                            }
+                                                        </ul>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                }
+
+                                @* Transfers *@
+                                @if (r.Transfers?.Any() ?? false)
+                                {
+                                    <h6 class="mt-3 text-info">@Localizer["Transfers"]</h6>
+                                    <table class="table table-bordered table-striped">
+                                        <thead class="table-info">
+                                            <tr>
+                                                <th>@Localizer["From"]</th>
+                                                <th>@Localizer["To"]</th>
+                                                <th>@Localizer["Date"]</th>
+                                                <th>@Localizer["NumberPlate"]</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var t in r.Transfers)
+                                            {
+                                                <tr>
+                                                    <td>@t.FromCustomers?.Name</td>
+                                                    <td>@t.ToCustomers?.Name</td>
+                                                    <td>@t.TransferDate.ToShortDateString()</td>
+                                                    <td>@t.Cars?.NumberPlate</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+
+            <!-- PDF Export -->
+            <div class="d-flex justify-content-end mt-4 no-print">
+                <button id="exportPdfClient" class="btn btn-success">
+                    📄 @Localizer["ExportPdfButton"]
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <script>
-        $(document).ready(function () {
-
-            // PDF Export
-            $("#exportPdfBtn").on("click", function () {
-                let content = document.getElementById("pdfContent");
-
-                if (!content) {
-                    alert("PDF content not found!");
-                    return;
-                }
-
-                html2canvas(content, { scale: 2, useCORS: true }).then(function (canvas) {
-                    // ✅ Access jsPDF correctly from UMD
-                    const { jsPDF } = window.jspdf;
-                    let pdf = new jsPDF("p", "pt", "a4");
-
-                    let imgData = canvas.toDataURL("image/png");
-                    let pageWidth = pdf.internal.pageSize.getWidth();
-                    let pageHeight = pdf.internal.pageSize.getHeight();
-                    let imgWidth = pageWidth - 40; // margins
-                    let imgHeight = canvas.height * imgWidth / canvas.width;
-
-                    let heightLeft = imgHeight;
-                    let position = 20;
-
-                    // First page
-                    pdf.addImage(imgData, "PNG", 20, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight - 40;
-
-                    // Extra pages
-                    while (heightLeft > 0) {
-                        position = heightLeft - imgHeight + 20;
-                        pdf.addPage();
-                        pdf.addImage(imgData, "PNG", 20, position, imgWidth, imgHeight);
-                        heightLeft -= pageHeight - 40;
-                    }
-
-                    pdf.save("CustomerReport.pdf");
-                }).catch(function (error) {
-                    console.error("PDF Error:", error);
-                    alert("Error generating PDF: " + error.message);
+        $("#searchTerm").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: '@Url.Action("GetSearchSuggestions", "Reports")',
+                    data: { term: request.term },
+                    success: function (data) { response(data); }
                 });
+            },
+            minLength: 2,
+            autoFocus: true
+        });
+
+        $("#exportPdfClient").click(function () {
+            const { jsPDF } = window.jspdf;
+            html2canvas(document.querySelector("#reportContent")).then(canvas => {
+                const imgData = canvas.toDataURL("image/png");
+                const pdf = new jsPDF("p", "mm", "a4");
+                const imgWidth = 190;
+                const pageHeight = 295;
+                const imgHeight = canvas.height * imgWidth / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 10;
+
+                pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                pdf.save("CustomerReport_Client.pdf");
             });
         });
     </script>
 }
-

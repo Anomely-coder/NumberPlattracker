@@ -63,15 +63,6 @@
                         </tr>
                     }
                 </tbody>
-                <tfoot>
-                    <tr>
-                        <th>@Localizer["IDColumn"]</th>
-                        <th>@Localizer["CustomerColumn"]</th>
-                        <th>@Localizer["NumberPlateColumn"]</th>
-                        <th>@Localizer["DateColumn"]</th>
-                        <th>@Localizer["AmountColumn"]</th>
-                    </tr>
-                </tfoot>
             </table>
         </div>
     </div>
@@ -104,6 +95,7 @@
             responsive: true,
             lengthChange: false,
             autoWidth: false,
+            pageLength: 50,
             dom: 'Bfrtip',   // 👈 this makes buttons appear
             language: {
                 url: langUrl,

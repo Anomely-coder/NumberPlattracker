@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="CarsBreadcrumb" xml:space="preserve">
-    <value>السيارات</value>
+    <value>لوحة الرقم</value>
   </data>
   <data name="CopyButton" xml:space="preserve">
     <value>نسخ</value>
@@ -277,7 +277,7 @@
     <value>كل الحقوق محفوظة.</value>
   </data>
   <data name="CompanyLink" xml:space="preserve">
-    <value>اسم الشركة</value>
+    <value>أنظمة إنترنت الأشياء</value>
   </data>
   <data name="CopyrightText" xml:space="preserve">
     <value>حقوق الطبع والنشر©</value>
@@ -699,5 +699,20 @@
   </data>
   <data name="ResetButton" xml:space="preserve">
     <value>إعادة ضبط</value>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>بحث</value>
+  </data>
+  <data name="Search Results" xml:space="preserve">
+    <value>نتائج البحث</value>
+  </data>
+  <data name="Search by name, email, number plate..." xml:space="preserve">
+    <value>البحث حسب الاسم، البريد الإلكتروني، لوحة الأرقام...</value>
+  </data>
+  <data name="DashboardBreadcrumb" xml:space="preserve">
+    <value>اللوحة الرئيسية</value>
+  </data>
+  <data name="AreYouSureDelete" xml:space="preserve">
+    <value>هل أنت متأكد من الحذف؟</value>
   </data>
 </root>
