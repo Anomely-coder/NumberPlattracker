@@ -30,19 +30,19 @@
 
             <div class="row my-2">
                 <div class="col-md-6 form-group">
-                    <label asp-for="Name">@Localizer["NameLabel"]</label>
+                    <label asp-for="Name">@Localizer["Name"]</label>
                     <input class="form-control" asp-for="Name" />
                     <span class="text-danger" asp-validation-for="Name"></span>
                 </div>
 
                 <div class="col-md-6 form-group">
-                    <label asp-for="Email">@Localizer["EmailLabel"]</label>
+                    <label asp-for="Email">@Localizer["Email"]</label>
                     <input class="form-control" asp-for="Email" type="email" />
                     <span class="text-danger" asp-validation-for="Email"></span>
                 </div>
 
                 <div class="col-md-6 form-group">
-                    <label class="form-label" asp-for="MobileNumber">@Localizer["MobileNumber"]</label>
+                    <label asp-for="MobileNumber">@Localizer["MobileNumber"]</label>
                     <input class="form-control" asp-for="MobileNumber"
                            placeholder="05XXX XXXXX"
                            maxlength="11"
@@ -51,15 +51,17 @@
                 </div>
 
                 <div class="col-md-6 form-group">
-                    <label asp-for="EmiratesID">@Localizer["EmiratesIDLabel"]</label>
-                    <input class="form-control" asp-for="EmiratesID" id="emiratesID" maxlength="18" oninput="formatEmiratesID(this)" />
+                    <label asp-for="EmiratesID">@Localizer["EmiratesID"]</label>
+                    <input class="form-control" asp-for="EmiratesID"
+                           maxlength="18"
+                           oninput="formatEmiratesID(this)" />
                     <span class="text-danger" asp-validation-for="EmiratesID"></span>
                 </div>
 
                 <div class="col-md-6 form-group">
-                    <label asp-for="CarID">@Localizer["CarLabel"]</label>
+                    <label asp-for="CarID">@Localizer["NumberPlate"]</label>
                     <select class="form-control" asp-for="CarID" asp-items="ViewBag.Cars">
-                        <option value="">@Localizer["SelectCar"]</option>
+                        <option value="">@Localizer["SelectNumberPlate"]</option>
                     </select>
                     <span class="text-danger" asp-validation-for="CarID"></span>
                 </div>
@@ -84,16 +86,13 @@
             if (value.length > 7) formatted += '-' + value.slice(7, 14);
             if (value.length > 14) formatted += '-' + value.slice(14, 15);
             input.value = formatted.slice(0, 18);
-        },
-            function formatMobile(input) {
-            let value = input.value.replace(/\D/g, ''); // keep only digits
+        }
 
-            // Always start with "05"
+        function formatMobile(input) {
+            let value = input.value.replace(/\D/g, '');
             if (!value.startsWith("05")) {
                 value = "05" + value.replace(/^0+/, "");
             }
-
-            // Insert space after 5 digits
             if (value.length > 5) {
                 input.value = value.slice(0, 5) + " " + value.slice(5, 10);
             } else {

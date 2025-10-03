@@ -99,9 +99,13 @@
     <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.print.min.js"></script>
     <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
 
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <!-- Page specific script -->
     <script>
         $(function () {
+            // ✅ Initialize DataTable
             $("#example1").DataTable({
                 "responsive": true,
                 "lengthChange": false,
@@ -150,13 +154,55 @@
                 ]
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
 
-            // Localized Delete Confirmation
+            // ✅ SweetAlert2 Delete Confirmation
             $(".delete-confirm").on("click", function (e) {
-                var message = '@Localizer["AreYouSureDelete"]';
-                if (!confirm(message)) {
-                    e.preventDefault();
+            e.preventDefault();
+            var url = $(this).attr("href");
+
+            Swal.fire({
+                title: '<span class="swal-title-custom">@Localizer["DeleteNumberPlate"]</span>',
+                html: '<p>@Localizer["AreYouSure"]</p>',
+                showCancelButton: true,
+                confirmButtonText: '@Localizer["Delete"]',
+                cancelButtonText: '@Localizer["Cancel"]',
+                focusCancel: true,
+                customClass: {
+                    popup: 'custom-swal',
+                    title: 'swal-title',
+                    confirmButton: 'swal-confirm-btn',
+                    cancelButton: 'swal-cancel-btn'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
                 }
             });
         });
+
+            // ✅ SweetAlert2 popup for TempData messages
+            @if (TempData["ErrorMessage"] != null)
+            {
+                    <text>
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: '@TempData["ErrorMessage"]'
+                        });
+                    </text>
+            }
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                    <text>
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: '@TempData["SuccessMessage"]'
+                        });
+                    </text>
+            }
+        });
     </script>
 }
+
+

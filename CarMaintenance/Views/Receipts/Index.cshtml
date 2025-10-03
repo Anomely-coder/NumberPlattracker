@@ -52,7 +52,12 @@
                                 <td>@(item.Customers?.Name ?? Localizer["Unknown"])</td>
                                 <td>@(item.Cars?.NumberPlate ?? Localizer["Unknown"])</td>
                                 <td>@item.Date.ToString("d", CultureInfo.CurrentCulture)</td>
-                                <td>@item.TotalAmount.ToString("C", CultureInfo.CurrentCulture)</td>
+                                <td style="white-space: nowrap;">
+                                    @item.TotalAmount.ToString("N2")
+                                    <img src="@Url.Content("~/images/logo2.png")"
+                                         alt="logo"
+                                         style="height:18px; margin-left:5px; vertical-align:middle;" />
+                                </td>
                             </tr>
                         }
                     }

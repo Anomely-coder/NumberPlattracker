@@ -30,6 +30,13 @@ namespace CarMaintenance.Models
 
         public int CustomerStatus { get; set; }
 
+        // ✅ New fields for Date & Time
+        [DataType(DataType.DateTime)]
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        [DataType(DataType.DateTime)]
+        public DateTime? UpdatedAt { get; set; }
+
         [ValidateNever]
         public ICollection<Receipts> Receipts { get; set; }
     }

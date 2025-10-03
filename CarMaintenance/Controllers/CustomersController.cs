@@ -3,6 +3,7 @@ using CarMaintenance.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 
 namespace CarMaintenance.Controllers
@@ -56,6 +57,10 @@ namespace CarMaintenance.Controllers
 
             if (ModelState.IsValid)
             {
+                // set CreatedAt
+                customers.CreatedAt = DateTime.Now;
+                customers.UpdatedAt = null;
+
                 db.Tbl_Customers.Add(customers);
 
                 // Update car status if linked
@@ -104,6 +109,9 @@ namespace CarMaintenance.Controllers
             {
                 var oldCustomer = db.Tbl_Customers.AsNoTracking()
                     .FirstOrDefault(c => c.CustomerID == customers.CustomerID);
+
+                // set UpdatedAt on update
+                customers.UpdatedAt = DateTime.Now;
 
                 db.Tbl_Customers.Update(customers);
 

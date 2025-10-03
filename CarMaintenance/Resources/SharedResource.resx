@@ -714,4 +714,22 @@
   <data name="AreYouSureDelete" xml:space="preserve">
     <value>Are You Sure To Delete This</value>
   </data>
+  <data name="DeleteNumberPlate" xml:space="preserve">
+    <value>Delete Number Plate</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="AreYouSure" xml:space="preserve">
+    <value>Are You Sure Delete You Want To Delete This</value>
+  </data>
+  <data name="Delete Customer" xml:space="preserve">
+    <value>Delete Customer</value>
+  </data>
+  <data name="This service cannot be deleted because it is already used in receipts." xml:space="preserve">
+    <value>This service cannot be deleted because it is already used in receipts.</value>
+  </data>
+  <data name="Delete Services" xml:space="preserve">
+    <value>Delete Services</value>
+  </data>
 </root>

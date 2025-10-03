@@ -76,8 +76,22 @@ namespace CarMaintenance.Controllers
 
             if (data != null)
             {
-                db.Tbl_Cars.Remove(data);
-                db.SaveChanges();
+                try
+                {
+                    db.Tbl_Cars.Remove(data);
+                    db.SaveChanges();
+                    TempData["SuccessMessage"] = "Car deleted successfully!";
+                }
+                catch (DbUpdateException)
+                {
+                    // 🔒 Car is linked to Receipts or another table → show blocking message
+                    TempData["ErrorMessage"] = "This car cannot be deleted because it has receipts linked to it.";
+                }
+                catch (Exception ex)
+                {
+                    // fallback for unexpected errors
+                    TempData["ErrorMessage"] = "An unexpected error occurred: " + ex.Message;
+                }
             }
 
             return RedirectToAction("Index");

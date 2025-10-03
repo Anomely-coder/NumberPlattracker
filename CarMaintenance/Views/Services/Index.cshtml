@@ -2,7 +2,6 @@
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
 @using CarMaintenance
 
-
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <div class="container-fluid">
@@ -29,7 +28,7 @@
                 <a class="btn btn-primary my-3" asp-action="AddService" asp-controller="Services">@Localizer["AddServiceButton"]</a>
             </h3>
         </div>
-        <!-- /.card-header -->
+
         <div class="card-body">
             <table id="example1" class="table table-bordered table-striped">
                 <thead>
@@ -76,7 +75,6 @@
                 </tbody>
             </table>
         </div>
-        <!-- /.card-body -->
     </div>
 </section>
 
@@ -95,7 +93,8 @@
     <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.print.min.js"></script>
     <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
 
-    <!-- Page specific script -->
+    
+
     <script>
         $(function () {
             $("#example1").DataTable({
@@ -136,7 +135,6 @@
                                 '<img src="/images/logo1.png" style="height:60px;" />' +
                                 '</div>'
                             );
-
                             $(win.document.body).find('table')
                                 .addClass('compact')
                                 .css('font-size', '12px')
@@ -151,12 +149,51 @@
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
 
             // Localized Delete Confirmation
-            $(".delete-confirm").on("click", function (e) {
-                var message = "@Localizer["AreYouSureDelete"]";
-                if (!confirm(message)) {
-                    e.preventDefault();
+                                  $(".delete-confirm").on("click", function (e) {
+            e.preventDefault();
+            var url = $(this).attr("href");
+
+            Swal.fire({
+                title: '<span class="swal-title-custom">@Localizer["Delete Services"]</span>',
+                html: '<p>@Localizer["AreYouSure"]</p>',
+                showCancelButton: true,
+                confirmButtonText: '@Localizer["Delete"]',
+                cancelButtonText: '@Localizer["Cancel"]',
+                focusCancel: true,
+                customClass: {
+                    popup: 'custom-swal',
+                    title: 'swal-title',
+                    confirmButton: 'swal-confirm-btn',
+                    cancelButton: 'swal-cancel-btn'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
                 }
             });
+        });
+
+            // ✅ SweetAlert2 popup for TempData messages
+            @if (TempData["ErrorMessage"] != null)
+            {
+                    <text>
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: '@TempData["ErrorMessage"]'
+                        });
+                    </text>
+            }
+            @if (TempData["SuccessMessage"] != null)
+            {
+                    <text>
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: '@TempData["SuccessMessage"]'
+                        });
+                    </text>
+            }
         });
     </script>
 }

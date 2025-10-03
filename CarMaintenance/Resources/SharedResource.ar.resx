@@ -715,4 +715,23 @@
   <data name="AreYouSureDelete" xml:space="preserve">
     <value>هل أنت متأكد من الحذف؟</value>
   </data>
+  <data name="DeleteNumberPlate" xml:space="preserve">
+    <value>حذف لوحة الأرقام</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>يلغي</value>
+  </data>
+  <data name="AreYouSure" xml:space="preserve">
+    <value>هل أنت متأكد</value>
+  </data>
+  <data name="Delete Customer" xml:space="preserve">
+    <value>حذف العميل</value>
+  </data>
+  <data name="This service cannot be deleted because it is already used in receipts." xml:space="preserve">
+    <value>لا يمكن حذف هذه الخدمة لأنها مستخدمة بالفعل في الإيصالات.</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="Delete Services" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
 </root>
