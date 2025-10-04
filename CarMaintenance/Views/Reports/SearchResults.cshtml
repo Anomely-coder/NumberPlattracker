@@ -17,7 +17,7 @@
                     <input type="text" id="searchTerm" name="searchTerm"
                            class="form-control"
                            value="@searchTerm"
-                           placeholder="@Localizer["Search by name, email, number plate..."]"
+                           placeholder="@Localizer["Search by name, email, emirates id, number plate, mobile..."]"
                            autocomplete="off" />
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-search"></i> @Localizer["Search"]
@@ -27,12 +27,13 @@
 
             <!-- Report Content -->
             <div id="reportContent">
-                <div class="alert alert-info p-2">
+                <!-- Hide this on webpage but show in PDF -->
+                <div class="alert alert-info p-2 print-only">
                     <strong>@Localizer["GeneratedBy"]:</strong> @generatedBy <br />
                     <strong>@Localizer["CustomerName"]:</strong> @searchTerm
                 </div>
 
-                <hr />
+                <hr class="print-only" />
 
                 @if (string.IsNullOrEmpty(searchTerm))
                 {
@@ -52,6 +53,8 @@
                             </div>
                             <div class="card-body">
                                 <p><strong>@Localizer["Email"]:</strong> @r.Customer.Email</p>
+                                <p><strong>@Localizer["EmiratesId"]:</strong> @r.Customer.EmiratesID</p>
+                                <p><strong>@Localizer["Mobile"]:</strong> @r.Customer.MobileNumber</p>
                                 <p><strong>@Localizer["NumberPlate"]:</strong> @r.Customer.Cars?.NumberPlate</p>
 
                                 @* Receipts *@
@@ -129,6 +132,22 @@
 </div>
 
 @section Scripts {
+    <style>
+        @@media print {
+            .print-only {
+                display: block !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        .print-only {
+            display: none;
+        }
+    </style>
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
@@ -150,6 +169,10 @@
 
         $("#exportPdfClient").click(function () {
             const { jsPDF } = window.jspdf;
+
+            // Show print-only content temporarily
+            $(".print-only").show();
+
             html2canvas(document.querySelector("#reportContent")).then(canvas => {
                 const imgData = canvas.toDataURL("image/png");
                 const pdf = new jsPDF("p", "mm", "a4");
@@ -168,7 +191,11 @@
                     pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
                     heightLeft -= pageHeight;
                 }
+
                 pdf.save("CustomerReport_Client.pdf");
+
+                // Hide print-only content again after PDF export
+                $(".print-only").hide();
             });
         });
     </script>

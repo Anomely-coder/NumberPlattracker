@@ -57,6 +57,8 @@ namespace CarMaintenance.Controllers
                 .Where(c =>
                     EF.Functions.Like(c.Name, $"%{searchTerm}%") ||
                     EF.Functions.Like(c.Email, $"%{searchTerm}%") ||
+                    EF.Functions.Like(c.EmiratesID, $"%{searchTerm}%") ||   // ✅ added
+                    EF.Functions.Like(c.MobileNumber, $"%{searchTerm}%") || // ✅ added
                     (c.Cars != null && EF.Functions.Like(c.Cars.NumberPlate, $"%{searchTerm}%"))
                 )
                 .ToList();
@@ -99,6 +101,8 @@ namespace CarMaintenance.Controllers
                 {
                     c.Name ?? "",
                     c.Email ?? "",
+                    c.EmiratesID ?? "",       // ✅ added
+                    c.MobileNumber ?? "",     // ✅ added
                     c.Cars != null ? c.Cars.NumberPlate : ""
                 })
                 .Where(s => !string.IsNullOrEmpty(s) &&
@@ -137,6 +141,8 @@ namespace CarMaintenance.Controllers
                 .Where(c =>
                     EF.Functions.Like(c.Name, $"%{searchTerm}%") ||
                     EF.Functions.Like(c.Email, $"%{searchTerm}%") ||
+                    EF.Functions.Like(c.EmiratesID, $"%{searchTerm}%") ||   // ✅ added
+                    EF.Functions.Like(c.MobileNumber, $"%{searchTerm}%") || // ✅ added
                     (c.Cars != null && EF.Functions.Like(c.Cars.NumberPlate, $"%{searchTerm}%"))
                 )
                 .ToList();
@@ -167,6 +173,8 @@ namespace CarMaintenance.Controllers
                 foreach (var r in results)
                 {
                     document.Add(new Paragraph($"Customer: {r.Customer.Name} ({r.Customer.Email})").SetBold());
+                    document.Add(new Paragraph($"Emirates ID: {r.Customer.EmiratesID ?? "N/A"}"));
+                    document.Add(new Paragraph($"Mobile: {r.Customer.MobileNumber ?? "N/A"}"));
                     document.Add(new Paragraph($"Number Plate: {r.Customer.Cars?.NumberPlate ?? "N/A"}"));
 
                     if (r.Customer.Receipts.Any())

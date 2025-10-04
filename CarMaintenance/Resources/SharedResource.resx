@@ -709,7 +709,7 @@
     <value>Search by name, email, number plate...</value>
   </data>
   <data name="DashboardBreadcrumb" xml:space="preserve">
-    <value>DashboardBreadcrumb</value>
+    <value>Dashboard </value>
   </data>
   <data name="AreYouSureDelete" xml:space="preserve">
     <value>Are You Sure To Delete This</value>

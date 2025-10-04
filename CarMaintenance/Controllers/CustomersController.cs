@@ -153,29 +153,32 @@ namespace CarMaintenance.Controllers
         }
 
         // ---------------- DELETE ----------------
+        [HttpGet]
         public IActionResult DeleteCustomer(int id)
         {
-            var data = db.Tbl_Customers.Find(id);
-            if (data != null)
+            var customer = db.Tbl_Customers.Find(id);
+            if (customer == null)
             {
-                if (data.CarID.HasValue)
-                {
-                    var car = db.Tbl_Cars.Find(data.CarID.Value);
-                    if (car != null)
-                    {
-                        bool stillAssigned = db.Tbl_Customers
-                            .Any(c => c.CarID == car.CarID && c.CustomerID != data.CustomerID);
-                        if (!stillAssigned)
-                        {
-                            car.CarStatus = 0;
-                            db.Tbl_Cars.Update(car);
-                        }
-                    }
-                }
-
-                db.Tbl_Customers.Remove(data);
-                db.SaveChanges();
+                TempData["ErrorMessage"] = "Customer not found.";
+                return RedirectToAction("Index");
             }
+
+            try
+            {
+                db.Tbl_Customers.Remove(customer);
+                db.SaveChanges();
+                TempData["SuccessMessage"] = "Customer deleted successfully.";
+            }
+            catch (DbUpdateException ex)
+            {
+                // This is where the foreign key conflict happens
+                TempData["ErrorMessage"] = "Cannot delete this customer because there are related receipts.";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "An error occurred while deleting the customer.";
+            }
+
             return RedirectToAction("Index");
         }
     }

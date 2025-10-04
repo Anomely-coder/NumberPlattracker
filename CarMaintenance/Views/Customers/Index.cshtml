@@ -99,8 +99,10 @@
     <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.print.min.js"></script>
     <script src="~/AdminTheme/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         $(function () {
+            // Initialize DataTable
             $("#example1").DataTable({
                 "responsive": true,
                 "lengthChange": false,
@@ -147,6 +149,7 @@
                 ]
             }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
 
+            // SweetAlert confirm before delete
             $(".delete-confirm").on("click", function (e) {
                 e.preventDefault();
                 var url = $(this).attr("href");
@@ -171,7 +174,29 @@
                     }
                 });
             });
+
+            // Show TempData messages
+            @if (TempData["ErrorMessage"] != null)
+            {
+                    <text>
+                    Swal.fire({
+                        icon: 'error',
+                        title: '@Localizer["Error"]',
+                        text: '@TempData["ErrorMessage"]'
+                    });
+                    </text>
+            }
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                    <text>
+                    Swal.fire({
+                        icon: 'success',
+                        title: '@Localizer["Success"]',
+                        text: '@TempData["SuccessMessage"]'
+                    });
+                    </text>
+            }
         });
-    </script>
     </script>
 }

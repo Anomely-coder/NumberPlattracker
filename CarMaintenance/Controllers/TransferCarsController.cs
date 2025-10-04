@@ -8,47 +8,59 @@ namespace CarMaintenance.Controllers
 {
     public class TransferCarsController : Controller
     {
-        private AppDbContext db;
+        private readonly AppDbContext db;
 
         public TransferCarsController(AppDbContext _db)
         {
             db = _db;
         }
 
+        // List of transfers
         public IActionResult Index()
         {
-            var data = db.Tbl_TransferCars.Include(x => x.FromCustomers).Include(y => y.ToCustomers).Include(z => z.Cars).ToList();
+            var data = db.Tbl_TransferCars
+                .Include(x => x.FromCustomers)
+                .Include(y => y.ToCustomers)
+                .Include(z => z.Cars)
+                .ToList();
 
             return View(data);
         }
 
+        // Show transfer form
         public IActionResult Transfer()
         {
-            ViewBag.Customers = new SelectList(db.Tbl_Customers.Where(x => x.CarID != 0).ToList(), "CustomerID", "Name");
-
             var model = new TransferCars
             {
                 TransferDate = DateTime.Now
             };
-
             return View(model);
-
         }
 
+        // Autocomplete API
         [HttpGet]
-        public IActionResult GetCarByCustomer(int customerId)
+        public IActionResult SearchCustomers(string term)
         {
-            var car = db.Tbl_Customers
-                        .Where(c => c.CustomerID == customerId)
-                        .Select(c => new
-                        {
-                            c.CarID,
-                            c.Cars.NumberPlate // Adjust this property name if different
-                        }).FirstOrDefault();
+            var customers = db.Tbl_Customers
+                .Where(c =>
+                    c.Name.Contains(term) ||
+                    c.EmiratesID.Contains(term) ||
+                    c.MobileNumber.Contains(term))
+                .Select(c => new
+                {
+                    customerID = c.CustomerID,
+                    name = c.Name,
+                    emiratesId = c.EmiratesID,
+                    mobile = c.MobileNumber,
+                    carID = c.CarID,
+                    numberPlate = c.Cars != null ? c.Cars.NumberPlate : ""
+                })
+                .ToList();
 
-            return Json(car);
+            return Json(customers);
         }
 
+        // Save transfer
         [HttpPost]
         public IActionResult Transfer(TransferCars model)
         {
@@ -59,16 +71,14 @@ namespace CarMaintenance.Controllers
 
                 if (fromCustomer != null && toCustomer != null)
                 {
-                    // 1. Update old customer’s CarID to 0
+                    // 1. Remove car from old customer
                     fromCustomer.CarID = null;
 
-
-                    // 2. Assign the car to the new customer
+                    // 2. Assign car to new customer
                     toCustomer.CarID = model.CarID;
 
                     // 3. Save transfer record
                     db.Tbl_TransferCars.Add(model);
-
                     db.SaveChanges();
 
                     TempData["success"] = "Car transferred successfully.";
@@ -76,11 +86,8 @@ namespace CarMaintenance.Controllers
                 }
             }
 
-            ViewBag.Customers = new SelectList(db.Tbl_Customers.ToList(), "CustomerID", "Name");
+            TempData["error"] = "Something went wrong. Please try again.";
             return View(model);
         }
-
-
-
     }
 }

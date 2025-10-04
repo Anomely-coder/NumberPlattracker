@@ -1,9 +1,8 @@
-﻿@model TransferCars
+﻿@model CarMaintenance.Models.TransferCars
 @inject IViewLocalizer Localizer
-@using CarMaintenance
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
 
-<!-- Content Header (Page header) -->
+<!-- Content Header -->
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
@@ -33,29 +32,27 @@
                         @Localizer["From"]
                         <span class="text-danger fw-bold" asp-validation-for="FromCustomerID"></span>
                     </label>
-                    <select class="form-control" asp-for="FromCustomerID" asp-items="ViewBag.Customers">
-                        <option value="">@Localizer["SelectCustomer"]</option>
-                    </select>
+                    <input type="text" id="FromCustomerName" class="form-control" placeholder="@Localizer["TypeCustomerName,E-Id,Mobile"]" />
+                    <input type="hidden" id="FromCustomerID" name="FromCustomerID" asp-for="FromCustomerID" />
                 </div>
 
                 <!-- Number Plate -->
-                <!-- Number Plate (VISIBLE and populated by AJAX) -->
                 <div class="col-md-6 form-group">
                     <label class="form-label">@Localizer["NumberPlate"]</label>
                     <input type="text" class="form-control" id="NumberPlate" name="NumberPlate" readonly />
                 </div>
 
-                <!-- Car ID (still hidden, so it gets posted with the form) -->
+                <!-- Hidden Car ID -->
                 <input type="hidden" id="CarID" name="CarID" asp-for="CarID" />
+
                 <!-- To Customer -->
                 <div class="col-md-6 form-group">
                     <label class="form-label">
                         @Localizer["To"]
                         <span class="text-danger fw-bold" asp-validation-for="ToCustomerID"></span>
                     </label>
-                    <select class="form-control" asp-for="ToCustomerID" asp-items="ViewBag.Customers">
-                        <option value="">@Localizer["SelectCustomer"]</option>
-                    </select>
+                    <input type="text" id="ToCustomerName" class="form-control" placeholder="@Localizer["TypeCustomerName,E-Id,Mobile"]" />
+                    <input type="hidden" id="ToCustomerID" name="ToCustomerID" asp-for="ToCustomerID" />
                 </div>
 
                 <!-- Transfer Date -->
@@ -78,22 +75,64 @@
 </section>
 
 @section Scripts {
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
     <script>
         $(document).ready(function () {
-            $('#FromCustomerID').change(function () {
-                var customerId = $(this).val();
-                if (customerId) {
+            // From Customer autocomplete
+            $("#FromCustomerName").autocomplete({
+                source: function (request, response) {
                     $.ajax({
-                        url: '/TransferCars/GetCarByCustomer?customerId=' + customerId,
+                        url: '/TransferCars/SearchCustomers',
                         type: 'GET',
+                        data: { term: request.term },
                         success: function (data) {
-                            $('#NumberPlate').val(data.NumberPlate);
-                            $('#CarID').val(data.carID);
+                            response($.map(data, function (item) {
+                                return {
+                                    label: item.name + " | " + item.emiratesId + " | " + item.mobile,
+                                    value: item.name,
+                                    id: item.customerID,
+                                    carID: item.carID,
+                                    numberPlate: item.numberPlate
+                                };
+                            }));
                         }
                     });
-                } else {
-                    $('#NumberPlate').val('');
-                    $('#CarID').val('');
+                },
+                minLength: 1,
+                select: function (event, ui) {
+                    $("#FromCustomerID").val(ui.item.id);
+                    $("#FromCustomerName").val(ui.item.value);
+                    $("#NumberPlate").val(ui.item.numberPlate);
+                    $("#CarID").val(ui.item.carID);
+                    return false;
+                }
+            });
+
+            // To Customer autocomplete
+            $("#ToCustomerName").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: '/TransferCars/SearchCustomers',
+                        type: 'GET',
+                        data: { term: request.term },
+                        success: function (data) {
+                            response($.map(data, function (item) {
+                                return {
+                                    label: item.name + " | " + item.emiratesId + " | " + item.mobile,
+                                    value: item.name,
+                                    id: item.customerID
+                                };
+                            }));
+                        }
+                    });
+                },
+                minLength: 1,
+                select: function (event, ui) {
+                    $("#ToCustomerID").val(ui.item.id);
+                    $("#ToCustomerName").val(ui.item.value);
+                    return false;
                 }
             });
         });
