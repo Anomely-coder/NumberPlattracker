@@ -73,8 +73,13 @@
                 <tbody></tbody>
             </table>
 
+            <!-- ✅ Total with currency logo -->
             <input type="hidden" asp-for="TotalAmount" id="totalAmountHidden" />
-            <h4>@Localizer["TotalLabel"] <span id="totalDisplay">0</span></h4>
+            <h4 class="d-flex align-items-center">
+                @Localizer["TotalLabel"]:
+                <span id="totalDisplay" class="ml-2 mr-1">0</span>
+                <img id="currencyLogo" src="/images/logo2.png" alt="Currency" style="height:25px; width:auto;">
+            </h4>
 
             <div class="mt-2">
                 <button type="submit" class="btn btn-success mr-2" id="saveBtn">
@@ -131,7 +136,7 @@
 
             total += price;
             $('#totalAmountHidden').val(total);
-            $('#totalDisplay').text(total);
+            $('#totalDisplay').text(total.toFixed(2));
 
             const row = `
                 <tr>
@@ -146,7 +151,7 @@
                     </td>
                     <td>
                         <input type="hidden" name="ServicesSelected[${index}].Price" value="${price}" />
-                        ${price}
+                        ${price.toFixed(2)}
                     </td>
                     <td><button type="button" class="btn btn-danger btn-sm removeService">X</button></td>
                 </tr>
@@ -159,7 +164,7 @@
             const price = parseFloat($(this).closest('tr').find("input[name$='.Price']").val());
             total -= price;
             $('#totalAmountHidden').val(total);
-            $('#totalDisplay').text(total);
+            $('#totalDisplay').text(total.toFixed(2));
             $(this).closest('tr').remove();
         });
 
@@ -179,8 +184,8 @@
             });
         });
 
-        // ✅ Print function
-               function printReceipt(receipt) {
+        // ✅ Print function with logo + currency logo
+        function printReceipt(receipt) {
             var servicesRows = '';
             receipt.services.forEach(function (s, i) {
                 servicesRows += `
@@ -199,24 +204,21 @@
             <div style="width: 900px; margin: 50px auto; font-family: Arial, sans-serif; font-size: 14px; border:1px solid #000; padding:20px;">
 
                 <!-- ✅ Centered Logo -->
-                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <!-- Arabic header (left) -->
-            <div style="flex:1; text-align:left; font-size:18px; font-weight:bold;">
-                شرطة الفجيرة ق.ع.د<br />
-                شؤون المالية
-            </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <div style="flex:1; text-align:left; font-size:18px; font-weight:bold;">
+                        شرطة الفجيرة ق.ع.د<br />
+                        شؤون المالية
+                    </div>
 
-            <!-- Center logo -->
-            <div style="flex:1; text-align:center;">
-                <img src="/images/logo1.png" alt="@Localizer["LogoAlt"]" style="height:80px;" />
-            </div>
+                    <div style="flex:1; text-align:center;">
+                        <img src="/images/logo1.png" alt="@Localizer["LogoAlt"]" style="height:80px;" />
+                    </div>
 
-            <!-- English header (right) -->
-            <div style="flex:1; text-align:right; font-size:18px; font-weight:bold;">
-                Fujairah Police G.H.Q<br />
-                FINANCE AFFAIRS
-            </div>
-        </div>
+                    <div style="flex:1; text-align:right; font-size:18px; font-weight:bold;">
+                        Fujairah Police G.H.Q<br />
+                        FINANCE AFFAIRS
+                    </div>
+                </div>
 
                 <div>
                     <b>@Localizer["ReceiptNoLabel"]:</b> ${receipt.receiptID} <br/>
@@ -236,9 +238,14 @@
                     </thead>
                     <tbody>${servicesRows}</tbody>
                 </table>
-                <div style="margin-top:10px; font-weight:bold;">
-                    @Localizer["TotalAmountLabel"]: ${receipt.totalAmount.toFixed(2)}
+
+                <!-- ✅ Total with currency logo -->
+                <div style="margin-top:10px; font-weight:bold; display:flex; align-items:center;">
+                    @Localizer["TotalAmountLabel"]:
+                    <span style="margin:0 5px;">${receipt.totalAmount.toFixed(2)}</span>
+                    <img src="/images/logo2.png" alt="Currency" style="height:20px; width:auto;">
                 </div>
+
                 <div style="margin-top:20px; text-align:right;">
                     @Localizer["SuccessPartnerMessage"] <br/>
                     @Localizer["ComplaintsSuggestionsMessage"] <br/>

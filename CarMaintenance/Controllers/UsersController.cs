@@ -4,7 +4,7 @@ using CarMaintenance.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
-using Microsoft.AspNetCore.Authorization; // Added for role-based authorization
+using Microsoft.AspNetCore.Authorization;
 
 namespace CarMaintenance.Controllers
 {
@@ -24,6 +24,7 @@ namespace CarMaintenance.Controllers
             return View(data);
         }
 
+        [Authorize(Roles = "Admin")] // ✅ Only Admin can add users
         public IActionResult AddUser()
         {
             return View(new Users());
@@ -31,11 +32,11 @@ namespace CarMaintenance.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")] // ✅ Only Admin can add users
         public IActionResult AddUser(Users model)
         {
             if (!ModelState.IsValid)
             {
-                // Remove password required error if password is empty
                 if (string.IsNullOrWhiteSpace(model.Password) && ModelState.ContainsKey("Password"))
                 {
                     ModelState["Password"].Errors.Clear();
@@ -75,11 +76,9 @@ namespace CarMaintenance.Controllers
                     UserStatus = true
                 };
 
-                Console.WriteLine($"Generated Password for {user.Email}: {user.Password}");
                 db.Tbl_Users.Add(user);
                 db.SaveChanges();
 
-                // Add to password history
                 db.Tbl_PasswordHistory.Add(new PasswordHistory
                 {
                     UserID = user.UserID,
@@ -88,7 +87,6 @@ namespace CarMaintenance.Controllers
                 });
                 db.SaveChanges();
 
-                Console.WriteLine($"Saved user {user.Email} to database.");
                 TempData["Message"] = $"User {user.Email} added successfully.";
                 return RedirectToAction("Index");
             }
@@ -100,7 +98,7 @@ namespace CarMaintenance.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin")] // Restrict to Admin role
+        [Authorize(Roles = "Admin")] // ✅ Only Admin can edit users
         public IActionResult EditUser(int Id)
         {
             var data = db.Tbl_Users.Find(Id);
@@ -114,14 +112,13 @@ namespace CarMaintenance.Controllers
                 Email = data.Email,
                 Role = data.Role,
                 UserStatus = data.UserStatus
-                // Password is not populated to avoid exposing it
             };
             return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")] // Restrict to Admin role
+        [Authorize(Roles = "Admin")] // ✅ Only Admin can edit users
         public IActionResult EditUser(Users model)
         {
             var existingUser = db.Tbl_Users.Find(model.UserID);
@@ -129,7 +126,6 @@ namespace CarMaintenance.Controllers
 
             if (!ModelState.IsValid)
             {
-                // Remove password required error if password is empty
                 if (string.IsNullOrWhiteSpace(model.Password) && ModelState.ContainsKey("Password"))
                 {
                     ModelState["Password"].Errors.Clear();
@@ -140,7 +136,6 @@ namespace CarMaintenance.Controllers
                 {
                     var errors = ModelState.Values.SelectMany(v => v.Errors)
                         .Select(e => e.ErrorMessage).ToList();
-                    Console.WriteLine("ModelState Errors: " + string.Join(", ", errors));
                     ViewBag.Message = "Validation failed: " + string.Join(", ", errors);
                     return View(model);
                 }
@@ -151,14 +146,12 @@ namespace CarMaintenance.Controllers
                 if (!PasswordHelper.ValidatePassword(model.Password))
                 {
                     ModelState.AddModelError("Password", "Password does not meet policy requirements.");
-                    Console.WriteLine("Password validation failed");
                     ViewBag.Message = "Password does not meet policy requirements.";
                     return View(model);
                 }
                 if (PasswordHelper.IsPasswordInHistory(model.Password, existingUser.UserID, db))
                 {
                     ModelState.AddModelError("Password", "Password cannot be one of the last two used passwords.");
-                    Console.WriteLine("Password validation failed: Matches recent password");
                     ViewBag.Message = "Password cannot be one of the last two used passwords.";
                     return View(model);
                 }
@@ -186,19 +179,17 @@ namespace CarMaintenance.Controllers
             try
             {
                 db.SaveChanges();
-                Console.WriteLine($"Updated user {existingUser.Email}");
                 TempData["Message"] = $"User {existingUser.Email} updated successfully.";
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error updating user: {ex.Message}");
                 ViewBag.Message = "Error updating user: " + ex.Message;
                 return View(model);
             }
         }
 
-        [Authorize(Roles = "Admin")] // Restrict to Admin role
+        [Authorize(Roles = "Admin")] // ✅ Only Admin can delete users
         public IActionResult DeleteUser(int Id)
         {
             var data = db.Tbl_Users.Find(Id);
@@ -207,7 +198,6 @@ namespace CarMaintenance.Controllers
                 db.Tbl_PasswordHistory.RemoveRange(db.Tbl_PasswordHistory.Where(ph => ph.UserID == Id));
                 db.Tbl_Users.Remove(data);
                 db.SaveChanges();
-                Console.WriteLine($"Deleted user ID {Id}");
                 TempData["Message"] = $"User deleted successfully.";
             }
             else
@@ -217,33 +207,44 @@ namespace CarMaintenance.Controllers
             return RedirectToAction("Index");
         }
 
-        [Authorize(Roles = "Admin")] // Restrict to Admin role
+        [Authorize] // ✅ Any logged-in user can reset their own password
         public IActionResult ResetPassword(int Id)
         {
             var user = db.Tbl_Users.Find(Id);
-            if (user != null)
-            {
-                string newPassword = PasswordHelper.GeneratePassword();
-                while (PasswordHelper.IsPasswordInHistory(newPassword, user.UserID, db))
-                {
-                    newPassword = PasswordHelper.GeneratePassword();
-                }
-                user.Password = newPassword;
-                user.PasswordLastChanged = DateTime.Now;
-                db.Tbl_PasswordHistory.Add(new PasswordHistory
-                {
-                    UserID = user.UserID,
-                    Password = newPassword,
-                    CreatedAt = DateTime.Now
-                });
-                db.SaveChanges();
-                Console.WriteLine($"New Password for {user.Email}: {newPassword}");
-                TempData["Message"] = $"Password reset for {user.Email}. New password: {newPassword}";
-            }
-            else
+            if (user == null)
             {
                 TempData["Message"] = "User not found.";
+                return RedirectToAction("Index");
             }
+
+            var loggedInEmail = User.Identity?.Name;
+            var isAdmin = User.IsInRole("Admin");
+
+            // ✅ Non-admin users can only reset their OWN password
+            if (!isAdmin && !string.Equals(user.Email, loggedInEmail, StringComparison.OrdinalIgnoreCase))
+            {
+                return Forbid(); // Block access
+            }
+
+            string newPassword = PasswordHelper.GeneratePassword();
+            while (PasswordHelper.IsPasswordInHistory(newPassword, user.UserID, db))
+            {
+                newPassword = PasswordHelper.GeneratePassword();
+            }
+
+            user.Password = newPassword;
+            user.PasswordLastChanged = DateTime.Now;
+
+            db.Tbl_PasswordHistory.Add(new PasswordHistory
+            {
+                UserID = user.UserID,
+                Password = newPassword,
+                CreatedAt = DateTime.Now
+            });
+
+            db.SaveChanges();
+
+            TempData["Message"] = $"Password reset for {user.Email}. New password: {newPassword}";
             return RedirectToAction("Index");
         }
     }

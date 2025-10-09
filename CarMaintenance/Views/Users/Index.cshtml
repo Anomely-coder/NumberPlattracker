@@ -30,18 +30,27 @@
     <div class="container-fluid">
         @if (TempData["Message"] != null)
         {
-            <div class="alert alert-success alert-dismissible">
-                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
                 @TempData["Message"]
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
         }
+
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">@Localizer["CurrentUsersTitle"]</h3>
                 <div class="card-tools">
-                    <a asp-action="AddUser" asp-controller="Users" class="btn btn-primary btn-sm">@Localizer["AddNewUserButton"]</a>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-action="AddUser" asp-controller="Users" class="btn btn-primary btn-sm">
+                            <i class="fas fa-user-plus"></i> @Localizer["AddNewUserButton"]
+                        </a>
+                    }
                 </div>
             </div>
+
             <div class="card-body">
                 <table class="table table-bordered table-striped">
                     <thead>
@@ -65,18 +74,44 @@
                                     <td>@user.FirstName @user.LastName</td>
                                     <td>@user.Email</td>
                                     <td>@user.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss")</td>
-                                    <td>@(user.LastLogin.HasValue? user.LastLogin.Value.ToString("dd/MM/yyyy HH:mm:ss") : Localizer["NeverText"])</td>
-                                    <td>@(isExpired? Localizer["ExpiredText"] : Localizer["ValidText"])</td>
                                     <td>
-                                        @if (User.IsInRole("Admin"))
+                                        @(user.LastLogin.HasValue
+                                                                        ? user.LastLogin.Value.ToString("dd/MM/yyyy HH:mm:ss")
+                                                                        : Localizer["NeverText"])
+                            </td>
+                            <td>
+                                @Html.Raw(
+                                                                isExpired
+                                                                ? $"<span class='text-danger'>{Localizer["ExpiredText"]}</span>"
+                                                                : $"<span class='text-success'>{Localizer["ValidText"]}</span>"
+                                                                )
+                            </td>
+                            <td>
+                                @if (User.IsInRole("Admin"))
                                         {
-                                            <a asp-action="EditUser" asp-controller="Users" asp-route-Id="@user.UserID" class="btn btn-sm btn-warning">@Localizer["EditButton"]</a>
-                                            <a asp-action="DeleteUser" asp-controller="Users" asp-route-Id="@user.UserID" class="btn btn-sm btn-danger" onclick="return confirm('@Localizer["DeleteConfirmMessage"]');">@Localizer["DeleteButton"]</a>
-                                            <a asp-action="ResetPassword" asp-controller="Users" asp-route-Id="@user.UserID" class="btn btn-sm btn-info" onclick="return confirm('@Localizer["ResetPasswordConfirmMessage", user.Email]');">@Localizer["ResetPasswordButton"]</a>
+                                            <a asp-action="EditUser" asp-controller="Users" asp-route-Id="@user.UserID" class="btn btn-sm btn-warning">
+                                                <i class="fas fa-edit"></i> @Localizer["EditButton"]
+                                            </a>
+                                            <a asp-action="DeleteUser" asp-controller="Users" asp-route-Id="@user.UserID" class="btn btn-sm btn-danger"
+                                               onclick="return confirm('@Localizer["DeleteConfirmMessage"]');">
+                                                <i class="fas fa-trash"></i> @Localizer["DeleteButton"]
+                                            </a>
+                                            <a asp-action="ResetPassword" asp-controller="Users" asp-route-Id="@user.UserID" class="btn btn-sm btn-info"
+                                               onclick="return confirm('@Localizer["ResetPasswordConfirmMessage", user.Email]');">
+                                                <i class="fas fa-key"></i> @Localizer["ResetPasswordButton"]
+                                            </a>
+                                        }
+                                        else if (User.Identity?.Name != null &&
+                                        string.Equals(User.Identity.Name, user.Email, StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <a asp-action="ResetPassword" asp-controller="Users" asp-route-Id="@user.UserID" class="btn btn-sm btn-info"
+                                               onclick="return confirm('@Localizer["ResetPasswordConfirmMessage", user.Email]');">
+                                                <i class="fas fa-key"></i> @Localizer["ResetPasswordButton"]
+                                            </a>
                                         }
                                         else
                                         {
-                                            <span>@Localizer["NoAccessText"]</span>
+                                            <span class="text-muted">@Localizer["NoActionsAvailable"]</span>
                                         }
                                     </td>
                                 </tr>
@@ -85,7 +120,7 @@
                         else
                         {
                             <tr>
-                                <td colspan="6">@Localizer["NoUsersFound"]</td>
+                                <td colspan="6" class="text-center">@Localizer["NoUsersFound"]</td>
                             </tr>
                         }
                     </tbody>
@@ -94,3 +129,21 @@
         </div>
     </div>
 </section>
+
+<style>
+    .table th, .table td {
+        vertical-align: middle;
+    }
+
+    .card-title {
+        font-weight: 600;
+    }
+
+    .text-success {
+        font-weight: 500;
+    }
+
+    .text-danger {
+        font-weight: 500;
+    }
+</style>
