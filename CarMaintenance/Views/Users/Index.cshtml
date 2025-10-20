@@ -89,23 +89,26 @@
                             <td>
                                 @if (User.IsInRole("Admin"))
                                         {
-                                            <a asp-action="EditUser" asp-controller="Users" asp-route-Id="@user.UserID" class="btn btn-sm btn-warning">
+                                            <a asp-action="EditUser" asp-controller="Users" asp-route-Id="@user.UserID"
+                                               class="btn btn-sm btn-warning">
                                                 <i class="fas fa-edit"></i> @Localizer["EditButton"]
                                             </a>
-                                            <a asp-action="DeleteUser" asp-controller="Users" asp-route-Id="@user.UserID" class="btn btn-sm btn-danger"
-                                               onclick="return confirm('@Localizer["DeleteConfirmMessage"]');">
+
+                                            <a href="@Url.Action("DeleteUser", "Users", new { Id = user.UserID })"
+                                               class="btn btn-sm btn-danger delete-confirm">
                                                 <i class="fas fa-trash"></i> @Localizer["DeleteButton"]
                                             </a>
-                                            <a asp-action="ResetPassword" asp-controller="Users" asp-route-Id="@user.UserID" class="btn btn-sm btn-info"
-                                               onclick="return confirm('@Localizer["ResetPasswordConfirmMessage", user.Email]');">
+
+                                            <a href="@Url.Action("ResetPassword", "Users", new { Id = user.UserID })"
+                                               class="btn btn-sm btn-info reset-confirm">
                                                 <i class="fas fa-key"></i> @Localizer["ResetPasswordButton"]
                                             </a>
                                         }
                                         else if (User.Identity?.Name != null &&
                                         string.Equals(User.Identity.Name, user.Email, StringComparison.OrdinalIgnoreCase))
                                         {
-                                            <a asp-action="ResetPassword" asp-controller="Users" asp-route-Id="@user.UserID" class="btn btn-sm btn-info"
-                                               onclick="return confirm('@Localizer["ResetPasswordConfirmMessage", user.Email]');">
+                                            <a href="@Url.Action("ResetPassword", "Users", new { Id = user.UserID })"
+                                               class="btn btn-sm btn-info reset-confirm">
                                                 <i class="fas fa-key"></i> @Localizer["ResetPasswordButton"]
                                             </a>
                                         }
@@ -146,4 +149,55 @@
     .text-danger {
         font-weight: 500;
     }
+
+    .swal-title-custom {
+        font-weight: 600;
+        font-size: 20px;
+    }
 </style>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // ✅ SweetAlert for DELETE confirmation
+        $(".delete-confirm").on("click", function (e) {
+            e.preventDefault();
+            var url = $(this).attr("href");
+
+            Swal.fire({
+                title: '<span class="swal-title-custom">@Localizer["DeleteUser"]</span>',
+                html: '<p>@Localizer["AreYouSureDeleteUser"]</p>',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '@Localizer["Delete"]',
+                cancelButtonText: '@Localizer["Cancel"]',
+                focusCancel: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
+            });
+        });
+
+        // ✅ SweetAlert for RESET PASSWORD confirmation
+        $(".reset-confirm").on("click", function (e) {
+            e.preventDefault();
+            var url = $(this).attr("href");
+
+            Swal.fire({
+                title: '<span class="swal-title-custom">@Localizer["ResetPassword"]</span>',
+                html: '<p>@Localizer["AreYouSureResetPassword"]</p>',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: '@Localizer["YesReset"]',
+                cancelButtonText: '@Localizer["Cancel"]',
+                focusCancel: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = url;
+                }
+            });
+        });
+    </script>
+}

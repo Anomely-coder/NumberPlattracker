@@ -29,134 +29,133 @@ namespace CarMaintenance.Controllers
         // ---------------- ADD ----------------
         public IActionResult AddCustomer()
         {
+            // Show all cars that are unassigned and unregistered
             var unregisteredCars = db.Tbl_Cars
-                .Where(c => c.CarStatus == 0)
+                .Where(c => c.CustomerID == null && c.CarStatus == 0)
                 .ToList();
 
-            ViewBag.Cars = new SelectList(unregisteredCars, "CarID", "NumberPlate");
+            ViewBag.Cars = new MultiSelectList(unregisteredCars, "CarID", "NumberPlate");
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult AddCustomer(Customers customers)
+        public IActionResult AddCustomer(Customers customer, int[] selectedCarIDs)
         {
-            // Unique checks
-            if (db.Tbl_Customers.Any(c => c.Email == customers.Email))
-            {
-                ModelState.AddModelError("Email", "This Email already exists. Please enter a unique Email.");
-            }
-            if (db.Tbl_Customers.Any(c => c.EmiratesID == customers.EmiratesID))
-            {
-                ModelState.AddModelError("EmiratesID", "This Emirates ID already exists. Please enter a unique Emirates ID.");
-            }
-            if (db.Tbl_Customers.Any(c => c.MobileNumber == customers.MobileNumber))
-            {
-                ModelState.AddModelError("MobileNumber", "This Mobile Number already exists. Please enter a unique Mobile Number.");
-            }
+            // Unique field validation
+            if (db.Tbl_Customers.Any(c => c.Email == customer.Email))
+                ModelState.AddModelError("Email", "This Email already exists.");
+
+            if (db.Tbl_Customers.Any(c => c.EmiratesID == customer.EmiratesID))
+                ModelState.AddModelError("EmiratesID", "This Emirates ID already exists.");
+
+            if (db.Tbl_Customers.Any(c => c.MobileNumber == customer.MobileNumber))
+                ModelState.AddModelError("MobileNumber", "This Mobile Number already exists.");
 
             if (ModelState.IsValid)
             {
-                // set CreatedAt
-                customers.CreatedAt = DateTime.Now;
-                customers.UpdatedAt = null;
+                customer.CreatedAt = DateTime.Now;
+                db.Tbl_Customers.Add(customer);
+                db.SaveChanges(); // Generate CustomerID
 
-                db.Tbl_Customers.Add(customers);
-
-                // Update car status if linked
-                if (customers.CarID.HasValue)
+                // ✅ Link selected cars to this customer
+                if (selectedCarIDs != null && selectedCarIDs.Length > 0)
                 {
-                    var car = db.Tbl_Cars.Find(customers.CarID.Value);
-                    if (car != null)
+                    var cars = db.Tbl_Cars.Where(c => selectedCarIDs.Contains(c.CarID)).ToList();
+                    foreach (var car in cars)
                     {
-                        car.CarStatus = 1; // Registered
-                        db.Tbl_Cars.Update(car);
+                        car.CustomerID = customer.CustomerID;
+                        car.CarStatus = 1;
                     }
+                    db.Tbl_Cars.UpdateRange(cars);
+                    db.SaveChanges();
                 }
 
-                db.SaveChanges();
+                TempData["SuccessMessage"] = "Customer added successfully!";
                 return RedirectToAction("Index");
             }
 
-            // Re-bind dropdown
+            // Re-bind cars if validation fails
             var unregisteredCars = db.Tbl_Cars
-                .Where(c => c.CarStatus == 0)
+                .Where(c => c.CustomerID == null && c.CarStatus == 0)
                 .ToList();
-            ViewBag.Cars = new SelectList(unregisteredCars, "CarID", "NumberPlate");
-            return View(customers);
+            ViewBag.Cars = new MultiSelectList(unregisteredCars, "CarID", "NumberPlate", selectedCarIDs);
+
+            return View(customer);
         }
 
         // ---------------- EDIT ----------------
         public IActionResult EditCustomer(int id)
         {
-            var data = db.Tbl_Customers.Find(id);
-            if (data == null) return NotFound();
+            var customer = db.Tbl_Customers
+                .Include(c => c.Cars)
+                .FirstOrDefault(c => c.CustomerID == id);
 
-            ViewBag.Cars = new SelectList(db.Tbl_Cars.ToList(), "CarID", "NumberPlate");
-            return View(data);
+            if (customer == null) return NotFound();
+
+            var availableCars = db.Tbl_Cars
+                .Where(c => c.CustomerID == null || c.CustomerID == id)
+                .ToList();
+
+            var selectedIds = customer.Cars.Select(c => c.CarID).ToArray();
+
+            ViewBag.Cars = new MultiSelectList(availableCars, "CarID", "NumberPlate", selectedIds);
+            return View(customer);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult EditCustomer(Customers customers)
+        public IActionResult EditCustomer(Customers customer, int[] selectedCarIDs)
         {
-            if (db.Tbl_Customers.Any(c => c.EmiratesID == customers.EmiratesID && c.CustomerID != customers.CustomerID))
-            {
-                ModelState.AddModelError("EmiratesID", "This Emirates ID already exists. Please enter a unique Emirates ID.");
-            }
+            if (db.Tbl_Customers.Any(c => c.EmiratesID == customer.EmiratesID && c.CustomerID != customer.CustomerID))
+                ModelState.AddModelError("EmiratesID", "This Emirates ID already exists.");
 
             if (ModelState.IsValid)
             {
-                var oldCustomer = db.Tbl_Customers.AsNoTracking()
-                    .FirstOrDefault(c => c.CustomerID == customers.CustomerID);
+                customer.UpdatedAt = DateTime.Now;
+                db.Tbl_Customers.Update(customer);
+                db.SaveChanges();
 
-                // set UpdatedAt on update
-                customers.UpdatedAt = DateTime.Now;
-
-                db.Tbl_Customers.Update(customers);
-
-                // If car changed, update old/new status
-                if (oldCustomer?.CarID != customers.CarID)
+                // Unlink cars that were previously assigned but not selected
+                var assignedCars = db.Tbl_Cars.Where(c => c.CustomerID == customer.CustomerID).ToList();
+                foreach (var car in assignedCars)
                 {
-                    if (oldCustomer?.CarID != null)
+                    if (!selectedCarIDs.Contains(car.CarID))
                     {
-                        var oldCar = db.Tbl_Cars.Find(oldCustomer.CarID.Value);
-                        if (oldCar != null)
-                        {
-                            bool stillAssigned = db.Tbl_Customers
-                                .Any(c => c.CarID == oldCar.CarID && c.CustomerID != customers.CustomerID);
-                            if (!stillAssigned)
-                            {
-                                oldCar.CarStatus = 0;
-                                db.Tbl_Cars.Update(oldCar);
-                            }
-                        }
-                    }
-
-                    if (customers.CarID != null)
-                    {
-                        var newCar = db.Tbl_Cars.Find(customers.CarID.Value);
-                        if (newCar != null)
-                        {
-                            newCar.CarStatus = 1;
-                            db.Tbl_Cars.Update(newCar);
-                        }
+                        car.CustomerID = null;
+                        car.CarStatus = 0;
                     }
                 }
 
+                // Link new cars
+                var newCars = db.Tbl_Cars.Where(c => selectedCarIDs.Contains(c.CarID)).ToList();
+                foreach (var car in newCars)
+                {
+                    car.CustomerID = customer.CustomerID;
+                    car.CarStatus = 1;
+                }
+
                 db.SaveChanges();
+                TempData["SuccessMessage"] = "Customer updated successfully!";
                 return RedirectToAction("Index");
             }
 
-            ViewBag.Cars = new SelectList(db.Tbl_Cars.ToList(), "CarID", "NumberPlate");
-            return View(customers);
+            var availableCars = db.Tbl_Cars
+                .Where(c => c.CustomerID == null || c.CustomerID == customer.CustomerID)
+                .ToList();
+            ViewBag.Cars = new MultiSelectList(availableCars, "CarID", "NumberPlate", selectedCarIDs);
+
+            return View(customer);
         }
 
         // ---------------- DELETE ----------------
         [HttpGet]
         public IActionResult DeleteCustomer(int id)
         {
-            var customer = db.Tbl_Customers.Find(id);
+            var customer = db.Tbl_Customers
+                .Include(c => c.Cars)
+                .FirstOrDefault(c => c.CustomerID == id);
+
             if (customer == null)
             {
                 TempData["ErrorMessage"] = "Customer not found.";
@@ -165,18 +164,22 @@ namespace CarMaintenance.Controllers
 
             try
             {
+                // Unlink cars before deletion
+                foreach (var car in customer.Cars)
+                {
+                    car.CustomerID = null;
+                    car.CarStatus = 0;
+                }
+
+                db.Tbl_Cars.UpdateRange(customer.Cars);
                 db.Tbl_Customers.Remove(customer);
                 db.SaveChanges();
+
                 TempData["SuccessMessage"] = "Customer deleted successfully.";
             }
-            catch (DbUpdateException ex)
+            catch
             {
-                // This is where the foreign key conflict happens
                 TempData["ErrorMessage"] = "Cannot delete this customer because there are related receipts.";
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = "An error occurred while deleting the customer.";
             }
 
             return RedirectToAction("Index");

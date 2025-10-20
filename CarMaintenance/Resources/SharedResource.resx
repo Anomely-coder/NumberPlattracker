@@ -268,7 +268,7 @@
     <value>Transfer</value>
   </data>
   <data name="TransferNewCarLink" xml:space="preserve">
-    <value>Transfer New Number Plate</value>
+    <value>Transfer  Number Plate</value>
   </data>
   <data name="QuickSearchLink" xml:space="preserve">
     <value>Quick Search</value>
@@ -625,7 +625,7 @@
     <value>ID</value>
   </data>
   <data name="TransferNewNumberPlate" xml:space="preserve">
-    <value>Transfer New Number Plate</value>
+    <value>Transfer  Number Plate</value>
   </data>
   <data name="Home" xml:space="preserve">
     <value>Home</value>
@@ -731,5 +731,47 @@
   </data>
   <data name="Delete Services" xml:space="preserve">
     <value>Delete Services</value>
+  </data>
+  <data name="CreatedAt" xml:space="preserve">
+    <value>CreatedAt</value>
+  </data>
+  <data name="UpdatedAt" xml:space="preserve">
+    <value>UpdatedAt</value>
+  </data>
+  <data name="MobileNumber" xml:space="preserve">
+    <value>MobileNumber</value>
+  </data>
+  <data name="ReceiptDetailsTitle" xml:space="preserve">
+    <value>Receipt Details</value>
+  </data>
+  <data name="BackToListButton" xml:space="preserve">
+    <value>Back To List</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="RegisteredNumberPlate" xml:space="preserve">
+    <value>Registered Number Plate</value>
+  </data>
+  <data name="ViewNumberPlatesTitle" xml:space="preserve">
+    <value>View Number Plates</value>
+  </data>
+  <data name="Search by name, email, emirates id, number plate, mobile..." xml:space="preserve">
+    <value>Search by name, email, emirates id, number plate, mobile...</value>
+  </data>
+  <data name="AreYouSureDeleteUser" xml:space="preserve">
+    <value>Are You Sure Delete User</value>
+  </data>
+  <data name="DeleteUser" xml:space="preserve">
+    <value>Delete User</value>
+  </data>
+  <data name="TypeCustomerName,E-Id,Mobile" xml:space="preserve">
+    <value>Type CustomerName,E-Id,Mobile</value>
+  </data>
+  <data name="-- Select Number Plate --" xml:space="preserve">
+    <value>-- Select Number Plate --</value>
+  </data>
+  <data name="Reset" xml:space="preserve">
+    <value>Reset</value>
   </data>
 </root>

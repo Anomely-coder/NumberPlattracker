@@ -1,17 +1,17 @@
 ﻿@using CarMaintenance
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
-@model IEnumerable<Customers>
+@model IEnumerable<CarMaintenance.Models.Customers>
 
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>@Localizer["CustomersTitle"]</h1>
+                <h1>@Localizer["CustomersSection"]</h1>
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="#">@Localizer["HomeLink"]</a></li>
+                    <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">@Localizer["HomeLink"]</a></li>
                     <li class="breadcrumb-item active">@Localizer["CustomersBreadcrumb"]</li>
                 </ol>
             </div>
@@ -28,6 +28,7 @@
                 <a class="btn btn-primary my-3" asp-action="AddCustomer" asp-controller="Customers">@Localizer["CreateCustomerButton"]</a>
             </h3>
         </div>
+
         <div class="card-body">
             <table id="example1" class="table table-bordered table-striped">
                 <thead>
@@ -45,30 +46,43 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @if (Model.Any())
+                    @if (Model != null && Model.Any())
                     {
-                        @foreach (var item in Model)
+                        foreach (var item in Model)
                         {
                             <tr>
-                                <th>@item.CustomerID</th>
+                                <td>@item.CustomerID</td>
                                 <td>@item.Name</td>
                                 <td>@item.Email</td>
                                 <td>@item.MobileNumber</td>
                                 <td>@item.EmiratesID</td>
-                                <td>@item.Cars?.NumberPlate</td>
+
+                                <!-- ✅ Show multiple car plates for each customer -->
+                                <td>
+                                    @if (item.Cars != null && item.Cars.Any())
+                                    {
+                                        @string.Join(", ", item.Cars.Select(c => c.NumberPlate))
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">@Localizer["NoCarsAssigned"]</span>
+                                    }
+                                </td>
+
                                 <td>@item.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
                                 <td>@(item.UpdatedAt?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+
                                 <td>
                                     <a class="text-primary fas fa-pen"
                                        asp-action="EditCustomer"
                                        asp-controller="Customers"
-                                       asp-route-Id="@item.CustomerID"></a>
+                                       asp-route-id="@item.CustomerID"></a>
                                 </td>
                                 <td>
                                     <a class="text-danger fas fa-trash delete-confirm"
                                        asp-action="DeleteCustomer"
                                        asp-controller="Customers"
-                                       asp-route-Id="@item.CustomerID"></a>
+                                       asp-route-id="@item.CustomerID"></a>
                                 </td>
                             </tr>
                         }
@@ -109,23 +123,14 @@
                 "autoWidth": false,
                 "pageLength": 50,
                 "buttons": [
-                    {
-                        extend: 'copy',
-                        exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] }
-                    },
-                    {
-                        extend: 'csv',
-                        exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] }
-                    },
+                    { extend: 'copy', exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] } },
+                    { extend: 'csv', exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] } },
                     {
                         extend: 'excel',
                         text: '@Localizer["ExcelButton"]',
                         exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] }
                     },
-                    {
-                        extend: 'pdf',
-                        exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] }
-                    },
+                    { extend: 'pdf', exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7] } },
                     {
                         extend: 'print',
                         text: '@Localizer["PrintButton"]',
@@ -161,13 +166,7 @@
                     showCancelButton: true,
                     confirmButtonText: '@Localizer["Delete"]',
                     cancelButtonText: '@Localizer["Cancel"]',
-                    focusCancel: true,
-                    customClass: {
-                        popup: 'custom-swal',
-                        title: 'swal-title',
-                        confirmButton: 'swal-confirm-btn',
-                        cancelButton: 'swal-cancel-btn'
-                    }
+                    focusCancel: true
                 }).then((result) => {
                     if (result.isConfirmed) {
                         window.location.href = url;
@@ -175,26 +174,26 @@
                 });
             });
 
-            // Show TempData messages
+            // SweetAlert for TempData messages
             @if (TempData["ErrorMessage"] != null)
             {
                     <text>
-                    Swal.fire({
-                        icon: 'error',
-                        title: '@Localizer["Error"]',
-                        text: '@TempData["ErrorMessage"]'
-                    });
+                        Swal.fire({
+                            icon: 'error',
+                            title: '@Localizer["Error"]',
+                            text: '@TempData["ErrorMessage"]'
+                        });
                     </text>
             }
 
             @if (TempData["SuccessMessage"] != null)
             {
                     <text>
-                    Swal.fire({
-                        icon: 'success',
-                        title: '@Localizer["Success"]',
-                        text: '@TempData["SuccessMessage"]'
-                    });
+                        Swal.fire({
+                            icon: 'success',
+                            title: '@Localizer["Success"]',
+                            text: '@TempData["SuccessMessage"]'
+                        });
                     </text>
             }
         });

@@ -24,12 +24,12 @@ namespace CarMaintenance.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configure Customers-Cars relationship
+            // ✅ One Customer → Many Cars
             modelBuilder.Entity<Customers>()
-                .HasOne(c => c.Cars)
-                .WithMany(c => c.Customers)
-                .HasForeignKey(c => c.CarID)
-                .OnDelete(DeleteBehavior.SetNull);
+                .HasMany(c => c.Cars)
+                .WithOne(ca => ca.Customer)
+                .HasForeignKey(ca => ca.CustomerID)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Prevent cascade delete where needed
             modelBuilder.Entity<Receipts>()

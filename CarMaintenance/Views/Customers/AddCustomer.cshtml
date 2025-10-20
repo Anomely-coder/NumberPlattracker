@@ -3,7 +3,7 @@
 @using CarMaintenance
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
 
-<!-- Content Header (Page header) -->
+<!-- Content Header -->
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
@@ -21,25 +21,28 @@
     </div>
 </section>
 
-<!-- Main content -->
+<!-- Main Content -->
 <section class="content">
     <div class="container">
         <form method="post" asp-action="AddCustomer" asp-controller="Customers" id="customerForm">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="row my-2">
 
+            <div class="row my-2">
+                <!-- Name -->
                 <div class="col-md-6 form-group">
                     <label asp-for="Name">@Localizer["Name"]</label>
                     <input class="form-control" asp-for="Name" />
                     <span class="text-danger" asp-validation-for="Name"></span>
                 </div>
 
+                <!-- Email -->
                 <div class="col-md-6 form-group">
                     <label asp-for="Email">@Localizer["Email"]</label>
                     <input class="form-control" asp-for="Email" type="email" />
                     <span class="text-danger" asp-validation-for="Email"></span>
                 </div>
 
+                <!-- Mobile Number -->
                 <div class="col-md-6 form-group">
                     <label asp-for="MobileNumber">@Localizer["MobileNumber"]</label>
                     <input class="form-control" asp-for="MobileNumber"
@@ -52,6 +55,7 @@
                     <span class="text-danger" asp-validation-for="MobileNumber"></span>
                 </div>
 
+                <!-- Emirates ID -->
                 <div class="col-md-6 form-group">
                     <label asp-for="EmiratesID">@Localizer["EmiratesID"]</label>
                     <input class="form-control" asp-for="EmiratesID"
@@ -60,14 +64,16 @@
                     <span class="text-danger" asp-validation-for="EmiratesID"></span>
                 </div>
 
+                <!-- Multi Car Selection -->
                 <div class="col-md-6 form-group">
-                    <label asp-for="CarID">@Localizer["NumberPlate"]</label>
-                    <select class="form-control" asp-for="CarID" asp-items="ViewBag.Cars">
-                        <option value="">@Localizer["SelectNumberPlate"]</option>
+                    <label>@Localizer["NumberPlate"]</label>
+                    <select class="form-control" multiple name="selectedCarIDs" asp-items="ViewBag.Cars">
+                        <option disabled>@Localizer["SelectNumberPlate"]</option>
                     </select>
-                    <span class="text-danger" asp-validation-for="CarID"></span>
+                    <small class="text-muted">@Localizer["Hold Ctrl To Select Multiple"]</small>
                 </div>
 
+                <!-- Buttons -->
                 <div class="col-md-12 my-2">
                     <button type="submit" class="btn btn-primary">@Localizer["AddCustomerButton"]</button>
                     <button type="reset" class="btn btn-secondary">@Localizer["Reset"]</button>
@@ -79,6 +85,7 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
     <script>
         // Format Emirates ID as XXXX-XXXX-XXXXXXX-X
         function formatEmiratesID(input) {
@@ -93,17 +100,11 @@
 
         // Format Mobile Number as 05XXX XXXXX
         function formatMobile(input) {
-            let value = input.value.replace(/\D/g, ''); // only digits
-
-            // Always start with "05"
+            let value = input.value.replace(/\D/g, '');
             if (!value.startsWith("05")) {
                 value = "05" + value.replace(/^0+/, "");
             }
-
-            // Limit to 10 digits
             value = value.slice(0, 10);
-
-            // Add space after 5th digit
             if (value.length > 5) {
                 input.value = value.slice(0, 5) + " " + value.slice(5);
             } else {
@@ -111,7 +112,7 @@
             }
         }
 
-        // Strip spaces before submitting to server
+        // Remove spaces before submitting
         document.getElementById("customerForm").addEventListener("submit", function () {
             const mobileInput = document.querySelector("[name='MobileNumber']");
             mobileInput.value = mobileInput.value.replace(/\s/g, "");

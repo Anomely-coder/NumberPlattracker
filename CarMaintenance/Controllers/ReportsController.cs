@@ -9,6 +9,7 @@ using iText.Kernel.Pdf;
 using iText.Layout;
 using iText.Layout.Element;
 using System.IO;
+using Microsoft.AspNetCore.Http;
 
 namespace CarMaintenance.Controllers
 {
@@ -26,7 +27,7 @@ namespace CarMaintenance.Controllers
             return View("Search");
         }
 
-        // ✅ Search method with EF.Functions.Like (Contains)
+        // ✅ Search
         public IActionResult Search(string searchTerm)
         {
             searchTerm = searchTerm?.Trim() ?? "";
@@ -39,7 +40,6 @@ namespace CarMaintenance.Controllers
                 return View("SearchResults", new List<SearchResultViewModel>());
             }
 
-            // Fetch customers from database with filtering
             var customersQuery = _db.Tbl_Customers
                 .Include(c => c.Cars)
                 .Include(c => c.Receipts)
@@ -57,9 +57,9 @@ namespace CarMaintenance.Controllers
                 .Where(c =>
                     EF.Functions.Like(c.Name, $"%{searchTerm}%") ||
                     EF.Functions.Like(c.Email, $"%{searchTerm}%") ||
-                    EF.Functions.Like(c.EmiratesID, $"%{searchTerm}%") ||   // ✅ added
-                    EF.Functions.Like(c.MobileNumber, $"%{searchTerm}%") || // ✅ added
-                    (c.Cars != null && EF.Functions.Like(c.Cars.NumberPlate, $"%{searchTerm}%"))
+                    EF.Functions.Like(c.EmiratesID, $"%{searchTerm}%") ||
+                    EF.Functions.Like(c.MobileNumber, $"%{searchTerm}%") ||
+                    (c.Cars.Any(car => EF.Functions.Like(car.NumberPlate, $"%{searchTerm}%")))
                 )
                 .ToList();
 
@@ -89,21 +89,26 @@ namespace CarMaintenance.Controllers
             return userName;
         }
 
-        // ✅ Autocomplete suggestions
+        // ✅ Autocomplete Suggestions
         public IActionResult GetSearchSuggestions(string term)
         {
             term = term?.Trim() ?? "";
 
-            var customers = _db.Tbl_Customers.Include(c => c.Cars).ToList();
+            var customers = _db.Tbl_Customers
+                .Include(c => c.Cars)
+                .ToList();
 
             var suggestions = customers
-                .SelectMany(c => new List<string>
+                .SelectMany(c =>
                 {
-                    c.Name ?? "",
-                    c.Email ?? "",
-                    c.EmiratesID ?? "",       // ✅ added
-                    c.MobileNumber ?? "",     // ✅ added
-                    c.Cars != null ? c.Cars.NumberPlate : ""
+                    var carNumbers = c.Cars.Select(car => car.NumberPlate ?? "");
+                    return new List<string>
+                    {
+                        c.Name ?? "",
+                        c.Email ?? "",
+                        c.EmiratesID ?? "",
+                        c.MobileNumber ?? ""
+                    }.Concat(carNumbers);
                 })
                 .Where(s => !string.IsNullOrEmpty(s) &&
                             s.StartsWith(term, StringComparison.OrdinalIgnoreCase))
@@ -115,7 +120,7 @@ namespace CarMaintenance.Controllers
             return Json(suggestions);
         }
 
-        // ✅ PDF Export
+        // ✅ Export PDF
         public IActionResult ExportPdf(string searchTerm)
         {
             searchTerm = searchTerm?.Trim() ?? "";
@@ -141,9 +146,9 @@ namespace CarMaintenance.Controllers
                 .Where(c =>
                     EF.Functions.Like(c.Name, $"%{searchTerm}%") ||
                     EF.Functions.Like(c.Email, $"%{searchTerm}%") ||
-                    EF.Functions.Like(c.EmiratesID, $"%{searchTerm}%") ||   // ✅ added
-                    EF.Functions.Like(c.MobileNumber, $"%{searchTerm}%") || // ✅ added
-                    (c.Cars != null && EF.Functions.Like(c.Cars.NumberPlate, $"%{searchTerm}%"))
+                    EF.Functions.Like(c.EmiratesID, $"%{searchTerm}%") ||
+                    EF.Functions.Like(c.MobileNumber, $"%{searchTerm}%") ||
+                    (c.Cars.Any(car => EF.Functions.Like(car.NumberPlate, $"%{searchTerm}%")))
                 )
                 .ToList();
 
@@ -175,7 +180,17 @@ namespace CarMaintenance.Controllers
                     document.Add(new Paragraph($"Customer: {r.Customer.Name} ({r.Customer.Email})").SetBold());
                     document.Add(new Paragraph($"Emirates ID: {r.Customer.EmiratesID ?? "N/A"}"));
                     document.Add(new Paragraph($"Mobile: {r.Customer.MobileNumber ?? "N/A"}"));
-                    document.Add(new Paragraph($"Number Plate: {r.Customer.Cars?.NumberPlate ?? "N/A"}"));
+
+                    // ✅ Show multiple cars properly
+                    if (r.Customer.Cars != null && r.Customer.Cars.Any())
+                    {
+                        var carList = string.Join(", ", r.Customer.Cars.Select(car => car.NumberPlate));
+                        document.Add(new Paragraph($"Cars: {carList}"));
+                    }
+                    else
+                    {
+                        document.Add(new Paragraph("Cars: N/A"));
+                    }
 
                     if (r.Customer.Receipts.Any())
                     {

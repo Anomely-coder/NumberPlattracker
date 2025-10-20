@@ -734,4 +734,47 @@
   <data name="Delete Services" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
+  <data name="CreatedAt" xml:space="preserve">
+    <value>تم الإنشاء في</value>
+  </data>
+  <data name="UpdatedAt" xml:space="preserve">
+    <value>تم التحديث في</value>
+  </data>
+  <data name="MobileNumber" xml:space="preserve">
+    <value>رقم الهاتف المحمول</value>
+  </data>
+  <data name="ReceiptDetailsTitle" xml:space="preserve">
+    <value>تفاصيل الإيصال</value>
+  </data>
+  <data name="BackToListButton" xml:space="preserve">
+    <value>العودة إلى القائمة</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>تفاصيل</value>
+  </data>
+  <data name="RegisteredNumberPlate" xml:space="preserve">
+    <value>لوحة رقم مسجلة</value>
+  </data>
+  <data name="ViewNumberPlatesTitle" xml:space="preserve">
+    <value>عرض لوحات الأرقام</value>
+  </data>
+  <data name="Search by name, email, emirates id, number plate, mobile..." xml:space="preserve">
+    <value>البحث حسب الاسم، البريد الإلكتروني، هوية الإمارات، رقم اللوحة، الهاتف المحمول...
+</value>
+  </data>
+  <data name="AreYouSureDeleteUser" xml:space="preserve">
+    <value>هل أنت متأكد من حذف المستخدم؟</value>
+  </data>
+  <data name="DeleteUser" xml:space="preserve">
+    <value>حذف المستخدم</value>
+  </data>
+  <data name="TypeCustomerName,E-Id,Mobile" xml:space="preserve">
+    <value>نوع اسم العميل، معرف البريد الإلكتروني، الجوال</value>
+  </data>
+  <data name="-- Select Number Plate --" xml:space="preserve">
+    <value>-- اختر لوحة الأرقام --</value>
+  </data>
+  <data name="Reset" xml:space="preserve">
+    <value>إعادة ضبط</value>
+  </data>
 </root>

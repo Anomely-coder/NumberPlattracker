@@ -28,11 +28,12 @@
                     <input type="hidden" asp-for="CustomerID" id="customerIdHidden" />
                 </div>
 
-                <!-- Car Number -->
+                <!-- ✅ Car Number Dropdown -->
                 <div class="col-md-4">
                     <label>@Localizer["NumberPlateLabel"]</label>
-                    <input type="text" class="form-control" asp-for="NumberPlate" id="NumberPlateTextbox" readonly />
-                    <input type="hidden" asp-for="CarID" id="carIdHidden" />
+                    <select class="form-control" asp-for="CarID" id="carDropdown" disabled>
+                        <option value="">@Localizer["SelectNumberPlate"]</option>
+                    </select>
                 </div>
 
                 <!-- Date -->
@@ -73,7 +74,6 @@
                 <tbody></tbody>
             </table>
 
-            <!-- ✅ Total with currency logo -->
             <input type="hidden" asp-for="TotalAmount" id="totalAmountHidden" />
             <h4 class="d-flex align-items-center">
                 @Localizer["TotalLabel"]:
@@ -101,7 +101,7 @@
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
 
     <script>
-        // ✅ Customer autocomplete + auto car number
+        // ✅ Customer autocomplete + car list loading
         $("#customerSearch").autocomplete({
             source: function (request, response) {
                 $.get('/Receipts/SearchCustomers', { term: request.term }, function (data) {
@@ -112,17 +112,27 @@
             },
             select: function (event, ui) {
                 $("#customerIdHidden").val(ui.item.id);
-                $.get('/Receipts/GetCarByCustomer?customerId=' + ui.item.id, function (data) {
-                    if (data) {
-                        $('#NumberPlateTextbox').val(data.numberPlate);
-                        $('#carIdHidden').val(data.carId);
+
+                // Load cars of selected customer
+                $.get('/Receipts/GetCarsByCustomer?customerId=' + ui.item.id, function (cars) {
+                    const dropdown = $("#carDropdown");
+                    dropdown.empty();
+                    dropdown.append('<option value="">Select Number Plate</option>');
+                    if (cars && cars.length > 0) {
+                        cars.forEach(function (c) {
+                            dropdown.append(`<option value="${c.carId}">${c.numberPlate}</option>`);
+                        });
+                        dropdown.prop("disabled", false);
+                    } else {
+                        dropdown.append('<option value="">No cars found</option>');
+                        dropdown.prop("disabled", true);
                     }
                 });
             },
             minLength: 2
         });
 
-        // ✅ Service adding logic
+        // ✅ Services add/remove logic
         let total = 0;
         let index = 0;
         $('#addServiceBtn').click(function () {
@@ -140,22 +150,12 @@
 
             const row = `
                 <tr>
-                    <td>
-                        <input type="hidden" name="ServicesSelected[${index}].ServiceID" value="${serviceId}" />
-                        <input type="hidden" name="ServicesSelected[${index}].ServiceName" value="${serviceName}" />
-                        ${serviceName}
-                    </td>
-                    <td>
-                        <input type="hidden" name="ServicesSelected[${index}].Description" value="${description}" />
-                        ${description}
-                    </td>
-                    <td>
-                        <input type="hidden" name="ServicesSelected[${index}].Price" value="${price}" />
-                        ${price.toFixed(2)}
-                    </td>
+                    <td><input type="hidden" name="ServicesSelected[${index}].ServiceID" value="${serviceId}" />
+                        <input type="hidden" name="ServicesSelected[${index}].ServiceName" value="${serviceName}" />${serviceName}</td>
+                    <td><input type="hidden" name="ServicesSelected[${index}].Description" value="${description}" />${description}</td>
+                    <td><input type="hidden" name="ServicesSelected[${index}].Price" value="${price}" />${price.toFixed(2)}</td>
                     <td><button type="button" class="btn btn-danger btn-sm removeService">X</button></td>
-                </tr>
-            `;
+                </tr>`;
             $('#servicesTable tbody').append(row);
             index++;
         });
@@ -170,93 +170,33 @@
 
         // ✅ Save & Print
         $('#savePrintBtn').click(function () {
-            var form = $('#receiptForm');
-            var formData = form.serialize();
-
+            const formData = $('#receiptForm').serialize();
             $.post('/Receipts/AddReceipt', formData, function (receipt) {
-                if (receipt && receipt.receiptID) {
-                    printReceipt(receipt);
-                } else {
-                    alert("@Localizer["SaveReceiptFailedAlert"]");
-                }
-            }).fail(function () {
-                alert("@Localizer["SaveReceiptFailedAlert"]");
-            });
+                if (receipt && receipt.receiptID) printReceipt(receipt);
+                else alert("Error saving receipt");
+            }).fail(() => alert("Error saving receipt"));
         });
 
-        // ✅ Print function with logo + currency logo
         function printReceipt(receipt) {
-            var servicesRows = '';
-            receipt.services.forEach(function (s, i) {
-                servicesRows += `
-                    <tr>
-                        <td style="border:1px solid #000; text-align:center;">${i + 1}</td>
-                        <td style="border:1px solid #000; text-align:center;">${s.serviceName}</td>
-                        <td style="border:1px solid #000; text-align:center;">${s.description}</td>
-                        <td style="border:1px solid #000; text-align:center;">${s.price.toFixed(2)}</td>
-                    </tr>`;
+            let rows = '';
+            receipt.services.forEach((s, i) => {
+                rows += `<tr><td>${i + 1}</td><td>${s.serviceName}</td><td>${s.description}</td><td>${s.price.toFixed(2)}</td></tr>`;
             });
-
-            var currentDate = new Date().toLocaleDateString('en-GB');
-            var currentTime = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-
-            var html = `
-            <div style="width: 900px; margin: 50px auto; font-family: Arial, sans-serif; font-size: 14px; border:1px solid #000; padding:20px;">
-
-                <!-- ✅ Centered Logo -->
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                    <div style="flex:1; text-align:left; font-size:18px; font-weight:bold;">
-                        شرطة الفجيرة ق.ع.د<br />
-                        شؤون المالية
-                    </div>
-
-                    <div style="flex:1; text-align:center;">
-                        <img src="/images/logo1.png" alt="@Localizer["LogoAlt"]" style="height:80px;" />
-                    </div>
-
-                    <div style="flex:1; text-align:right; font-size:18px; font-weight:bold;">
-                        Fujairah Police G.H.Q<br />
-                        FINANCE AFFAIRS
-                    </div>
-                </div>
-
-                <div>
-                    <b>@Localizer["ReceiptNoLabel"]:</b> ${receipt.receiptID} <br/>
-                    <b>@Localizer["DateLabel"]:</b> ${currentDate} <br/>
-                    <b>@Localizer["TimeLabel"]:</b> ${currentTime}
-                </div>
-                <hr/>
-                <b>@Localizer["ReceivedFromLabel"]:</b> ${receipt.customerName}
-                <table style="width:100%; border-collapse:collapse; margin-top:10px;">
-                    <thead>
-                        <tr>
-                            <th style="border:1px solid #000;">@Localizer["NumberColumn"]</th>
-                            <th style="border:1px solid #000;">@Localizer["ServiceColumn"]</th>
-                            <th style="border:1px solid #000;">@Localizer["DescriptionColumn"]</th>
-                            <th style="border:1px solid #000;">@Localizer["PriceColumn"]</th>
-                        </tr>
-                    </thead>
-                    <tbody>${servicesRows}</tbody>
-                </table>
-
-                <!-- ✅ Total with currency logo -->
-                <div style="margin-top:10px; font-weight:bold; display:flex; align-items:center;">
-                    @Localizer["TotalAmountLabel"]:
-                    <span style="margin:0 5px;">${receipt.totalAmount.toFixed(2)}</span>
-                    <img src="/images/logo2.png" alt="Currency" style="height:20px; width:auto;">
-                </div>
-
-                <div style="margin-top:20px; text-align:right;">
-                    @Localizer["SuccessPartnerMessage"] <br/>
-                    @Localizer["ComplaintsSuggestionsMessage"] <br/>
-                    @Localizer["ContactEmail"]
-                </div>
-            </div>`;
-
-            var printWindow = window.open('', '', 'height=700,width=900');
-            printWindow.document.write(html);
-            printWindow.document.close();
-            printWindow.print();
+            const html = `
+                <div style="width:900px;margin:auto;padding:20px;border:1px solid #000;">
+                    <h3>Receipt #${receipt.receiptID}</h3>
+                    <p><strong>Customer:</strong> ${receipt.customerName}</p>
+                    <p><strong>Car:</strong> ${receipt.carNumber}</p>
+                    <table border="1" style="width:100%;border-collapse:collapse;">
+                        <thead><tr><th>#</th><th>Service</th><th>Description</th><th>Price</th></tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                    <h4>Total: ${receipt.totalAmount.toFixed(2)}</h4>
+                </div>`;
+            const w = window.open('', '', 'height=700,width=900');
+            w.document.write(html);
+            w.document.close();
+            w.print();
         }
     </script>
 }

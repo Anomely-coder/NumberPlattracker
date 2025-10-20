@@ -3,6 +3,8 @@ using CarMaintenance.Models;
 using CarMaintenance.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CarMaintenance.Controllers
@@ -16,7 +18,6 @@ namespace CarMaintenance.Controllers
             db = _db;
         }
 
-        // Show all receipts
         public IActionResult Index()
         {
             var data = db.Tbl_Receipts
@@ -26,7 +27,7 @@ namespace CarMaintenance.Controllers
             return View(data);
         }
 
-        // GET: AddReceipt
+        // ---------------- GET: Add Receipt ----------------
         public IActionResult AddReceipt()
         {
             var vm = new ReceiptViewModel
@@ -37,31 +38,16 @@ namespace CarMaintenance.Controllers
             return View(vm);
         }
 
-        // POST: AddReceipt
+        // ---------------- POST: Add Receipt ----------------
         [HttpPost]
         public IActionResult AddReceipt(ReceiptViewModel vm)
         {
-            if (!ModelState.IsValid)
-            {
-                ViewBag.Services = db.Tbl_Services.ToList();
-                return View(vm);
-            }
+            ViewBag.Services = db.Tbl_Services.ToList();
 
-            // Map NumberPlate to CarID (or create new Car)
-            int carId = 0;
-            if (!string.IsNullOrEmpty(vm.NumberPlate))
-            {
-                var car = db.Tbl_Cars.FirstOrDefault(c => c.NumberPlate == vm.NumberPlate);
-                if (car != null)
-                    carId = car.CarID;
-                else
-                {
-                    var newCar = new Cars { NumberPlate = vm.NumberPlate };
-                    db.Tbl_Cars.Add(newCar);
-                    db.SaveChanges();
-                    carId = newCar.CarID;
-                }
-            }
+            if (!ModelState.IsValid)
+                return View(vm);
+
+            int carId = vm.CarID;
 
             var receipt = new Receipts
             {
@@ -74,8 +60,7 @@ namespace CarMaintenance.Controllers
             db.Tbl_Receipts.Add(receipt);
             db.SaveChanges();
 
-            // Add services
-            List<object> servicesList = new List<object>();
+            var servicesList = new List<object>();
             if (vm.ServicesSelected != null && vm.ServicesSelected.Any())
             {
                 foreach (var item in vm.ServicesSelected)
@@ -96,27 +81,29 @@ namespace CarMaintenance.Controllers
                 db.SaveChanges();
             }
 
-            // Detect if request is AJAX (Save & Print)
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             {
+                var customer = db.Tbl_Customers
+                    .Include(c => c.Cars)
+                    .FirstOrDefault(c => c.CustomerID == vm.CustomerID);
+
+                var selectedCar = db.Tbl_Cars.FirstOrDefault(c => c.CarID == vm.CarID);
+
                 return Json(new
                 {
                     receiptID = receipt.ReceiptID,
                     date = receipt.Date.ToString("yyyy-MM-dd HH:mm"),
-                    customerName = db.Tbl_Customers.FirstOrDefault(c => c.CustomerID == vm.CustomerID)?.Name ?? "N/A",
-                    carNumber = vm.NumberPlate,
+                    customerName = customer?.Name ?? "N/A",
+                    carNumber = selectedCar?.NumberPlate ?? "N/A",
                     services = servicesList,
                     totalAmount = vm.TotalAmount
                 });
             }
 
-            // Normal form submit
-            ViewBag.Services = db.Tbl_Services.ToList();
-            return View(vm);
+            return RedirectToAction("Index");
         }
 
-
-        // JSON: Search customers for autocomplete
+        // ---------------- AJAX: Customer Search ----------------
         [HttpGet]
         public JsonResult SearchCustomers(string term)
         {
@@ -131,16 +118,35 @@ namespace CarMaintenance.Controllers
             return Json(customers);
         }
 
-        // JSON: Get car info by customer ID
+        // ---------------- AJAX: Get Cars for Selected Customer ----------------
         [HttpGet]
-        public JsonResult GetCarByCustomer(int customerId)
+        public JsonResult GetCarsByCustomer(int customerId)
         {
-            var customer = db.Tbl_Customers.Include(c => c.Cars).FirstOrDefault(c => c.CustomerID == customerId);
-            return Json(new
-            {
-                carId = customer?.CarID ?? 0,
-                NumberPlate = customer?.Cars?.NumberPlate ?? "N/A"
-            });
+            var cars = db.Tbl_Cars
+                         .Where(c => c.CustomerID == customerId)
+                         .Select(c => new
+                         {
+                             carId = c.CarID,
+                             numberPlate = c.NumberPlate
+                         })
+                         .ToList();
+            return Json(cars);
+        }
+
+        // ---------------- GET: Receipt Details ----------------
+        public IActionResult Details(int id)
+        {
+            var receipt = db.Tbl_Receipts
+                            .Include(r => r.Customers)
+                            .Include(r => r.Cars)
+                            .Include(r => r.ReceiptsDetails)
+                                .ThenInclude(rd => rd.Services)
+                            .FirstOrDefault(r => r.ReceiptID == id);
+
+            if (receipt == null)
+                return NotFound();
+
+            return View(receipt);
         }
     }
 }

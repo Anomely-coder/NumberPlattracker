@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CarMaintenance.Models
 {
@@ -15,9 +16,12 @@ namespace CarMaintenance.Models
         // 0 = Unregistered, 1 = Registered
         public int CarStatus { get; set; }
 
-        // Navigation
+        // ✅ Foreign key → Customer
+        public int? CustomerID { get; set; }
+
+        [ForeignKey("CustomerID")]
         [ValidateNever]
-        public ICollection<Customers> Customers { get; set; }
+        public Customers? Customer { get; set; }
 
         [ValidateNever]
         public ICollection<Receipts> Receipts { get; set; }
@@ -25,7 +29,7 @@ namespace CarMaintenance.Models
         [ValidateNever]
         public ICollection<TransferCars> TransferCars { get; set; }
 
-        // Computed property to show status as text
+        // Computed property
         public string StatusText => CarStatus == 1 ? "Registered" : "Unregistered";
     }
 }

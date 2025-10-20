@@ -1,4 +1,4 @@
-﻿@model Customers
+﻿@model CarMaintenance.Models.Customers
 @inject IViewLocalizer ViewLocalizer
 @using CarMaintenance
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
@@ -26,7 +26,7 @@
     <div class="container">
         <form method="post" asp-action="EditCustomer" asp-controller="Customers" id="customerForm">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input asp-for="CustomerID" hidden />
+            <input asp-for="CustomerID" type="hidden" />
 
             <div class="row my-2">
                 <div class="col-md-6 form-group">
@@ -58,20 +58,41 @@
                     <span class="text-danger" asp-validation-for="EmiratesID"></span>
                 </div>
 
-                <div class="col-md-6 form-group">
-                    <label asp-for="CarID">@Localizer["NumberPlate"]</label>
-                    <select class="form-control" asp-for="CarID" asp-items="ViewBag.Cars">
-                        <option value="">@Localizer["SelectNumberPlate"]</option>
-                    </select>
-                    <span class="text-danger" asp-validation-for="CarID"></span>
-                </div>
-
                 <div class="col-md-12 my-2">
                     <button type="submit" class="btn btn-primary">@Localizer["UpdateCustomerButton"]</button>
                     <button type="reset" class="btn btn-secondary">@Localizer["Reset"]</button>
                 </div>
             </div>
         </form>
+
+        <!-- ✅ Show customer's cars list -->
+        <div class="mt-4">
+            <h4>@Localizer["RegisteredNumberPlate"]</h4>
+
+            @if (Model.Cars != null && Model.Cars.Any())
+            {
+                <table class="table table-bordered table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>@Localizer["NumberPlate"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var car in Model.Cars)
+                        {
+                            <tr>
+                                <td>@car.NumberPlate</td>
+                                
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p class="text-muted">@Localizer["NoCarsFoundForThisCustomer"]</p>
+            }
+        </div>
     </div>
 </section>
 

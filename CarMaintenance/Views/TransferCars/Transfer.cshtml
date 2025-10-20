@@ -1,5 +1,5 @@
 ﻿@model CarMaintenance.Models.TransferCars
-@inject IViewLocalizer Localizer
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
 
 <!-- Content Header -->
@@ -36,14 +36,13 @@
                     <input type="hidden" id="FromCustomerID" name="FromCustomerID" asp-for="FromCustomerID" />
                 </div>
 
-                <!-- Number Plate -->
+                <!-- Number Plate Dropdown -->
                 <div class="col-md-6 form-group">
                     <label class="form-label">@Localizer["NumberPlate"]</label>
-                    <input type="text" class="form-control" id="NumberPlate" name="NumberPlate" readonly />
+                    <select class="form-control" id="NumberPlateDropdown" name="CarID" asp-for="CarID">
+                        <option value="">-- Select Number Plate --</option>
+                    </select>
                 </div>
-
-                <!-- Hidden Car ID -->
-                <input type="hidden" id="CarID" name="CarID" asp-for="CarID" />
 
                 <!-- To Customer -->
                 <div class="col-md-6 form-group">
@@ -80,7 +79,8 @@
 
     <script>
         $(document).ready(function () {
-            // From Customer autocomplete
+
+            // ✅ From Customer Autocomplete
             $("#FromCustomerName").autocomplete({
                 source: function (request, response) {
                     $.ajax({
@@ -92,9 +92,7 @@
                                 return {
                                     label: item.name + " | " + item.emiratesId + " | " + item.mobile,
                                     value: item.name,
-                                    id: item.customerID,
-                                    carID: item.carID,
-                                    numberPlate: item.numberPlate
+                                    id: item.customerID
                                 };
                             }));
                         }
@@ -104,13 +102,26 @@
                 select: function (event, ui) {
                     $("#FromCustomerID").val(ui.item.id);
                     $("#FromCustomerName").val(ui.item.value);
-                    $("#NumberPlate").val(ui.item.numberPlate);
-                    $("#CarID").val(ui.item.carID);
+
+                    // ✅ Fetch number plates for selected customer
+                    $.ajax({
+                        url: '/TransferCars/GetNumberPlates',
+                        type: 'GET',
+                        data: { customerId: ui.item.id },
+                        success: function (plates) {
+                            const dropdown = $("#NumberPlateDropdown");
+                            dropdown.empty();
+                            dropdown.append('<option value="">-- Select Number Plate --</option>');
+                            $.each(plates, function (i, plate) {
+                                dropdown.append('<option value="' + plate.carID + '">' + plate.numberPlate + '</option>');
+                            });
+                        }
+                    });
                     return false;
                 }
             });
 
-            // To Customer autocomplete
+            // ✅ To Customer Autocomplete
             $("#ToCustomerName").autocomplete({
                 source: function (request, response) {
                     $.ajax({

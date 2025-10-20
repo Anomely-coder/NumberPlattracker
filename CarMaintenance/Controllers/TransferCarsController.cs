@@ -1,8 +1,9 @@
 ﻿using CarMaintenance.Data;
 using CarMaintenance.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
 
 namespace CarMaintenance.Controllers
 {
@@ -15,7 +16,7 @@ namespace CarMaintenance.Controllers
             db = _db;
         }
 
-        // List of transfers
+        // ✅ List all car transfers
         public IActionResult Index()
         {
             var data = db.Tbl_TransferCars
@@ -27,7 +28,7 @@ namespace CarMaintenance.Controllers
             return View(data);
         }
 
-        // Show transfer form
+        // ✅ Show transfer form
         public IActionResult Transfer()
         {
             var model = new TransferCars
@@ -37,11 +38,14 @@ namespace CarMaintenance.Controllers
             return View(model);
         }
 
-        // Autocomplete API
+        // ✅ Autocomplete API for customer search
         [HttpGet]
         public IActionResult SearchCustomers(string term)
         {
+            term = term?.Trim() ?? "";
+
             var customers = db.Tbl_Customers
+                .Include(c => c.Cars)
                 .Where(c =>
                     c.Name.Contains(term) ||
                     c.EmiratesID.Contains(term) ||
@@ -51,33 +55,61 @@ namespace CarMaintenance.Controllers
                     customerID = c.CustomerID,
                     name = c.Name,
                     emiratesId = c.EmiratesID,
-                    mobile = c.MobileNumber,
-                    carID = c.CarID,
-                    numberPlate = c.Cars != null ? c.Cars.NumberPlate : ""
+                    mobile = c.MobileNumber
                 })
                 .ToList();
 
             return Json(customers);
         }
 
-        // Save transfer
+        // ✅ Fetch Number Plates for a selected customer
+        [HttpGet]
+        public IActionResult GetNumberPlates(int customerId)
+        {
+            var plates = db.Tbl_Cars
+                .Where(c => c.CustomerID == customerId)
+                .Select(c => new
+                {
+                    carID = c.CarID,
+                    numberPlate = c.NumberPlate
+                })
+                .ToList();
+
+            return Json(plates);
+        }
+
+        // ✅ Save transfer
         [HttpPost]
         public IActionResult Transfer(TransferCars model)
         {
             if (ModelState.IsValid)
             {
-                var fromCustomer = db.Tbl_Customers.Find(model.FromCustomerID);
-                var toCustomer = db.Tbl_Customers.Find(model.ToCustomerID);
+                var car = db.Tbl_Cars.FirstOrDefault(c => c.CarID == model.CarID);
+
+                if (car == null)
+                {
+                    TempData["error"] = "Car not found.";
+                    return View(model);
+                }
+
+                var fromCustomer = db.Tbl_Customers
+                    .Include(c => c.Cars)
+                    .FirstOrDefault(c => c.CustomerID == model.FromCustomerID);
+
+                var toCustomer = db.Tbl_Customers
+                    .Include(c => c.Cars)
+                    .FirstOrDefault(c => c.CustomerID == model.ToCustomerID);
 
                 if (fromCustomer != null && toCustomer != null)
                 {
-                    // 1. Remove car from old customer
-                    fromCustomer.CarID = null;
+                    if (car.CustomerID != fromCustomer.CustomerID)
+                    {
+                        TempData["error"] = "This car does not belong to the selected source customer.";
+                        return View(model);
+                    }
 
-                    // 2. Assign car to new customer
-                    toCustomer.CarID = model.CarID;
+                    car.CustomerID = toCustomer.CustomerID;
 
-                    // 3. Save transfer record
                     db.Tbl_TransferCars.Add(model);
                     db.SaveChanges();
 

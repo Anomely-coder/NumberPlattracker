@@ -53,9 +53,15 @@
                             </div>
                             <div class="card-body">
                                 <p><strong>@Localizer["Email"]:</strong> @r.Customer.Email</p>
-                                <p><strong>@Localizer["EmiratesId"]:</strong> @r.Customer.EmiratesID</p>
-                                <p><strong>@Localizer["Mobile"]:</strong> @r.Customer.MobileNumber</p>
-                                <p><strong>@Localizer["NumberPlate"]:</strong> @r.Customer.Cars?.NumberPlate</p>
+                                <p><strong>@Localizer["EmiratesID"]:</strong> @r.Customer.EmiratesID</p>
+                                <p><strong>@Localizer["MobileNumber"]:</strong> @r.Customer.MobileNumber</p>
+                                <p>
+                                    <strong>@Localizer["NumberPlate"]:</strong>
+                                    @{
+                                        var plates = r.Customer?.Cars?.Select(c => c.NumberPlate).ToList();
+                                    }
+                                    @(plates != null && plates.Any() ? string.Join(", ", plates) : "N/A")
+                                </p>
 
                                 @* Receipts *@
                                 @if (r.Customer.Receipts?.Any() ?? false)
@@ -74,7 +80,12 @@
                                             {
                                                 <tr>
                                                     <td>@rec.Date.ToShortDateString()</td>
-                                                    <td>@rec.TotalAmount.ToString("F2")</td>
+                                                    <td>
+                                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                                            <img src="~/images/logo2.png" alt="Logo" style="width: 20px; height: 20px;" />
+                                                            <span>@rec.TotalAmount.ToString("F2")</span>
+                                                        </div>
+                                                    </td>
                                                     <td>
                                                         <ul class="mb-0">
                                                             @foreach (var d in rec.ReceiptsDetails)

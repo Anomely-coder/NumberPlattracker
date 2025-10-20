@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CarMaintenance.Models
 {
@@ -21,21 +22,19 @@ namespace CarMaintenance.Models
 
         [Required]
         [RegularExpression(@"^05\d{8}$", ErrorMessage = "Mobile number must start with 05 and be 10 digits long.")]
-        public string MobileNumber { get; set; }   // 📱 New field
-
-        public int? CarID { get; set; }
-
-        [ForeignKey("CarID")]
-        public Cars? Cars { get; set; }
+        public string MobileNumber { get; set; }
 
         public int CustomerStatus { get; set; }
 
-        // ✅ New fields for Date & Time
         [DataType(DataType.DateTime)]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         [DataType(DataType.DateTime)]
         public DateTime? UpdatedAt { get; set; }
+
+        // ✅ One Customer → Many Cars
+        [ValidateNever]
+        public ICollection<Cars> Cars { get; set; }
 
         [ValidateNever]
         public ICollection<Receipts> Receipts { get; set; }
