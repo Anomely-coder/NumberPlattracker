@@ -777,4 +777,22 @@
   <data name="Reset" xml:space="preserve">
     <value>إعادة ضبط</value>
   </data>
+  <data name="AssignNumberPlateTitle" xml:space="preserve">
+    <value>تخصيص لوحة الأرقام</value>
+  </data>
+  <data name="String1TransferNumberPlateTitle" xml:space="preserve">
+    <value>لوحة رقم النقل</value>
+  </data>
+  <data name="Assign To Customer" xml:space="preserve">
+    <value>تعيين للعميل</value>
+  </data>
+  <data name="Assign Number Plate" xml:space="preserve">
+    <value>تخصيص لوحة الأرقام</value>
+  </data>
+  <data name="Transfer Number Plate" xml:space="preserve">
+    <value>لوحة رقم النقل</value>
+  </data>
+  <data name="AssignCarButton" xml:space="preserve">
+    <value>تعيين سيارة</value>
+  </data>
 </root>

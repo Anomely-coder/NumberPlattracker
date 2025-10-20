@@ -774,4 +774,22 @@
   <data name="Reset" xml:space="preserve">
     <value>Reset</value>
   </data>
+  <data name="AssignNumberPlateTitle" xml:space="preserve">
+    <value>Assign Number Plate</value>
+  </data>
+  <data name="String1TransferNumberPlateTitle" xml:space="preserve">
+    <value>Transfer Number Plate</value>
+  </data>
+  <data name="Assign To Customer" xml:space="preserve">
+    <value>Assign To Customer</value>
+  </data>
+  <data name="Assign Number Plate" xml:space="preserve">
+    <value>Assign Number Plate</value>
+  </data>
+  <data name="Transfer Number Plate" xml:space="preserve">
+    <value>Transfer Number Plate</value>
+  </data>
+  <data name="AssignCarButton" xml:space="preserve">
+    <value>Assign Car</value>
+  </data>
 </root>

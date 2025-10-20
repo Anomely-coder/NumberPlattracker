@@ -50,7 +50,11 @@
                                 <th>@item.ServiceID</th>
                                 <td>@item.ServiceName</td>
                                 <td>@item.Description</td>
-                                <td>@item.Price</td>
+                                <td>
+                                    @item.Price
+                                    <img src="~/images/logo2.png" alt="Logo" style="height:20px; width:auto; margin-right:5px;" />
+                                    
+                                </td>
                                 <td>
                                     <a class="text-primary fas fa-pen"
                                        asp-action="EditService"

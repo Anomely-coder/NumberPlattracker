@@ -1,5 +1,6 @@
 ﻿using CarMaintenance.Data;
 using CarMaintenance.Models;
+using iText.Commons.Actions.Contexts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -29,12 +30,13 @@ namespace CarMaintenance.Controllers
         }
 
         // ✅ Show transfer form
-        public IActionResult Transfer()
+        public IActionResult Transfer(string mode = "transfer")
         {
             var model = new TransferCars
             {
                 TransferDate = DateTime.Now
             };
+            ViewBag.Mode = mode; // "transfer" or "assign"
             return View(model);
         }
 
@@ -62,7 +64,7 @@ namespace CarMaintenance.Controllers
             return Json(customers);
         }
 
-        // ✅ Fetch Number Plates for a selected customer
+        // ✅ Fetch Number Plates for a selected customer (used in Transfer mode)
         [HttpGet]
         public IActionResult GetNumberPlates(int customerId)
         {
@@ -78,29 +80,69 @@ namespace CarMaintenance.Controllers
             return Json(plates);
         }
 
-        // ✅ Save transfer
+        // ✅ Fetch unassigned cars (used in Assign mode)
+        [HttpGet]
+        public IActionResult GetUnassignedCars()
+        {
+            // ✅ Only cars that are not assigned to any customer
+            var unassignedCars = db.Tbl_Cars
+                .Where(c => c.CustomerID == null)
+                .Select(c => new
+                {
+                    carID = c.CarID,
+                    numberPlate = c.NumberPlate
+                })
+                .ToList();
+
+            return Json(unassignedCars);
+        }
+
+        // ✅ Save transfer or assignment
         [HttpPost]
-        public IActionResult Transfer(TransferCars model)
+        public IActionResult Transfer(TransferCars model, string mode = "transfer")
         {
             if (ModelState.IsValid)
             {
                 var car = db.Tbl_Cars.FirstOrDefault(c => c.CarID == model.CarID);
-
                 if (car == null)
                 {
                     TempData["error"] = "Car not found.";
                     return View(model);
                 }
 
+                // === ASSIGN MODE ===
+                if (mode == "assign")
+                {
+                    var toCustomer = db.Tbl_Customers.FirstOrDefault(c => c.CustomerID == model.ToCustomerID);
+                    if (toCustomer == null)
+                    {
+                        TempData["error"] = "Target customer not found.";
+                        return View(model);
+                    }
+
+                    if (car.CustomerID != null)
+                    {
+                        TempData["error"] = "This car is already assigned.";
+                        return View(model);
+                    }
+
+                    car.CustomerID = toCustomer.CustomerID;
+                    db.SaveChanges();
+
+                    TempData["success"] = "Car assigned successfully.";
+                    return RedirectToAction("Index");
+                }
+
+                // === TRANSFER MODE ===
                 var fromCustomer = db.Tbl_Customers
                     .Include(c => c.Cars)
                     .FirstOrDefault(c => c.CustomerID == model.FromCustomerID);
 
-                var toCustomer = db.Tbl_Customers
+                var toCust = db.Tbl_Customers
                     .Include(c => c.Cars)
                     .FirstOrDefault(c => c.CustomerID == model.ToCustomerID);
 
-                if (fromCustomer != null && toCustomer != null)
+                if (fromCustomer != null && toCust != null)
                 {
                     if (car.CustomerID != fromCustomer.CustomerID)
                     {
@@ -108,8 +150,7 @@ namespace CarMaintenance.Controllers
                         return View(model);
                     }
 
-                    car.CustomerID = toCustomer.CustomerID;
-
+                    car.CustomerID = toCust.CustomerID;
                     db.Tbl_TransferCars.Add(model);
                     db.SaveChanges();
 

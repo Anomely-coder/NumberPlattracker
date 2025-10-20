@@ -2,18 +2,20 @@
 @inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
 
+@{
+    var mode = ViewBag.Mode as string ?? "transfer";
+}
+
 <!-- Content Header -->
 <section class="content-header">
     <div class="container-fluid">
         <div class="row mb-2">
             <div class="col-sm-6">
-                <h1>@Localizer["TransferCarsTitle"]</h1>
+                <h1>@(mode == "assign" ? Localizer["AssignNumberPlateTitle"] : Localizer["TransferNumberPlateTitle"])</h1>
             </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="#">@Localizer["Home"]</a></li>
-                    <li class="breadcrumb-item active">@Localizer["TransferCars"]</li>
-                </ol>
+            <div class="col-sm-6 text-right">
+                <a asp-action="Transfer" asp-route-mode="transfer" class="btn btn-outline-primary btn-sm">@Localizer["Transfer Number Plate"]</a>
+                <a asp-action="Transfer" asp-route-mode="assign" class="btn btn-outline-success btn-sm">@Localizer["Assign Number Plate"]</a>
             </div>
         </div>
         <hr />
@@ -24,17 +26,21 @@
 <section class="content">
     <div class="container">
         <form method="post" asp-action="Transfer" asp-controller="TransferCars">
-            <div class="row my-2">
+            <input type="hidden" name="mode" value="@mode" />
 
-                <!-- From Customer -->
-                <div class="col-md-6 form-group">
-                    <label class="form-label">
-                        @Localizer["From"]
-                        <span class="text-danger fw-bold" asp-validation-for="FromCustomerID"></span>
-                    </label>
-                    <input type="text" id="FromCustomerName" class="form-control" placeholder="@Localizer["TypeCustomerName,E-Id,Mobile"]" />
-                    <input type="hidden" id="FromCustomerID" name="FromCustomerID" asp-for="FromCustomerID" />
-                </div>
+            <div class="row my-2">
+                @if (mode == "transfer")
+                {
+                    <!-- From Customer -->
+                    <div class="col-md-6 form-group">
+                        <label class="form-label">
+                            @Localizer["From"]
+                            <span class="text-danger fw-bold" asp-validation-for="FromCustomerID"></span>
+                        </label>
+                        <input type="text" id="FromCustomerName" class="form-control" placeholder="@Localizer["TypeCustomerName,E-Id,Mobile"]" />
+                        <input type="hidden" id="FromCustomerID" name="FromCustomerID" asp-for="FromCustomerID" />
+                    </div>
+                }
 
                 <!-- Number Plate Dropdown -->
                 <div class="col-md-6 form-group">
@@ -47,7 +53,7 @@
                 <!-- To Customer -->
                 <div class="col-md-6 form-group">
                     <label class="form-label">
-                        @Localizer["To"]
+                        @(mode == "assign" ? Localizer["Assign To Customer"] : Localizer["To"])
                         <span class="text-danger fw-bold" asp-validation-for="ToCustomerID"></span>
                     </label>
                     <input type="text" id="ToCustomerName" class="form-control" placeholder="@Localizer["TypeCustomerName,E-Id,Mobile"]" />
@@ -65,7 +71,9 @@
 
                 <!-- Buttons -->
                 <div class="col-md-12 my-2">
-                    <button type="submit" class="btn btn-primary mr-2">@Localizer["TransferCarButton"]</button>
+                    <button type="submit" class="btn btn-primary mr-2">
+                        @(mode == "assign" ? Localizer["AssignCarButton"] : Localizer["TransferCarButton"])
+                    </button>
                     <button type="reset" class="btn btn-secondary">@Localizer["ResetButton"]</button>
                 </div>
             </div>
@@ -79,47 +87,64 @@
 
     <script>
         $(document).ready(function () {
+            var mode = '@mode';
 
-            // ✅ From Customer Autocomplete
-            $("#FromCustomerName").autocomplete({
-                source: function (request, response) {
-                    $.ajax({
-                        url: '/TransferCars/SearchCustomers',
-                        type: 'GET',
-                        data: { term: request.term },
-                        success: function (data) {
-                            response($.map(data, function (item) {
-                                return {
-                                    label: item.name + " | " + item.emiratesId + " | " + item.mobile,
-                                    value: item.name,
-                                    id: item.customerID
-                                };
-                            }));
-                        }
-                    });
-                },
-                minLength: 1,
-                select: function (event, ui) {
-                    $("#FromCustomerID").val(ui.item.id);
-                    $("#FromCustomerName").val(ui.item.value);
+            if (mode === "transfer") {
+                // ✅ From Customer Autocomplete
+                $("#FromCustomerName").autocomplete({
+                    source: function (request, response) {
+                        $.ajax({
+                            url: '/TransferCars/SearchCustomers',
+                            type: 'GET',
+                            data: { term: request.term },
+                            success: function (data) {
+                                response($.map(data, function (item) {
+                                    return {
+                                        label: item.name + " | " + item.emiratesId + " | " + item.mobile,
+                                        value: item.name,
+                                        id: item.customerID
+                                    };
+                                }));
+                            }
+                        });
+                    },
+                    minLength: 1,
+                    select: function (event, ui) {
+                        $("#FromCustomerID").val(ui.item.id);
+                        $("#FromCustomerName").val(ui.item.value);
 
-                    // ✅ Fetch number plates for selected customer
-                    $.ajax({
-                        url: '/TransferCars/GetNumberPlates',
-                        type: 'GET',
-                        data: { customerId: ui.item.id },
-                        success: function (plates) {
-                            const dropdown = $("#NumberPlateDropdown");
-                            dropdown.empty();
-                            dropdown.append('<option value="">-- Select Number Plate --</option>');
-                            $.each(plates, function (i, plate) {
-                                dropdown.append('<option value="' + plate.carID + '">' + plate.numberPlate + '</option>');
-                            });
-                        }
-                    });
-                    return false;
-                }
-            });
+                        // ✅ Fetch number plates for selected customer
+                        $.ajax({
+                            url: '/TransferCars/GetNumberPlates',
+                            type: 'GET',
+                            data: { customerId: ui.item.id },
+                            success: function (plates) {
+                                const dropdown = $("#NumberPlateDropdown");
+                                dropdown.empty();
+                                dropdown.append('<option value="">-- Select Number Plate --</option>');
+                                $.each(plates, function (i, plate) {
+                                    dropdown.append('<option value="' + plate.carID + '">' + plate.numberPlate + '</option>');
+                                });
+                            }
+                        });
+                        return false;
+                    }
+                });
+            } else {
+                // ✅ Assign mode: Fetch unassigned cars
+                $.ajax({
+                    url: '/TransferCars/GetUnassignedCars',
+                    type: 'GET',
+                    success: function (plates) {
+                        const dropdown = $("#NumberPlateDropdown");
+                        dropdown.empty();
+                        dropdown.append('<option value="">-- Select Unassigned Car --</option>');
+                        $.each(plates, function (i, plate) {
+                            dropdown.append('<option value="' + plate.carID + '">' + plate.numberPlate + '</option>');
+                        });
+                    }
+                });
+            }
 
             // ✅ To Customer Autocomplete
             $("#ToCustomerName").autocomplete({

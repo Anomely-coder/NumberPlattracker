@@ -45,32 +45,26 @@
                 <!-- Mobile Number -->
                 <div class="col-md-6 form-group">
                     <label asp-for="MobileNumber">@Localizer["MobileNumber"]</label>
-                    <input class="form-control" asp-for="MobileNumber"
+                    <input class="form-control"
+                           asp-for="MobileNumber"
+                           id="MobileNumber"
                            placeholder="05XXX XXXXX"
-                           maxlength="11"
-                           pattern="^05\d{8}$"
-                           title="Mobile number must start with 05 and be 10 digits long"
-                           oninput="formatMobile(this)"
-                           onblur="this.value=this.value.replace(/\s/g,'')" />
+                           maxlength="10"
+                           title="Mobile number must start with 05 and be 10 digits long" />
+                    <small class="form-text text-muted">
+                        Example: 0501234567
+                    </small>
                     <span class="text-danger" asp-validation-for="MobileNumber"></span>
                 </div>
 
                 <!-- Emirates ID -->
                 <div class="col-md-6 form-group">
                     <label asp-for="EmiratesID">@Localizer["EmiratesID"]</label>
-                    <input class="form-control" asp-for="EmiratesID"
+                    <input class="form-control"
+                           asp-for="EmiratesID"
                            maxlength="18"
                            oninput="formatEmiratesID(this)" />
                     <span class="text-danger" asp-validation-for="EmiratesID"></span>
-                </div>
-
-                <!-- Multi Car Selection -->
-                <div class="col-md-6 form-group">
-                    <label>@Localizer["NumberPlate"]</label>
-                    <select class="form-control" multiple name="selectedCarIDs" asp-items="ViewBag.Cars">
-                        <option disabled>@Localizer["SelectNumberPlate"]</option>
-                    </select>
-                    <small class="text-muted">@Localizer["Hold Ctrl To Select Multiple"]</small>
                 </div>
 
                 <!-- Buttons -->
@@ -87,7 +81,7 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-        // Format Emirates ID as XXXX-XXXX-XXXXXXX-X
+        // ✅ Emirates ID formatting (xxxx-xxxx-xxxxxxx-x)
         function formatEmiratesID(input) {
             let value = input.value.replace(/\D/g, '');
             let formatted = '';
@@ -98,24 +92,54 @@
             input.value = formatted.slice(0, 18);
         }
 
-        // Format Mobile Number as 05XXX XXXXX
-        function formatMobile(input) {
-            let value = input.value.replace(/\D/g, '');
-            if (!value.startsWith("05")) {
-                value = "05" + value.replace(/^0+/, "");
-            }
-            value = value.slice(0, 10);
-            if (value.length > 5) {
-                input.value = value.slice(0, 5) + " " + value.slice(5);
-            } else {
-                input.value = value;
-            }
-        }
+        // ✅ Mobile number logic
+        document.addEventListener("DOMContentLoaded", function () {
+            const mobileInput = document.getElementById("MobileNumber");
 
-        // Remove spaces before submitting
-        document.getElementById("customerForm").addEventListener("submit", function () {
-            const mobileInput = document.querySelector("[name='MobileNumber']");
-            mobileInput.value = mobileInput.value.replace(/\s/g, "");
+            // Auto-insert 05 when focus
+            mobileInput.addEventListener("focus", function () {
+                if (!mobileInput.value.startsWith("05")) {
+                    mobileInput.value = "05";
+                }
+            });
+
+            mobileInput.addEventListener("input", function () {
+                let value = mobileInput.value.replace(/\D/g, "");
+
+                // Always start with 05
+                if (!value.startsWith("05")) {
+                    value = "05" + value.replace(/^0+/, "");
+                }
+
+                // Limit to 10 digits
+                value = value.slice(0, 10);
+
+                // Update the visible value
+                mobileInput.value = value;
+
+                // Validate only when 10 digits are filled
+                const regex = /^05\d{8}$/;
+                if (regex.test(value)) {
+                    mobileInput.setCustomValidity(""); // valid
+                } else {
+                    mobileInput.setCustomValidity(""); // no redline while typing
+                }
+            });
+
+            // On blur, check validity finally
+            mobileInput.addEventListener("blur", function () {
+                const regex = /^05\d{8}$/;
+                if (!regex.test(mobileInput.value)) {
+                    mobileInput.setCustomValidity("Mobile number must start with 05 and be 10 digits long.");
+                } else {
+                    mobileInput.setCustomValidity("");
+                }
+            });
+
+            // Before submit: remove spaces (if any)
+            document.getElementById("customerForm").addEventListener("submit", function () {
+                mobileInput.value = mobileInput.value.replace(/\s/g, "");
+            });
         });
     </script>
 }
