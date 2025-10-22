@@ -1,5 +1,5 @@
 ﻿@model CarMaintenance.Models.TransferCars
-@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer ViewLocalizer
 @inject Microsoft.Extensions.Localization.IStringLocalizer<SharedResource> Localizer
 
 @{
@@ -60,13 +60,23 @@
                     <input type="hidden" id="ToCustomerID" name="ToCustomerID" asp-for="ToCustomerID" />
                 </div>
 
-                <!-- Transfer Date -->
+                <!-- ✅ Transfer Date (updated) -->
                 <div class="col-md-6 form-group">
                     <label class="form-label">
                         @Localizer["TransferDate"]
                         <span class="text-danger fw-bold" asp-validation-for="TransferDate"></span>
                     </label>
-                    <input class="form-control" asp-for="TransferDate" />
+                    <div class="input-group">
+                        <input class="form-control"
+                               id="TransferDate"
+                               name="TransferDate"
+                               type="text"
+                               value="@(Model.TransferDate.ToString("MM/dd/yyyy hh:mm tt"))"
+                               placeholder="Select Date and Time" />
+                        <div class="input-group-append">
+                            <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Buttons -->
@@ -82,12 +92,26 @@
 </section>
 
 @section Scripts {
+    <!-- ✅ Include jQuery and jQuery UI -->
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
+    <!-- ✅ Include jQuery UI Timepicker Addon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-ui-timepicker-addon/1.6.3/jquery-ui-timepicker-addon.min.js"></script>
 
     <script>
         $(document).ready(function () {
             var mode = '@mode';
+
+            // ✅ Initialize DateTime Picker
+            $('#TransferDate').datetimepicker({
+                dateFormat: 'mm/dd/yy',
+                timeFormat: 'hh:mm tt',
+                showSecond: false,
+                stepMinute: 1,
+                stepSecond: 0
+            });
 
             if (mode === "transfer") {
                 // ✅ From Customer Autocomplete

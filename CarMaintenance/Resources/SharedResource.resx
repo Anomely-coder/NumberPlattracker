@@ -790,6 +790,6 @@
     <value>Transfer Number Plate</value>
   </data>
   <data name="AssignCarButton" xml:space="preserve">
-    <value>Assign Car</value>
+    <value>Assign Number Plate</value>
   </data>
 </root>
